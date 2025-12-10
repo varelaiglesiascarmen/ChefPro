@@ -1,0 +1,1 @@
+I added this text to the rest of README.md to force the upload of folders because GitHub does not allow empty folders to be uploaded.
