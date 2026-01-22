@@ -1,0 +1,45 @@
+<nav class="navbar">
+  <button class="hamburger-btn" (click)="toggleMenu()">
+    <span class="menu-icon">≡</span>
+  </button>
+
+  <div class="nav-links" [class.open]="isMenuOpen">
+    <button class="close-btn" (click)="toggleMenu()">✕</button>
+
+    <a routerLink="/homepage" (click)="isMenuOpen = false">Inicio</a>
+    <a routerLink="/aboutUs" (click)="isMenuOpen = false">Sobre nosotros</a>
+    <a routerLink="/contact" (click)="isMenuOpen = false">Contacto</a>
+    <a routerLink="/login" (click)="isMenuOpen = false">Únete</a>
+  </div>
+
+  <div class="nav-actions">
+    <div class="search-box">
+      <button class="filter-menu-btn" (click)="$event.stopPropagation(); toggleFilterMenu()">
+        <span class="menu-icon" [style.color]="hasFilterActive ? '#A67C00' : 'inherit'">{{ showFilterMenu ? '▽' : '▷'
+          }}</span>
+      </button>
+
+      <input type="text" placeholder="Buscar..." [(ngModel)]="searchText" (keyup.enter)="performSearch()"
+        class="search-input" appFocusOnInit>
+
+      <button class="search-submit-btn" (click)="toggleSearch()">
+        <img src="/logos/magnifier.svg" alt="Buscar" class="search-icon-svg">
+      </button>
+
+      <!-- Filter dropdown -->
+      <div class="filter-dropdown-container" *ngIf="showFilterMenu">
+        <app-search-filter (close)="showFilterMenu = false" (apply)="onFilterApplied($event)">
+        </app-search-filter>
+      </div>
+    </div>
+
+    <button class="user-btn" (click)="goToProfile()" id="user-img-btn">
+      <!-- User profile image control -->
+      <img [src]="userProfileImage" (error)="handleImageError($event)" alt="Usuario" class="user-svg"
+        style="object-fit: cover; border-radius: 50%;">
+    </button>
+  </div>
+
+  <div class="sidebar-overlay" *ngIf="isMenuOpen" (click)="toggleMenu()"></div>
+
+</nav>

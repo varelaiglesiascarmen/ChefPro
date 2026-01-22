@@ -1,0 +1,31 @@
+<div class="login-page">
+  <div class="login-container">
+
+    <div class="logo-section">
+      <img src="/logos/largeWebsiteLogo.svg" alt="Chef Pro Logo" class="main-logo">
+    </div>
+
+    <div class="form-section">
+      <div class="form-wrapper">
+        <h2 class="title">¡Hola, nos encanta verte de nuevo aquí!</h2>
+
+        <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
+          <input type="text" name="username" [(ngModel)]="loginData.username"
+                 placeholder="Nombre de usuario" required appFocusOnInit>
+
+          <input type="password" name="password" [(ngModel)]="loginData.password"
+                 placeholder="****************" required appFocusOnInit>
+
+          <a href="#" class="forgot-link">¿Has olvidado tu contraseña?</a>
+
+          <button type="submit" class="btn-submit">Iniciar sesión</button>
+
+          <p class="register-footer">
+            * Si todavía no tienes cuenta, <a href="#">regístrate aquí</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
