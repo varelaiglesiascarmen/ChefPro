@@ -1,0 +1,32 @@
+/* code in processs*/
+
+.footer {
+  background-color: var(--dark-brown);
+  color: white;
+  padding: 40px 100px;
+  margin-top: auto;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.column h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.column a {
+  display: block;
+  color: #ddd;
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+
+.copyright {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
