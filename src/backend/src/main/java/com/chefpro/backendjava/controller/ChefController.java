@@ -1,10 +1,11 @@
 package com.chefpro.backendjava.controller;
 
-import com.chefpro.backendjava.entity.Menu;
 import com.chefpro.backendjava.service.MenuService;
+import com.chefpro.backendjava.controller.dto.MenuDTO;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -18,20 +19,15 @@ public class ChefController {
     }
 
     @GetMapping("/menus")
-    public List<Menu> getMenusDelChef(Principal principal) {
-        String chefUsername = principal.getName();
-        return menuService.listarPorChef(chefUsername);
+    public List<MenuDTO> getMenusDelChef(Authentication authentication) {
+
+        return menuService.listarPorChef(authentication);
     }
 
 
     @PostMapping("/menus")
-    public Menu crearMenu(@RequestBody Menu menu, Principal principal) {
-        String chefUsername = principal.getName();
-        return menuService.crearMenu(
-                menu.getNombre(),
-                menu.getDescripcion(),
-                menu.getPrecio(),
-                chefUsername
-        );
+    public ResponseEntity<MenuDTO> crearMenu(@RequestBody MenuDTO menuDto, Authentication authentication) {
+
+        return ResponseEntity.status(200).build();
     }
 }

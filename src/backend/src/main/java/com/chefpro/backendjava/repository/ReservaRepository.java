@@ -1,15 +1,15 @@
 package com.chefpro.backendjava.repository;
 
-import com.chefpro.backendjava.entity.Reserva;
+import com.chefpro.backendjava.repository.entity.reservations;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+public interface ReservaRepository extends JpaRepository<reservations, Long> {
 
     // Ver reservas de un comensal
-    List<Reserva> findByComensalUsername(String comensalUsername);
+    List<reservations> findByComensalUsername(String comensalUsername);
 
     // (Opcional) Ver reservas de un chef
-    List<Reserva> findByChefUsername(String chefUsername);
+    List<reservations> findByChefUsername(String chefUsername);
 }

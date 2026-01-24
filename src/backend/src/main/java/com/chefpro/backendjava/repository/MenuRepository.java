@@ -1,6 +1,6 @@
 package com.chefpro.backendjava.repository;
 
-import com.chefpro.backendjava.entity.Menu;
+import com.chefpro.backendjava.repository.entity.Menu;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

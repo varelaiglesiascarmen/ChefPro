@@ -1,7 +1,7 @@
 package com.chefpro.backendjava.service; // ajusta a tu package real
 
-import com.chefpro.backendjava.entity.Menu;
-import com.chefpro.backendjava.entity.Reserva;
+import com.chefpro.backendjava.repository.entity.Menu;
+import com.chefpro.backendjava.repository.entity.reservations;
 import com.chefpro.backendjava.repository.MenuRepository;
 import com.chefpro.backendjava.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
@@ -23,15 +23,15 @@ public class ReservaService {
     /**
      * Crear una reserva para un menú concreto, hecha por un comensal.
      */
-    public Reserva crearReserva(Long menuId, String comensalUsername, Integer numeroComensales) {
+    public reservations crearReserva(Long menuId, String comensalUsername, Integer numeroComensales) {
 
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new IllegalArgumentException("Menú no encontrado con id: " + menuId));
 
-        Reserva reserva = new Reserva();
+        reservations reserva = new reservations();
         reserva.setMenu(menu);
         reserva.setComensalUsername(comensalUsername);
-        reserva.setChefUsername(menu.getChefUsername());
+        //reserva.setChefUsername(menu.get());
         reserva.setFechaReserva(LocalDateTime.now());
         reserva.setNumeroComensales(numeroComensales);
         reserva.setEstado("PENDIENTE");
@@ -42,14 +42,14 @@ public class ReservaService {
     /**
      * Listar reservas de un comensal (por si quieres mostrarle su histórico).
      */
-    public List<Reserva> listarPorComensal(String comensalUsername) {
+    public List<reservations> listarPorComensal(String comensalUsername) {
         return reservaRepository.findByComensalUsername(comensalUsername);
     }
 
     /**
      * (Opcional) Listar reservas de un chef.
      */
-    public List<Reserva> listarPorChef(String chefUsername) {
+    public List<reservations> listarPorChef(String chefUsername) {
         return reservaRepository.findByChefUsername(chefUsername);
     }
 }
