@@ -1,22 +1,21 @@
 package com.chefpro.backendjava.controller;
 
-import com.chefpro.backendjava.controller.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.security.JwtUtil;
+import com.chefpro.backendjava.controller.dto.login.LoginRequestDto;
+import com.chefpro.backendjava.controller.dto.login.LoginResponseDto;
+import com.chefpro.backendjava.controller.dto.login.UserLoginDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("api/auth")
 public class LoginController {
 
 
@@ -29,29 +28,59 @@ public class LoginController {
         this.jwtUtil = jwtUtil;
     }
 
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDto request){
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+  @PostMapping("/login")
+  public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request){
 
-        UserDetails user = (UserDetails) authentication.getPrincipal();
+    Authentication authentication = authenticationManager.authenticate(
+      new UsernamePasswordAuthenticationToken(
+        request.getUsername(),
+        request.getPassword()
+      )
+    );
 
-        String token = jwtUtil.generateToken(user);
+    UserDetails user = (UserDetails) authentication.getPrincipal();
 
-        String role = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .findFirst()
-                .orElse(null);
+    String token = jwtUtil.generateToken(user);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("username", user.getUsername());
-        response.put("role", role);
-        response.put("token", token);
+    String role = user.getAuthorities().stream()
+      .map(GrantedAuthority::getAuthority)
+      .findFirst()
+      .orElse(null);
 
-        return ResponseEntity.ok(response);
+    // mapear a UserDto (ajusta según tu entidad real)
+    UserLoginDto userLoginDto = new UserLoginDto();
+    userLoginDto.setId(user.getUsername());   // o el id real si lo tienes
+    userLoginDto.setName(user.getUsername()); // o nombre completo
+    userLoginDto.setEmail(null);              // si no tienes email todavía
+    userLoginDto.setPhotoURL(null);
+    userLoginDto.setRole(role);
+
+    LoginResponseDto response = new LoginResponseDto();
+    response.setToken(token);
+    response.setUser(userLoginDto);
+
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<UserLoginDto> me(@AuthenticationPrincipal UserDetails user) {
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    String role = user.getAuthorities().stream()
+      .map(GrantedAuthority::getAuthority)
+      .findFirst()
+      .orElse(null);
+
+    UserLoginDto userLoginDto = new UserLoginDto();
+    userLoginDto.setId(user.getUsername());
+    userLoginDto.setName(user.getUsername());
+    userLoginDto.setEmail(null);
+    userLoginDto.setPhotoURL(null);
+    userLoginDto.setRole(role);
+
+    return ResponseEntity.ok(userLoginDto);
+  }
 }
