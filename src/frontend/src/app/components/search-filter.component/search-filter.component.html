@@ -1,1 +1,95 @@
-<p>search-filter.component works!</p>
+<div class="filter-card" (mouseleave)="close.emit()">
+
+  <div class="filter-header">
+    <h3>Filtros</h3>
+    <button class="close-btn" (click)="close.emit()">✕</button>
+  </div>
+
+  <div class="filter-body">
+
+    <div class="filter-group">
+      <label class="group-label">Preferencias Alimentarias</label>
+
+      @if (dietOptions.length === 0) {
+        <p class="loading-text">Cargando opciones...</p>
+      }
+
+      @if (dietOptions.length > 0) {
+        <div class="diet-grid">
+          @for (diet of dietOptions; track diet.id) {
+            <div class="checkbox-item">
+              <input type="checkbox" [id]="'diet-' + diet.id" [(ngModel)]="diet.selected">
+              <label [for]="'diet-' + diet.id">{{ diet.label }}</label>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="filter-group">
+      <label class="group-label">Precio por persona</label>
+
+      <div class="price-range-inputs">
+        <div class="price-field">
+          <span class="field-label">Desde</span>
+          <div class="input-wrapper">
+            <input type="number" [(ngModel)]="minPrice" (change)="validateInput(true)"
+              (keydown)="preventInvalidChars($event)" min="0" appFocusOnInit>
+            <span class="currency-symbol">€</span>
+          </div>
+        </div>
+
+        <div class="range-separator"></div>
+
+        <div class="price-field">
+          <span class="field-label">Hasta</span>
+          <div class="input-wrapper">
+            <input type="number" [(ngModel)]="maxPrice" (change)="validateInput(false)"
+              (keydown)="preventInvalidChars($event)" min="0" appFocusOnInit>
+            <span class="currency-symbol">€</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="range-slider-container">
+        <div class="slider-track"></div>
+        <div class="slider-range" [style.left]="getLeftPercent()" [style.width]="getWidthPercent()"></div>
+
+        <input type="range" [min]="sliderMin" [max]="sliderMax" [step]="sliderStep" [(ngModel)]="currentMin"
+          (input)="validateRange(true)">
+
+        <input type="range" [min]="sliderMin" [max]="sliderMax" [step]="sliderStep" [(ngModel)]="currentMax"
+          (input)="validateRange(false)">
+      </div>
+
+      <div class="slider-labels">
+        <span>0€</span>
+        <span>+{{ sliderMax }}€</span>
+      </div>
+
+    </div>
+
+    <div class="filter-group">
+      <label class="group-label">Número de Comensales</label>
+      <div class="input-with-icon">
+        <input type="number" placeholder="¿Cuantos seréis?" [(ngModel)]="guestCount" min="1"
+          (keydown)="preventInvalidChars($event)" appFocusOnInit>
+      </div>
+      <small class="helper-text">Si nos ofreces el número exacto de comensales podremos recomendarte los mejores servicios disponibles.</small>
+    </div>
+
+    <div class="filter-group toggle-group">
+      <label class="group-label" for="topRated">Mejor valorados (+ 4★)</label>
+      <label class="switch">
+        <input type="checkbox" id="topRated" [(ngModel)]="onlyTopRated">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+  </div>
+
+  <div class="filter-footer">
+    <button class="btn-clear" (click)="resetFilters()">Limpiar</button>
+    <button class="btn-apply" (click)="applyFilters()">Ver Resultados</button>
+  </div>
+</div>

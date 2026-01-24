@@ -1,12 +1,20 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, tap, catchError, of } from 'rxjs';
 
-// 1. Interfaz para el usuario (necesaria para el Navbar)
+// user interface
 export interface User {
   id: string;
   name: string;
+  email: string;
   photoURL?: string;
+  role?: string;
+}
+
+// login response according to Contract 2 of APIs_agreements_ChefPro
+interface LoginResponse {
+  token: string;
+  user: User;
 }
 
 @Injectable({
@@ -14,57 +22,58 @@ export interface User {
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/auth'; // Tu URL real
+  private apiUrl = 'http://localhost:8080/api/auth';
 
-  // 2. Propiedad para gestionar el usuario actual (necesaria para la imagen)
-  // Lo inicializamos con datos FALSOS para que veas la imagen mientras no tengas Backend.
-  // Cuando tengas backend, esto debería empezar en 'null'.
-  currentUser: User | null = {
-    id: '1',
-    name: 'Chef Pro',
-    photoURL: 'https://i.pravatar.cc/150?img=68'
-  };
+  // user status in memory
+  currentUser: User | null = null;
 
   constructor() {
-    // Opcional: Al cargar la app, podrías comprobar si hay token
-    // y recuperar el usuario real. Por ahora lo dejamos simulado.
+    // if the token exits, retrieve the user
+    if (this.getToken()) {
+      this.retrieveUser().subscribe();
+    }
   }
 
-  // --- LÓGICA DE CONEXIÓN (Tu código original mejorado) ---
+  // --- ENDPOINT 1: API ---
+  login(credentials: { username: string; password: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap((response) => {
+        localStorage.setItem('token', response.token);
 
-  login(credenciales: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credenciales).pipe(
-      tap((respuesta: any) => {
-        if (respuesta && respuesta.token) {
-          // Guardamos el token
-          localStorage.setItem('token', respuesta.token);
+        this.currentUser = response.user;
+      })
+    );
+  }
 
-          // AQUÍ DEBERÍAMOS ACTUALIZAR EL USUARIO
-          // Como tu backend aun no devuelve los datos del usuario (nombre, foto),
-          // simularemos que al loguearse se rellenan los datos.
-          this.currentUser = {
-            id: '1',
-            name: credenciales.username || 'Usuario',
-            photoURL: 'https://i.pravatar.cc/150?img=68'
-          };
-        }
+  // --- ENDPOINT 2: API ---
+  retrieveUser(): Observable<User | null> {
+    const token = this.getToken();
+    if (!token) return of(null);
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get<User>(`${this.apiUrl}/me`, { headers }).pipe(
+      tap((user) => {
+        console.log('Usuario recuperado: ', user);
+        this.currentUser = user;
+      }),
+      catchError((err) => {
+        console.error('Error recuperando usuario (token caducado?)', err);
+        this.logout();
+        return of(null);
       })
     );
   }
 
   logout() {
     localStorage.removeItem('token');
-    this.currentUser = null; // Borramos el usuario de la memoria para que se quite la foto
+    this.currentUser = null;
   }
-
-  // --- LÓGICA DE ESTADO ---
 
   isLoggedIn(): boolean {
-    // Verificamos si hay token O si tenemos usuario en memoria
-    return !!localStorage.getItem('token') || this.currentUser !== null;
+    return !!this.currentUser || !!localStorage.getItem('token');
   }
 
-  // Método auxiliar para obtener el token si lo necesitas en interceptores
   getToken(): string | null {
     return localStorage.getItem('token');
   }

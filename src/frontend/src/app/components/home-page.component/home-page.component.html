@@ -1,0 +1,36 @@
+<div class="main-container">
+
+  <header class="top-bar">
+    <button class="menu-btn" (click)="toggleMenu()">
+      <span style="font-size: 30px;">&#9776;</span>
+    </button>
+  </header>
+
+  <div class="nav-links" [class.open]="isMenuOpen">
+
+    <button class="close-btn" (click)="toggleMenu()">✕</button>
+
+    <nav class="links-container">
+      <a routerLink="/homepage" (click)="toggleMenu()">Inicio</a>
+      <a routerLink="/aboutUs" (click)="toggleMenu()">Sobre nosotros</a>
+      <a routerLink="/contact" (click)="toggleMenu()">Contacto</a>
+      <a routerLink="/login" (click)="toggleMenu()">Únete</a>
+    </nav>
+  </div>
+
+  @if (isMenuOpen) {
+    <div class="menu-overlay" (click)="toggleMenu()"></div>
+  }
+
+  <main class="content">
+    <h2 class="cursive-title">Bienvenidos a</h2>
+    <img src="logos/largeWebsiteLogo.svg" alt="Chef Pro Logo" class="logo-img">
+    <br/>
+    <button class="cta-button">¿Qué vas a comer hoy?</button>
+  </main>
+
+  <footer class="footer">
+    <p>© María Reyes Artacho y Carmen Varela Iglesias | Todos los derechos reservados</p>
+  </footer>
+
+</div>
