@@ -1,4 +1,4 @@
-package model.entity;
+package com.chefpro.backendjava.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,6 +1,6 @@
-package service;
-import model.entity.Menu;
-import repository.MenuRepository;
+package com.chefpro.backendjava.service;
+import com.chefpro.backendjava.entity.Menu;
+import com.chefpro.backendjava.repository.MenuRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

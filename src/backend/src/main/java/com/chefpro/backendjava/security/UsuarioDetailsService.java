@@ -1,6 +1,7 @@
-package security;
-import model.entity.Usuario;
-import repository.UsuarioRepository;
+package com.chefpro.backendjava.security;
+
+import com.chefpro.backendjava.entity.Usuario;
+import com.chefpro.backendjava.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,12 +19,13 @@ public class UsuarioDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Usuario no encontrado: " + username));
         return User.withUsername(usuario.getUsername())
-                .password(usuario.getPassword())   // hash BCrypt guardado en BBDD
-                .roles(usuario.getRol())           // COMENSAL / CHEF / ADMIN
+                .password(usuario.getPassword())   // hash BCrypt tal cual
+                .roles(usuario.getRol())           // CHEF / COMENSAL / ADMIN
                 .build();
     }
 }

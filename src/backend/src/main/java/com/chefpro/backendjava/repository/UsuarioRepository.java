@@ -1,5 +1,5 @@
-package repository;
-import model.entity.Usuario;
+package com.chefpro.backendjava.repository;
+import com.chefpro.backendjava.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

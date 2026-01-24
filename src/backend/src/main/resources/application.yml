@@ -4,8 +4,8 @@ server:
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/chefpro
-    username: root
-    password: ""
+    username: chefpro_user
+    password: chefPro01;
 
   jpa:
     hibernate:

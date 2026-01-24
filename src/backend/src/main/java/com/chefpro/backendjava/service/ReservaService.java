@@ -1,9 +1,9 @@
-package service; // ajusta a tu package real
+package com.chefpro.backendjava.service; // ajusta a tu package real
 
-import model.entity.Menu;
-import model.entity.Reserva;
-import repository.MenuRepository;
-import repository.ReservaRepository;
+import com.chefpro.backendjava.entity.Menu;
+import com.chefpro.backendjava.entity.Reserva;
+import com.chefpro.backendjava.repository.MenuRepository;
+import com.chefpro.backendjava.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

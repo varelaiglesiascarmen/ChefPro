@@ -1,4 +1,4 @@
-package model.entity; // ← cámbialo si tu package es otro
+package com.chefpro.backendjava.entity; // ← cámbialo si tu package es otro
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

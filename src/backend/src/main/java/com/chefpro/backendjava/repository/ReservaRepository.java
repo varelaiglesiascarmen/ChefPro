@@ -1,6 +1,6 @@
-package repository;
+package com.chefpro.backendjava.repository;
 
-import model.entity.Reserva;
+import com.chefpro.backendjava.entity.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
