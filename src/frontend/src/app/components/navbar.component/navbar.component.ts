@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { FocusOnInitDirective } from '../../directives/focus-on-init.directive';
 import { SearchFilterComponent } from '../search-filter.component/search-filter.component';
+import { trigger, style, animate, transition } from '@angular/animations';
 
 // definition of the NavbarComponent
 @Component({
@@ -20,8 +21,20 @@ import { SearchFilterComponent } from '../search-filter.component/search-filter.
     SearchFilterComponent
   ],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrl: './navbar.component.css',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('150ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
+      ])
+    ])
+  ]
 })
+
 // exportation of the NavbarComponent class
 export class NavbarComponent {
 

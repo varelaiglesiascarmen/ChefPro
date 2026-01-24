@@ -13,10 +13,11 @@
   </div>
 
   <div class="nav-actions">
-    <div class="search-box">
+    <div class="search-box" [class.expanded]="isSearchOpen">
       <button class="filter-menu-btn" (click)="$event.stopPropagation(); toggleFilterMenu()">
-        <span class="menu-icon" [style.color]="hasFilterActive ? '#A67C00' : 'inherit'">{{ showFilterMenu ? '▽' : '▷'
-          }}</span>
+        <span class="menu-icon" [style.color]="hasFilterActive ? '#A67C00' : 'inherit'">
+          {{ showFilterMenu ? '▽' : '▷' }}
+        </span>
       </button>
 
       <input type="text" placeholder="Buscar..." [(ngModel)]="searchText" (keyup.enter)="performSearch()"
@@ -26,20 +27,29 @@
         <img src="/logos/magnifier.svg" alt="Buscar" class="search-icon-svg">
       </button>
 
-      <!-- Filter dropdown -->
-      <div class="filter-dropdown-container" *ngIf="showFilterMenu">
-        <app-search-filter (close)="showFilterMenu = false" (apply)="onFilterApplied($event)">
-        </app-search-filter>
-      </div>
+      @if (showFilterMenu) {
+        <div class="filter-dropdown-container" @fadeInOut>
+          <app-search-filter
+            (close)="showFilterMenu = false"
+            (apply)="onFilterApplied($event)">
+          </app-search-filter>
+        </div>
+      }
+
     </div>
 
     <button class="user-btn" (click)="goToProfile()" id="user-img-btn">
-      <!-- User profile image control -->
-      <img [src]="userProfileImage" (error)="handleImageError($event)" alt="Usuario" class="user-svg"
-        style="object-fit: cover; border-radius: 50%;">
+      <img [src]="userProfileImage"
+           (error)="handleImageError($event)"
+           alt="Usuario"
+           class="user-svg"
+           [class.default-icon]="userProfileImage.includes('users.svg')"
+           style="border-radius: 50%;">
     </button>
   </div>
 
-  <div class="sidebar-overlay" *ngIf="isMenuOpen" (click)="toggleMenu()"></div>
+  @if (isMenuOpen) {
+    <div class="sidebar-overlay" (click)="toggleMenu()"></div>
+  }
 
 </nav>

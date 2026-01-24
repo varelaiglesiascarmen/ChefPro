@@ -65,7 +65,7 @@ La persistencia se gestiona en MySQL.
 
 #### Backend (Spring Boot)
 - Importar el proyecto como Maven Project en IntelliJ IDEA.
-- Configurar el application.properties con las credenciales de tu instancia de MySQL.
+- Configurar el application.properties con las credentials de tu instancia de MySQL.
 - Ejecutar la aplicación para levantar el servidor en el puerto 8080.
 *Nota:* La seguridad está implementada mediante Tokens JWT.
 
