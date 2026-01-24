@@ -1,4 +1,4 @@
-package model.entity; // ← mismo package que Usuario y Menu
+package com.chefpro.backendjava.repository.entity; // ← mismo package que Usuario y Menu
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservas")
-public class Reserva {
+public class reservations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,15 +37,15 @@ public class Reserva {
 
     // ---------- Constructores ----------
 
-    public Reserva() {
+    public reservations() {
     }
 
-    public Reserva(Menu menu,
-                   String comensalUsername,
-                   String chefUsername,
-                   LocalDateTime fechaReserva,
-                   Integer numeroComensales,
-                   String estado) {
+    public reservations(Menu menu,
+                        String comensalUsername,
+                        String chefUsername,
+                        LocalDateTime fechaReserva,
+                        Integer numeroComensales,
+                        String estado) {
         this.menu = menu;
         this.comensalUsername = comensalUsername;
         this.chefUsername = chefUsername;

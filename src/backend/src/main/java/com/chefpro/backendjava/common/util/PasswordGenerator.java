@@ -1,4 +1,4 @@
-package util;
+package com.chefpro.backendjava.common.util;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
