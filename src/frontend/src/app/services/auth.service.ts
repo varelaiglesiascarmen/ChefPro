@@ -1,80 +1,135 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap, catchError, of } from 'rxjs';
-
-// user interface
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  photoURL?: string;
-  role?: string;
-}
-
-// login response according to Contract 2 of APIs_agreements_ChefPro
-interface LoginResponse {
-  token: string;
-  user: User;
-}
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { delay, tap } from 'rxjs/operators';
+import { LoginRequest, LoginResponse, User } from '../models/auth.model';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private router = inject(Router);
 
-  // user status in memory
-  currentUser: User | null = null;
+  /*     ------  REAL CODE -----------
+
+    private http = inject(HttpClient); // Importar HttpClient arriba
+    private apiUrl = 'http://localhost:8080/api/auth';
+
+  */
+
+  // STATE MANAGEMENT (Reactivity)
+  // BehaviorSubject stores the current state and emits it to anyone who subscribes
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public user$ = this.currentUserSubject.asObservable();
 
   constructor() {
-    // if the token exits, retrieve the user
-    if (this.getToken()) {
-      this.retrieveUser().subscribe();
+    // attempt to rescue the saved session
+    this.restoreSession();
+  }
+
+  get currentUserValue(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+
+    // --------------- mock data in -----------------
+    console.log('[AuthService] Intentando login con:', credentials.username);
+
+    // mock user > ChefMaria
+    // mock password > 123456
+
+    const mockUser: User = {
+      id: 'u-' + Math.floor(Math.random() * 1000),
+      username: credentials.username,
+      name: credentials.username,
+      email: `${credentials.username}@chefpro.com`,
+      role: 'CLIENT',
+      photoUrl: `https://i.pravatar.cc/300?u=${credentials.username}`,
+
+      // data for your recommendation algorithm
+      preferences: {
+        dietary: ['Sin Gluten', 'Bajo en carbohidratos'],
+        favoriteCuisines: ['Mediterránea', 'Japonesa'],
+        location: 'Madrid Centro'
+      }
+    };
+
+    // simulated responses
+    const successResponse: LoginResponse = {
+      success: true,
+      token: 'fake-jwt-token-simulado-xyz-123',
+      user: mockUser
+    };
+
+    const errorResponse: LoginResponse = {
+      success: false,
+      message: 'Usuario o contraseña incorrectos (Prueba con 123456)'
+    };
+
+    // logic simulated
+    if (credentials.password === '123456') {
+      return of(successResponse).pipe(
+        delay(1000),
+        tap(response => {
+          if (response.success && response.user && response.token) {
+            this.setSession(response.user, response.token);
+          }
+        })
+      );
+    } else {
+      return of(errorResponse).pipe(delay(1000));
     }
-  }
 
-  // --- ENDPOINT 1: API ---
-  login(credentials: { username: string; password: string }): Observable<LoginResponse> {
+    // --------------- mock data out -----------------
+
+    /*    ------  REAL CODE -----------
+
+    console.log('[AuthService] Conectando a API LOGIN:', this.apiUrl);
+
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap((response) => {
-        localStorage.setItem('token', response.token);
-
-        this.currentUser = response.user;
+      tap(response => {
+        // Solo guardamos sesión si el backend dice success: true
+        if (response.success && response.user && response.token) {
+          console.log('Login real exitoso');
+          this.setSession(response.user, response.token);
+        }
       })
     );
+
+*/
+
   }
 
-  // --- ENDPOINT 2: API ---
-  retrieveUser(): Observable<User | null> {
-    const token = this.getToken();
-    if (!token) return of(null);
+  logout(): void {
+    console.log('[AuthService] Cerrando sesión...');
+    localStorage.removeItem('chefpro_user');
+    localStorage.removeItem('chefpro_token');
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/login']);
+  }
 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  // private methods
+  // save user
+  private setSession(user: User, token: string): void {
+    localStorage.setItem('chefpro_user', JSON.stringify(user));
+    localStorage.setItem('chefpro_token', token);
+    this.currentUserSubject.next(user);
+  }
 
-    return this.http.get<User>(`${this.apiUrl}/me`, { headers }).pipe(
-      tap((user) => {
-        console.log('Usuario recuperado: ', user);
-        this.currentUser = user;
-      }),
-      catchError((err) => {
-        console.error('Error recuperando usuario (token caducado?)', err);
+  // rescue user
+  private restoreSession(): void {
+    const userJson = localStorage.getItem('chefpro_user');
+    const token = localStorage.getItem('chefpro_token');
+
+    if (userJson && token) {
+      try {
+        const user: User = JSON.parse(userJson);
+        this.currentUserSubject.next(user);
+      } catch (e) {
         this.logout();
-        return of(null);
-      })
-    );
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.currentUser = null;
-  }
-
-  isLoggedIn(): boolean {
-    return !!this.currentUser || !!localStorage.getItem('token');
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
+      }
+    }
   }
 }

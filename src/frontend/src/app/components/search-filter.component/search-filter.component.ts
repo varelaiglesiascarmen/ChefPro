@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ChefService } from '../../services/chef.service';
-import { ChefFilter, DietOption } from '../../models/chef.model';
+import { ChefService } from '../../services/search-results.service';
+import { ChefFilter, DietOption } from '../../models/search-results.model';
 
 /**
  * Component responsible for displaying and managing search filters

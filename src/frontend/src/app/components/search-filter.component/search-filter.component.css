@@ -111,6 +111,7 @@
 .checkbox-item:hover {
   color: var(--gold-primary);
 }
+
 .checkbox-item input[type="checkbox"] {
   -webkit-appearance: none;
   appearance: none;
@@ -219,7 +220,7 @@
   transition: all 0.3s ease;
 }
 
-.input-wrapper input:focus + .currency-symbol {
+.input-wrapper input:focus+.currency-symbol {
   color: var(--gold-primary);
   opacity: 1;
 }

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Chef, DietOption, ChefFilter, Page } from '../models/chef.model';
+import { Chef, DietOption, ChefFilter, Page } from '../models/search-results.model';
 
 @Injectable({
   providedIn: 'root'
