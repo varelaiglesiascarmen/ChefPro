@@ -1,32 +1,25 @@
-/* 1. EL CONTENEDOR PRINCIPAL (Solo posiciona, no tiene pintura) */
+/* main */
 :host {
   position: absolute;
-  top: 75px; /* Un pelín más separado de la foto */
-  right: 25px; /* Alineado con el margen derecho */
+  top: 75px;
+  right: 25px;
   z-index: 9999;
-  /* Eliminamos background, border y shadow de aquí para evitar el "doble borde" */
 }
 
-/* 2. LA TARJETA DEL MENÚ */
+/* menu tarjet */
 .dropdown-menu {
-  background-color: #FDF7F0; /* Cream BG */
-  width: 240px; /* Un poco más ancho para respirar */
-  border: 1px solid rgba(166, 124, 0, 0.2); /* Borde dorado muy sutil */
-  border-radius: 16px; /* Bordes más redondeados */
-
-  /* Sombra de "elevación" suave y elegante */
+  background-color: #FDF7F0;
+  width: 240px;
+  border: 1px solid rgba(166, 124, 0, 0.2);
+  border-radius: 16px;
   box-shadow: 0 10px 40px -10px rgba(78, 36, 10, 0.2);
-
-  padding: 8px; /* Padding interno para que los botones no toquen el borde */
+  padding: 8px;
   display: flex;
   flex-direction: column;
-
-  /* Animación de entrada */
   animation: menuEnter 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
   transform-origin: top right;
 }
 
-/* 3. EL TRIÁNGULO DECORATIVO */
 .dropdown-menu::before {
   content: '';
   position: absolute;
@@ -41,9 +34,9 @@
   z-index: 0;
 }
 
-/* 4. LOS BOTONES (ITEMS) */
+/* buttons */
 .menu-item {
-  position: relative; /* Para que quede encima del triángulo si hace falta */
+  position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -51,80 +44,68 @@
   padding: 12px 16px;
   background: transparent;
   border: none;
-  border-radius: 12px; /* Redondeamos los botones al hacer hover */
-
+  border-radius: 12px;
   text-align: left;
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #4E240A; /* Dark Brown */
-
+  color: #4E240A;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 2px;
 }
 
-/* Efecto Hover estilo "Píldora" */
 .menu-item:hover {
-  background-color: rgba(166, 124, 0, 0.08); /* Gold muy clarito */
-  color: #A67C00; /* Gold Primary */
-  padding-left: 20px; /* Pequeño desplazamiento a la derecha */
+  background-color: rgba(166, 124, 0, 0.08);
+  color: #A67C00;
+  padding-left: 20px;
 }
 
-/* 5. SEPARADOR */
 .separator {
   height: 1px;
   background: linear-gradient(to right, transparent, #E6DED5, transparent);
   margin: 6px 0;
 }
 
-/* 6. ESTILO ESPECÍFICO PARA CERRAR SESIÓN */
 .menu-item.logout {
-  color: #b91c1c; /* Rojo elegante */
+  color: #b91c1c;
   font-weight: 600;
   margin-top: 2px;
 }
 
 .menu-item.logout:hover {
-  background-color: #FEF2F2; /* Fondo rojo muy suave */
+  background-color: #FEF2F2;
   color: #dc2626;
 }
 
-/* ... TUS ESTILOS DEL MENÚ ANTERIORES ... */
-
-
-/* --- ESTILOS DEL MODAL DE CERRAR SESIÓN --- */
-
-/* 1. EL FONDO OSCURO (Backdrop) */
+/* modal */
 .modal-overlay {
-  position: fixed; /* Cubre toda la pantalla */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(78, 36, 10, 0.4); /* Marrón oscuro semitransparente */
-  backdrop-filter: blur(4px); /* EFECTO PRO: Desenfoca el fondo */
-  z-index: 10000; /* Por encima de todo, incluido el Navbar */
+  background-color: rgba(78, 36, 10, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
   display: flex;
   justify-content: center;
   align-items: center;
   animation: fadeIn 0.2s ease-out;
 }
 
-/* 2. LA CAJA DEL MODAL */
 .modal-box {
-  background-color: #FDF7F0; /* Cream BG */
+  background-color: #FDF7F0;
   width: 90%;
-  max-width: 400px; /* Que no sea gigante en PC */
+  max-width: 400px;
   padding: 24px;
   border-radius: 16px;
   border: 1px solid #D1C7BD;
   box-shadow: 0 20px 50px rgba(0,0,0,0.2);
   text-align: center;
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Rebote suave */
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Textos */
 .modal-title {
   color: #4E240A;
   font-size: 1.25rem;
@@ -138,7 +119,6 @@
   margin-bottom: 24px;
 }
 
-/* Botones */
 .modal-actions {
   display: flex;
   gap: 12px;
@@ -156,7 +136,6 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* Botón Cancelar */
 .btn-cancel {
   background-color: transparent;
   border: 1px solid #D1C7BD;
@@ -167,9 +146,8 @@
   background-color: #E6DED5;
 }
 
-/* Botón Confirmar */
 .btn-confirm {
-  background-color: #A67C00; /* Gold */
+  background-color: #A67C00;
   color: white;
   box-shadow: 0 4px 10px rgba(166, 124, 0, 0.2);
 }
@@ -179,16 +157,14 @@
   transform: translateY(-1px);
 }
 
-/* Ajuste específico para el mensaje de despedida */
 .goodbye-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px; /* Un poco más de aire */
+  padding: 40px 24px;
 }
 
-/* ANIMACIONES */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -205,7 +181,6 @@
   }
 }
 
-/* 7. ANIMACIÓN KEYFRAMES */
 @keyframes menuEnter {
   from {
     opacity: 0;
