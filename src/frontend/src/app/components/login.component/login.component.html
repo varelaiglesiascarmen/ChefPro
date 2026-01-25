@@ -10,15 +10,35 @@
         <h2 class="title">¡Hola, nos encanta verte de nuevo aquí!</h2>
 
         <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
-          <input type="text" name="username" [(ngModel)]="loginData.username"
-                 placeholder="Nombre de usuario" required appFocusOnInit>
 
-          <input type="password" name="password" [(ngModel)]="loginData.password"
-                 placeholder="****************" required appFocusOnInit>
+          <input type="text"
+                 name="username"
+                 [(ngModel)]="loginData.username"
+                 placeholder="Nombre de usuario"
+                 required
+                 appFocusOnInit>
+
+          <input type="password"
+                 name="password"
+                 [(ngModel)]="loginData.password"
+                 placeholder="****************"
+                 required>
 
           <a href="#" class="forgot-link">¿Has olvidado tu contraseña?</a>
 
-          <button type="submit" class="btn-submit">Iniciar sesión</button>
+          @if (errorMessage) {
+            <div class="error-alert">
+              {{ errorMessage }}
+            </div>
+          }
+
+          <button type="submit" class="btn-submit" [disabled]="isLoading">
+            @if (isLoading) {
+              <span class="loader"></span> Cargando...
+            } @else {
+              Iniciar sesión
+            }
+          </button>
 
           <p class="register-footer">
             * Si todavía no tienes cuenta, <a routerLink="/signIn">regístrate aquí</a>

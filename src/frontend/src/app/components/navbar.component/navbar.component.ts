@@ -1,14 +1,13 @@
-// importation of components, services, directives, and modules
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { trigger, style, animate, transition } from '@angular/animations';
 import { AuthService } from '../../services/auth.service';
 import { FocusOnInitDirective } from '../../directives/focus-on-init.directive';
 import { SearchFilterComponent } from '../search-filter.component/search-filter.component';
-import { trigger, style, animate, transition } from '@angular/animations';
+import { User } from '../../models/auth.model';
 
-// definition of the NavbarComponent
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -34,9 +33,7 @@ import { trigger, style, animate, transition } from '@angular/animations';
     ])
   ]
 })
-
-// exportation of the NavbarComponent class
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -47,20 +44,30 @@ export class NavbarComponent {
   showFilterMenu = false;
   hasFilterActive = false;
 
-  // Getter to retrieve the user's profile image or a default image
+  // This variable stores the current user.
+  currentUser: User | null = null;
+
+  // reactive subscription
+  ngOnInit() {
+    // We subscribe to the service. Every time the user changes (log in/log out),
+    // this variable will update itself.
+    this.authService.user$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  // get img of user active
   get userProfileImage(): string {
     const defaultImage = '/logos/users.svg';
 
-    if (this.authService.isLoggedIn()) {
-      const user = this.authService.currentUser;
-      if (user && user.photoURL) {
-        return user.photoURL;
-      }
+    if (this.currentUser && this.currentUser.photoUrl) {
+      return this.currentUser.photoUrl;
     }
+
     return defaultImage;
   }
 
-  // Method to toggle the navigation menu
+  // Toggle menu
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
     if (this.isMenuOpen) {
@@ -73,7 +80,7 @@ export class NavbarComponent {
     this.isMenuOpen = false;
   }
 
-  // Method to toggle the search bar
+  // Toggle search
   toggleSearch() {
     const isMobile = window.innerWidth <= 768;
 
@@ -102,7 +109,6 @@ export class NavbarComponent {
     this.showFilterMenu = false;
   }
 
-  // Method to perform a search
   performSearch(filtrosOpcionales: any = null) {
     const cleanText = this.searchText.trim();
 
@@ -115,27 +121,24 @@ export class NavbarComponent {
     }
   }
 
-  // Method to toggle the filter menu
   toggleFilterMenu() {
     this.showFilterMenu = !this.showFilterMenu;
   }
 
-  // Method to handle applied filters
   onFilterApplied(filtros: any) {
     this.showFilterMenu = false;
     this.hasFilterActive = true;
     this.performSearch(filtros);
   }
 
-  // Method to handle image errors
   handleImageError(event: any) {
     event.target.src = '/logos/users.svg';
   }
 
-  // Method to navigate to the user's profile or login page
   goToProfile() {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/perfil']);
+    // We check if the user exists
+    if (this.currentUser) {
+      this.router.navigate(['/profile']);
     } else {
       this.router.navigate(['/login']);
     }
