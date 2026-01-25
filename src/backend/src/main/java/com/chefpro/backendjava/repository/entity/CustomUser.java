@@ -1,9 +1,17 @@
 package com.chefpro.backendjava.repository.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
@@ -17,7 +25,7 @@ public class CustomUser {
     private String id;
 
     @Column(length = 150, nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column(length = 255, nullable = false)
     private String password;

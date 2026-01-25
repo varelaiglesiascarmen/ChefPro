@@ -8,6 +8,7 @@ import { AboutComponent } from './components/about.component/about.component';
 import { NotFoundComponent } from './components/not-found.component/not-found.component';
 import { ProfileComponent } from './components/profile.component/profile.component';
 import { SearchComponent } from './components/search.component/search.component';
+import { UserMenuComponent } from './components/user-menu.component/user-menu.component';
 
 export const routes: Routes = [
   // If the path is empty (‘’), redirect to 'homepage'
@@ -39,6 +40,9 @@ export const routes: Routes = [
 
   // search root
   { path: 'search', component: SearchComponent },
+
+  // user-menu root
+  { path: 'user-menu', component: UserMenuComponent },
 
   // If you write something strange, send it to the home page
   { path: '**', redirectTo: 'homepage' }
