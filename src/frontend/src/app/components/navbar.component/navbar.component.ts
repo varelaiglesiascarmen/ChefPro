@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { FocusOnInitDirective } from '../../directives/focus-on-init.directive';
 import { SearchFilterComponent } from '../search-filter.component/search-filter.component';
 import { User } from '../../models/auth.model';
+import { UserMenuComponent } from '../user-menu.component/user-menu.component';
 
 @Component({
   selector: 'app-navbar',
@@ -17,7 +18,8 @@ import { User } from '../../models/auth.model';
     FormsModule,
     CommonModule,
     FocusOnInitDirective,
-    SearchFilterComponent
+    SearchFilterComponent,
+    UserMenuComponent
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
@@ -43,6 +45,7 @@ export class NavbarComponent implements OnInit {
   searchText: string = '';
   showFilterMenu = false;
   hasFilterActive = false;
+  isUserMenuOpen = false;
 
   // This variable stores the current user.
   currentUser: User | null = null;
@@ -135,12 +138,17 @@ export class NavbarComponent implements OnInit {
     event.target.src = '/logos/users.svg';
   }
 
-  goToProfile() {
+  handleUserClick() {
     // We check if the user exists
     if (this.currentUser) {
-      this.router.navigate(['/profile']);
+      // Toggle the user menu instead of navigating directly
+      this.isUserMenuOpen = !this.isUserMenuOpen;
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  closeUserMenu() {
+    this.isUserMenuOpen = false;
   }
 }

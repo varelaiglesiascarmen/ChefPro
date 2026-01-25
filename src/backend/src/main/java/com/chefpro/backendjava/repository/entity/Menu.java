@@ -1,9 +1,20 @@
 package com.chefpro.backendjava.repository.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
+import java.math.BigDecimal;
 import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "menu")
@@ -33,7 +44,7 @@ public class Menu {
     private String allergens;
 
     @Column(name = "price_per_person", nullable = false, precision = 10, scale = 2)
-    private Double pricePerPerson;
+    private BigDecimal pricePerPerson;
 
     @Column(name = "is_delivery_available", nullable = false)
     private boolean deliveryAvailable;
