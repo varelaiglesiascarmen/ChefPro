@@ -38,7 +38,7 @@
 
     </div>
 
-    <button class="user-btn" (click)="goToProfile()" id="user-img-btn">
+    <button class="user-btn" (click)="handleUserClick()" id="user-img-btn">
       <img [src]="userProfileImage"
            (error)="handleImageError($event)"
            alt="Usuario"
@@ -48,8 +48,8 @@
     </button>
   </div>
 
-  @if (isMenuOpen) {
-    <div class="sidebar-overlay" (click)="toggleMenu()"></div>
+  @if (currentUser && isUserMenuOpen) {
+    <app-user-menu (closeMenu)="closeUserMenu()"></app-user-menu>
   }
 
 </nav>

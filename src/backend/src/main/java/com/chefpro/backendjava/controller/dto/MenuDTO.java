@@ -1,7 +1,12 @@
 package com.chefpro.backendjava.controller.dto;
 
-import lombok.*;
+import java.math.BigDecimal;
 import java.time.Instant;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -16,7 +21,7 @@ public class MenuDTO {
     private String dishes;
     private String allergens;
 
-    private Double pricePerPerson;
+    private BigDecimal pricePerPerson;
 
     private boolean deliveryAvailable;
     private boolean cookAtClientHome;

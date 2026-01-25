@@ -65,7 +65,7 @@ export class AuthService {
 
     const errorResponse: LoginResponse = {
       success: false,
-      message: 'Usuario o contraseña incorrectos (Prueba con 123456)'
+      message: 'Usuario o contraseña incorrectos'
     };
 
     // logic simulated
@@ -107,7 +107,7 @@ export class AuthService {
     localStorage.removeItem('chefpro_user');
     localStorage.removeItem('chefpro_token');
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/index']);
   }
 
   // private methods

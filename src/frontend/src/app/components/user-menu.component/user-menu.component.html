@@ -1,0 +1,40 @@
+<div class="dropdown-menu">
+  <button class="menu-item" (click)="navigateTo('/profile')"> Perfil</button>
+
+  <button class="menu-item" (click)="navigateTo('/user-config')">Configuración de perfil</button>
+
+  <div class="separator"></div>
+
+  <button class="menu-item logout" (click)="onLogoutClick()">Cerrar sesión</button>
+</div>
+
+@if (showLogoutModal) {
+<div class="modal-overlay" (click)="cancelLogout()">
+
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <h3 class="modal-title">¡Oh! qué penas que te vayas..</h3>
+    <p class="modal-message">¿Estás seguro de que quieres cerrar sesión?</p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelLogout()">Cancelar</button>
+
+      <button class="btn-confirm" (click)="confirmLogout()">Cerrar sesión</button>
+    </div>
+
+  </div>
+</div>
+}
+
+@if (showGoodbyeModal) {
+<div class="modal-overlay">
+
+  <div class="modal-box goodbye-content">
+
+    <h3 class="modal-title">¡Hasta luego!</h3>
+    <p class="modal-message" style="margin-bottom: 0;">Esperamos verte pronto</p>
+
+  </div>
+
+</div>
+}

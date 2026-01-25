@@ -187,4 +187,3 @@ INSERT INTO reservations (
           'Recoger en local a las 14:15.',
           'CONFIRMED'
       );
-
