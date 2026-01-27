@@ -1,9 +1,9 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.common.security.JwtUtil;
-import com.chefpro.backendjava.controller.dto.login.LoginRequestDto;
-import com.chefpro.backendjava.controller.dto.login.LoginResponseDto;
-import com.chefpro.backendjava.controller.dto.login.UserLoginDto;
+import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
+import com.chefpro.backendjava.common.object.dto.login.LoginResponseDto;
+import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -61,6 +61,11 @@ public class LoginController {
     response.setUser(userLoginDto);
 
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/health")
+  public String health() {
+      return "OK";
   }
 
   @GetMapping("/me")

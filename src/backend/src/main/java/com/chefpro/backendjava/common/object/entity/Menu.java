@@ -1,4 +1,4 @@
-package com.chefpro.backendjava.repository.entity;
+package com.chefpro.backendjava.common.object.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -57,7 +57,7 @@ public class Menu {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "chef_id", nullable = false)
-    private CustomUser chef;
+    private UserLogin chef;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

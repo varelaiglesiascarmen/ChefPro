@@ -1,6 +1,6 @@
 package com.chefpro.backendjava.common.security;
 
-import com.chefpro.backendjava.repository.entity.CustomUser;
+import com.chefpro.backendjava.common.object.entity.UserLogin;
 import com.chefpro.backendjava.repository.CustomUserRepository;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,15 +19,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        CustomUser customUser = customUserRepository.findByUsername(username)
+        UserLogin userLogin = customUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
 
-        String roleName = customUser.getRole().name(); // USER o CHEF
+        String roleName = userLogin.getRole().name(); // USER o CHEF
 
         return User.builder()
-                .username(customUser.getName())
-                .password(customUser.getPassword())
+                .username(userLogin.getName())
+                .password(userLogin.getPassword())
                 .roles(roleName)
                 .build();
     }
