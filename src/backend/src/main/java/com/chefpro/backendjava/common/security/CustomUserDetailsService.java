@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         String roleName = userLogin.getRole().name(); // USER o CHEF
 
         return User.builder()
-                .username(userLogin.getName())
+                .username(userLogin.getUsername())
                 .password(userLogin.getPassword())
                 .roles(roleName)
                 .build();

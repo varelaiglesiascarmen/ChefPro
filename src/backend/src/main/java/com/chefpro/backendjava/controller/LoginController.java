@@ -82,8 +82,6 @@ public class LoginController {
     UserLoginDto userLoginDto = new UserLoginDto();
     userLoginDto.setId(user.getUsername());
     userLoginDto.setName(user.getUsername());
-    userLoginDto.setEmail(null);
-    userLoginDto.setPhotoURL(null);
     userLoginDto.setRole(role);
 
     return ResponseEntity.ok(userLoginDto);
