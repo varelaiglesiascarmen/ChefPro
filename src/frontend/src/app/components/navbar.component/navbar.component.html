@@ -7,7 +7,7 @@
     <button class="close-btn" (click)="toggleMenu()">✕</button>
 
     <a routerLink="/index" (click)="isMenuOpen = false">Inicio</a>
-    <a routerLink="/aboutUs" (click)="isMenuOpen = false">Sobre nosotros</a>
+    <a [routerLink]="[]" fragment="footer" (click)="isMenuOpen = false">Sobre nosotros</a>
     <a routerLink="/contact" (click)="isMenuOpen = false">Contacto</a>
     <a routerLink="/signIn" (click)="isMenuOpen = false">Únete</a>
   </div>
