@@ -1,7 +1,7 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.service.MenuService;
-import com.chefpro.backendjava.controller.dto.MenuDTO;
+import com.chefpro.backendjava.common.object.dto.MenuDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

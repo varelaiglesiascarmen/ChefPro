@@ -1,4 +1,4 @@
-package com.chefpro.backendjava.repository.entity;
+package com.chefpro.backendjava.common.object.entity;
 
 import java.time.Instant;
 
@@ -18,13 +18,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomUser {
+public class UserLogin {
 
     @Id
     @Column(length = 50)
     private String id;
 
-    @Column(length = 150, nullable = false, unique = true)
+    @Column(name = "email", length = 150, nullable = false, unique = true)
     private String username;
 
     @Column(length = 255, nullable = false)

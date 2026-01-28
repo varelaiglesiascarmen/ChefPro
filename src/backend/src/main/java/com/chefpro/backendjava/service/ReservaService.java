@@ -1,7 +1,7 @@
 package com.chefpro.backendjava.service; // ajusta a tu package real
 
-import com.chefpro.backendjava.repository.entity.Menu;
-import com.chefpro.backendjava.repository.entity.reservations;
+import com.chefpro.backendjava.common.object.entity.Menu;
+import com.chefpro.backendjava.common.object.entity.reservations;
 import com.chefpro.backendjava.repository.MenuRepository;
 import com.chefpro.backendjava.repository.ReservaRepository;
 import org.springframework.stereotype.Service;

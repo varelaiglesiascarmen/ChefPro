@@ -1,4 +1,4 @@
-package com.chefpro.backendjava.controller.dto;
+package com.chefpro.backendjava.common.object.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;

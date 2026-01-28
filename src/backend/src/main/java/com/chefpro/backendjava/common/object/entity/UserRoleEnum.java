@@ -1,4 +1,4 @@
-package com.chefpro.backendjava.repository.entity;
+package com.chefpro.backendjava.common.object.entity;
 
 public enum UserRoleEnum {
     ADMIN,
