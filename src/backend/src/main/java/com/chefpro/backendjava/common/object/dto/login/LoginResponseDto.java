@@ -1,4 +1,4 @@
-package com.chefpro.backendjava.controller.dto.login;
+package com.chefpro.backendjava.common.object.dto.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

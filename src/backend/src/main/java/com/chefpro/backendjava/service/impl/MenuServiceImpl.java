@@ -1,8 +1,8 @@
 package com.chefpro.backendjava.service.impl;
 
-import com.chefpro.backendjava.controller.dto.MenuDTO;
+import com.chefpro.backendjava.common.object.dto.MenuDTO;
 import com.chefpro.backendjava.repository.MenuRepository;
-import com.chefpro.backendjava.repository.entity.Menu;
+import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.service.MenuService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

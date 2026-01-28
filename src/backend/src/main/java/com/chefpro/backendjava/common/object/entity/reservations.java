@@ -1,4 +1,4 @@
-package com.chefpro.backendjava.repository.entity; // ← mismo package que Usuario y Menu
+package com.chefpro.backendjava.common.object.entity; // ← mismo package que Usuario y Menu
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

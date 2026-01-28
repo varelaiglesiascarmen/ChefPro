@@ -1,66 +1,66 @@
 package com.chefpro.backendjava.common.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    // Cambia esto por una clave secreta más larga y segura (mínimo 32 chars)
-    private static final String SECRET_KEY = "super_secret_key_12345678901234567890";
-    private static final long EXPIRATION_MS = 3600000; // 1 hora
+  private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+  private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 horas
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-    }
+  public String generateToken(UserDetails userDetails) {
+    Map<String, Object> claims = new HashMap<>();
+    return createToken(claims, userDetails.getUsername());
+  }
 
-    public String generateToken(UserDetails userDetails) {
+  private String createToken(Map<String, Object> claims, String subject) {
+    return Jwts.builder()
+      .setClaims(claims)
+      .setSubject(subject)
+      .setIssuedAt(new Date(System.currentTimeMillis()))
+      .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+      .signWith(SECRET_KEY)
+      .compact();
+  }
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority) // ROLE_CHEF / ROLE_USER
-                .toList();
+  public String extractUsername(String token) {
+    return extractClaim(token, Claims::getSubject);
+  }
 
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + EXPIRATION_MS);
+  public Date extractExpiration(String token) {
+    return extractClaim(token, Claims::getExpiration);
+  }
 
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim("roles", roles) // añadimos roles al token
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+  public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    final Claims claims = extractAllClaims(token);
+    return claimsResolver.apply(claims);
+  }
 
-    public String extractUsername(String token) {
-        return getClaims(token).getSubject();
-    }
+  private Claims extractAllClaims(String token) {
+    return Jwts.parserBuilder()
+      .setSigningKey(SECRET_KEY)
+      .build()
+      .parseClaimsJws(token)
+      .getBody();
+  }
 
-    public List<String> extractRoles(String token) {
-        return getClaims(token).get("roles", List.class);
-    }
+  private Boolean isTokenExpired(String token) {
+    return extractExpiration(token).before(new Date());
+  }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
-    }
-
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
+  public Boolean validateToken(String token, UserDetails userDetails) {
+    final String username = extractUsername(token);
+    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+  }
 }
