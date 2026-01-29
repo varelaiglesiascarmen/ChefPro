@@ -1,1 +1,114 @@
-<p>sign-in.component works!</p>
+<div class="register-page">
+  <div class="register-container">
+
+    <div class="logo-column">
+      <img src="/logos/largeWebsiteLogo.svg" alt="Chef Pro Logo" class="brand-logo">
+    </div>
+
+    <div class="form-column">
+      <h2 class="form-title">¡Regístrate!</h2>
+
+      <form (ngSubmit)="onRegister()" class="register-form">
+
+        <div class="form-group">
+          <label>Nombre:</label>
+          <input type="text" name="name" [(ngModel)]="registerData.name" placeholder="Nombre" required>
+        </div>
+
+        <div class="form-group">
+          <label>Apellidos:</label>
+          <input type="text" name="surname" [(ngModel)]="registerData.surname" placeholder="Apellidos" required>
+        </div>
+
+        <div class="form-group">
+          <label>Nombre de usuario:</label>
+          <input type="text"
+                 name="username"
+                 [(ngModel)]="registerData.username"
+                 (blur)="checkUsername()"
+                 required
+                 placeholder="Nombre de usuario">
+
+          @if (usernameStatus === 'TAKEN') {
+            <span class="status-msg error">El nombre de usuario no está disponible</span>
+          }
+          @if (usernameStatus === 'PENDING') {
+            <span class="status-msg info">Comprobando disponibilidad...</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Correo electrónico:</label>
+          <input type="email"
+                 name="email"
+                 [(ngModel)]="registerData.email"
+                 (blur)="checkEmail()"
+                 placeholder="Correo electrónico"
+                 required>
+
+          @if (emailStatus === 'TAKEN') {
+            <span class="status-msg error">Este correo ya está registrado</span>
+          }
+          @if (emailStatus === 'INVALID_FORMAT') {
+            <span class="status-msg warning">El correo debe llevar '@' y un dominio</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Repita el correo electrónico:</label>
+          <input type="email" name="confirmEmail" [(ngModel)]="confirmEmail" placeholder="Repita el correo electrónico" required>
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña:</label>
+          <input type="password"
+                 name="password"
+                 [(ngModel)]="registerData.password"
+                 (input)="calculateStrength()"
+                 required minlength="6"
+                 placeholder="Contraseña">
+
+          <div class="strength-container">
+            <div class="strength-meter">
+              <div class="strength-bar"
+                   [class.weak]="passwordStrength === 1"
+                   [class.medium]="passwordStrength === 2"
+                   [class.strong]="passwordStrength === 3">
+              </div>
+            </div>
+            <span class="strength-label"
+                  [class.text-weak]="passwordStrength === 1"
+                  [class.text-medium]="passwordStrength === 2"
+                  [class.text-strong]="passwordStrength === 3">
+              {{ passwordStrengthText }}
+            </span>
+          </div>
+
+          @if (passwordFeedback) {
+            <span class="status-msg info">{{ passwordFeedback }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Repite la contraseña:</label>
+          <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Repite la contraseña" required>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-message">{{ errorMessage }}</div>
+        }
+
+        <div class="actions">
+          <button type="submit" class="btn-register" [disabled]="isLoading">
+            {{ isLoading ? 'Registrando...' : 'Regístrate' }}
+          </button>
+        </div>
+
+        <p class="login-link">
+          * Si ya tienes cuenta, <a routerLink="/login">inicia sesión aquí</a>
+        </p>
+
+      </form>
+    </div>
+  </div>
+</div>
