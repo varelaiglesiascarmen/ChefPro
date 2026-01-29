@@ -4,6 +4,7 @@ import com.chefpro.backendjava.common.security.JwtUtil;
 import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginResponseDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
+import com.chefpro.backendjava.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,7 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/auth")
@@ -21,11 +25,13 @@ public class LoginController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
 
-    public LoginController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public LoginController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.userService = userService;
     }
 
 
@@ -48,12 +54,12 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
-    // mapear a UserDto (ajusta según tu entidad real)
+    UserLoginDto userFound = userService.findByEmail(request.getUsername());
+
     UserLoginDto userLoginDto = new UserLoginDto();
-    userLoginDto.setId(user.getUsername());   // o el id real si lo tienes
-    userLoginDto.setName(user.getUsername()); // o nombre completo
-    userLoginDto.setEmail(null);              // si no tienes email todavía
-    userLoginDto.setPhotoURL(null);
+    userLoginDto.setId(userFound.getId());
+    userLoginDto.setName(userFound.getName());
+    userLoginDto.setEmail(userFound.getEmail());
     userLoginDto.setRole(role);
 
     LoginResponseDto response = new LoginResponseDto();
@@ -79,9 +85,12 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
+    UserLoginDto userFound = userService.findByEmail(user.getUsername());
+
     UserLoginDto userLoginDto = new UserLoginDto();
-    userLoginDto.setId(user.getUsername());
-    userLoginDto.setName(user.getUsername());
+    userLoginDto.setId(userFound.getId());
+    userLoginDto.setName(userFound.getName());
+    userLoginDto.setEmail(userFound.getEmail());
     userLoginDto.setRole(role);
 
     return ResponseEntity.ok(userLoginDto);
