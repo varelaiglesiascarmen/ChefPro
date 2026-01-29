@@ -1,30 +1,29 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, User, RegisterRequest } from '../models/auth.model';
-import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
+// Injectable makes it possible to call the service from any component
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private http = inject(HttpClient);
   private router = inject(Router);
 
-  /*     ------  REAL CODE -----------
+  // environment URL > (http://localhost:8081/api) + /auth
+  private apiUrl = `${environment.apiUrl}/auth`;
 
-    private http = inject(HttpClient); // Importar HttpClient arriba
-    private apiUrl = 'http://localhost:8080/api/auth';
-
-  */
-
-  // STATE MANAGEMENT (Reactivity)
-  // BehaviorSubject stores the current state and emits it to anyone who subscribes
+  // STATE MANAGEMENT
+  // BehaviorSubject > Save the current user
   private currentUserSubject = new BehaviorSubject<User | null>(null);
+  // user$ > components (such as the Navbar) “subscribe” to this
   public user$ = this.currentUserSubject.asObservable();
 
   constructor() {
-    // attempt to rescue the saved session
     this.restoreSession();
   }
 
@@ -32,122 +31,70 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  // login > Receives the credentials and returns an Observable with the response from the backend
   login(credentials: LoginRequest): Observable<LoginResponse> {
+    console.log('[AuthService] Conectando a:', `${this.apiUrl}/login`);
 
-    // --------------- mock data in -----------------
-    console.log('[AuthService] Intentando login con:', credentials.username);
+    /*
 
-    // mock user > ChefMaria
-    // mock password > 123456
+    http.post > Sends the username and password to the backend.
 
-    const mockUser: User = {
-      id: 'u-' + Math.floor(Math.random() * 1000),
-      username: credentials.username,
-      name: credentials.username,
-      email: `${credentials.username}@chefpro.com`,
-      role: 'CLIENT',
-      photoUrl: `https://i.pravatar.cc/300?u=${credentials.username}`,
+    pipe() > This is a pipe; the response from the backend passes through here before reaching the component.
 
-      // data for your recommendation algorithm
-      preferences: {
-        dietary: ['Sin Gluten', 'Bajo en carbohidratos'],
-        favoriteCuisines: ['Mediterránea', 'Japonesa'],
-        location: 'Madrid Centro'
-      }
-    };
-
-    // simulated responses
-    const successResponse: LoginResponse = {
-      success: true,
-      token: 'fake-jwt-token-simulado-xyz-123',
-      user: mockUser
-    };
-
-    const errorResponse: LoginResponse = {
-      success: false,
-      message: 'Usuario o contraseña incorrectos'
-    };
-
-    // logic simulated
-    if (credentials.password === '123456') {
-      return of(successResponse).pipe(
-        delay(1000),
-        tap(response => {
-          if (response.success && response.user && response.token) {
-            this.setSession(response.user, response.token);
-          }
-        })
-      );
-    } else {
-      return of(errorResponse).pipe(delay(1000));
-    }
-
-    // --------------- mock data out -----------------
-
-    /*    ------  REAL CODE -----------
-
-    console.log('[AuthService] Conectando a API LOGIN:', this.apiUrl);
-
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        // Solo guardamos sesión si el backend dice success: true
-        if (response.success && response.user && response.token) {
-          console.log('Login real exitoso');
-          this.setSession(response.user, response.token);
-        }
-      })
-    );
-
-*/
-
-  }
-
-  register(data: RegisterRequest): Observable<boolean> {
-
-    // --------------- mock data in -----------------
-
-    // We simulate that “admin” already exists to test for errors.
-    if (data.username === 'admin' || data.email === 'admin@chefpro.com') {
-      // We return a simulated error after 1 second.
-      return throwError(() => new Error('USER_EXISTS')).pipe(delay(1000));
-    }
-
-    // If you are not an administrator, success
-    return of(true).pipe(
-      delay(1500),
-      tap(() => console.log('[AuthService] Usuario registrado con éxito (Simulación)'))
-    );
-
-    // --------------- mock data out -----------------
-
-
-    /* ------  REAL CODE (Para el futuro) -----------
-
-    return this.http.post<any>(`${this.apiUrl}/register`, data).pipe(
-      tap(() => console.log('Registro real enviado al backend'))
-    );
+    tap() > Used to intercept success. If the login is correct, we take the opportunity to save the data in the
+    browser (localStorage) before the component finds out.
 
     */
 
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(response => {
+        if (response.token) {
+          console.log('Login exitoso, guardando sesión...');
+          this.setSession(
+            /*
+            Save the user who sends back in response.user. If back fails, this saves us by using
+            decodeUserFromToken to detect what type of user it is.
+            */
+            response.user || this.decodeUserFromToken(credentials.username, response.token),
+            response.token
+          );
+        }
+      }),
+      catchError(this.handleError)
+    );
   }
 
+  // sign in > Registers a new user
+  register(data: RegisterRequest): Observable<any> {
+    console.log('[AuthService] Registrando usuario en:', `${this.apiUrl}/register`);
+    return this.http.post(`${this.apiUrl}/register`, data).pipe(
+      tap(() => console.log('Registro real completado')),
+      catchError(this.handleError)
+    );
+  }
 
-  // ---------- mock data in ------------
-
+  // real-time validation > Check if username or email is already taken
   checkUsernameAvailability(username: string): Observable<boolean> {
-    // We simulate that ‘admin’ and ‘chef’ are busy
-    const isTaken = username.toLowerCase() === 'admin' || username.toLowerCase() === 'chef';
-    return of(!isTaken).pipe(delay(500));
+    return this.http.get<boolean>(`${this.apiUrl}/check-username/${username}`).pipe(
+      catchError(() => of(true))
+    );
   }
 
+  // real-time validation > Check if email is already taken
   checkEmailAvailability(email: string): Observable<boolean> {
-    const isTaken = email.toLowerCase() === 'admin@chefpro.com';
-    return of(!isTaken).pipe(delay(500));
+    return this.http.get<boolean>(`${this.apiUrl}/check-email/${email}`).pipe(
+      catchError(() => of(true))
+    );
   }
 
-  // ---------------- mock dat out -----------------
+      /**
+       catchError(() => of(true))
 
-  // logout
+        Meaning: “If I try to ask the backend if the user exists and the backend gives
+        me an error (or does not have that endpoint), I will assume that the user is free.”
+       */
+
+  // logout > Clear user session
   logout(): void {
     console.log('[AuthService] Cerrando sesión...');
     localStorage.removeItem('chefpro_user');
@@ -156,27 +103,58 @@ export class AuthService {
     this.router.navigate(['/index']);
   }
 
-  // private methods
-  // save user
+  // remember user session
   private setSession(user: User, token: string): void {
     localStorage.setItem('chefpro_user', JSON.stringify(user));
     localStorage.setItem('chefpro_token', token);
     this.currentUserSubject.next(user);
   }
 
-  // rescue user
+  // restore user session
   private restoreSession(): void {
     const userJson = localStorage.getItem('chefpro_user');
     const token = localStorage.getItem('chefpro_token');
-
     if (userJson && token) {
       try {
         const user: User = JSON.parse(userJson);
         this.currentUserSubject.next(user);
       } catch (e) {
+        console.error('Error restaurando sesión', e);
         this.logout();
       }
     }
   }
 
+  // error handling
+  private handleError(error: HttpErrorResponse) {
+    console.error('Error en AuthService:', error);
+    return throwError(() => error);
+  }
+
+  // decode JWT token to extract user role
+  private decodeUserFromToken(username: string, token: string): User {
+    let role: 'CLIENT' | 'CHEF' | 'ADMIN' = 'CLIENT';
+
+    try {
+      const payloadPart = token.split('.')[1];
+      const payloadDecoded = atob(payloadPart);
+      const values = JSON.parse(payloadDecoded);
+      const tokenRole = values.role || values.roles || values.authority;
+
+      if (tokenRole === 'CHEF') role = 'CHEF';
+      if (tokenRole === 'ADMIN') role = 'ADMIN';
+
+    } catch (e) {
+      console.warn('No se pudo leer el rol del token, asignando CLIENT por defecto');
+    }
+
+    return {
+      id: 'temp-id',
+      username: username,
+      name: username,
+      email: 'temp@email.com',
+      role: role,
+      photoUrl: ''
+    };
+  }
 }
