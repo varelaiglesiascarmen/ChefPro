@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
-import { LoginRequest, LoginResponse, User } from '../models/auth.model';
+import { LoginRequest, LoginResponse, User, RegisterRequest } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -102,6 +102,52 @@ export class AuthService {
 
   }
 
+  register(data: RegisterRequest): Observable<boolean> {
+
+    // --------------- mock data in -----------------
+
+    // We simulate that “admin” already exists to test for errors.
+    if (data.username === 'admin' || data.email === 'admin@chefpro.com') {
+      // We return a simulated error after 1 second.
+      return throwError(() => new Error('USER_EXISTS')).pipe(delay(1000));
+    }
+
+    // If you are not an administrator, success
+    return of(true).pipe(
+      delay(1500),
+      tap(() => console.log('[AuthService] Usuario registrado con éxito (Simulación)'))
+    );
+
+    // --------------- mock data out -----------------
+
+
+    /* ------  REAL CODE (Para el futuro) -----------
+
+    return this.http.post<any>(`${this.apiUrl}/register`, data).pipe(
+      tap(() => console.log('Registro real enviado al backend'))
+    );
+
+    */
+
+  }
+
+
+  // ---------- mock data in ------------
+
+  checkUsernameAvailability(username: string): Observable<boolean> {
+    // We simulate that ‘admin’ and ‘chef’ are busy
+    const isTaken = username.toLowerCase() === 'admin' || username.toLowerCase() === 'chef';
+    return of(!isTaken).pipe(delay(500));
+  }
+
+  checkEmailAvailability(email: string): Observable<boolean> {
+    const isTaken = email.toLowerCase() === 'admin@chefpro.com';
+    return of(!isTaken).pipe(delay(500));
+  }
+
+  // ---------------- mock dat out -----------------
+
+  // logout
   logout(): void {
     console.log('[AuthService] Cerrando sesión...');
     localStorage.removeItem('chefpro_user');
@@ -132,4 +178,5 @@ export class AuthService {
       }
     }
   }
+
 }

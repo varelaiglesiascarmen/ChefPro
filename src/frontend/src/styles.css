@@ -1,8 +1,12 @@
 :root {
   --cream-bg: #FDF7F0;
-  --dark-brown: #512109; 
+  --dark-brown: #512109;
   --divider-brown: #512109;
   --gold-button: #9C7710;
+}
+
+html{
+  scroll-behavior: smooth;
 }
 
 body {

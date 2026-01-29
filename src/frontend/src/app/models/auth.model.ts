@@ -23,10 +23,19 @@ export interface User {
   };
 }
 
-// what the server should return
+// Object > login, what the server should return
 export interface LoginResponse {
   success: boolean;
   token?: string;
   user?: User;
   message?: string;
+}
+
+// Object > register attempt, what the server should return
+export interface RegisterRequest {
+    name: string;
+    surname: string;
+    username: string;
+    email: string;
+    password: string;
 }
