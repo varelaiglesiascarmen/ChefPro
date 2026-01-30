@@ -95,4 +95,14 @@ public class LoginController {
 
     return ResponseEntity.ok(userLoginDto);
   }
+
+  @PostMapping("/signin")
+  public String signin(@RequestBody LoginRequestDto request) {
+
+      if(!userService.singUserIn(request)) {
+
+        return "Account created";
+      }
+      return "Check your data, something is incorrect, such as mail already in use or a missing field left blank.";
+  }
 }
