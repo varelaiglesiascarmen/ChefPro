@@ -1,7 +1,5 @@
 package com.chefpro.backendjava.common.config;
 
-import com.chefpro.backendjava.common.security.CustomUserDetailsService;
-import com.chefpro.backendjava.common.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.chefpro.backendjava.common.security.CustomUserDetailsService;
+import com.chefpro.backendjava.common.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -38,6 +39,12 @@ public class SecurityConfig {
       .authorizeHttpRequests(auth -> auth
         // Endpoints públicos
         .requestMatchers("/api/auth/login", "/api/auth/health").permitAll()
+        // Permitir raíz y recursos estáticos
+        .requestMatchers(
+          "/", "/index.html", "/favicon.ico",
+          "/assets/**", "/static/**", "/public/**",
+          "/**/*.css", "/**/*.js", "/**/*.map"
+        ).permitAll()
 
         // Endpoints protegidos por rol
         .requestMatchers("/api/chef/**").hasRole("CHEF")
