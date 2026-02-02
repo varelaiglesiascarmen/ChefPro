@@ -15,7 +15,7 @@ public class UserLoginDto {
 
   private String email;
 
-  private String photoURL;
+  private String phoneNumber;
 
   private String role;
 

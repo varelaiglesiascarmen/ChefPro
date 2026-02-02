@@ -2,7 +2,9 @@ package com.chefpro.backendjava.common.object.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
+import com.chefpro.backendjava.common.object.dto.PlatoDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -37,7 +39,7 @@ public class Menu {
 
     // Guardamos lista de platos como texto separado por comas
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String dishes;
+    private List<Plato> dishes;
 
     // Guardamos lista de alérgenos como texto separado por comas
     @Column(nullable = false, columnDefinition = "TEXT")
