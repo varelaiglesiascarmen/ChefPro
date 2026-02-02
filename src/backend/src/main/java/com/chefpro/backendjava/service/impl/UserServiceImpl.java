@@ -1,10 +1,12 @@
 package com.chefpro.backendjava.service.impl;
 
+import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import com.chefpro.backendjava.common.object.entity.UserLogin;
 import com.chefpro.backendjava.repository.CustomUserRepository;
 import com.chefpro.backendjava.service.UserService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -38,4 +40,27 @@ public class UserServiceImpl implements UserService {
 
     return null;
   }
+
+  @Override
+  @Transactional
+  public Boolean singUserIn(LoginRequestDto request) {
+
+    if(request != null && request.getUsername() != null && request.getPassword() != null){
+
+      if(findByEmail(request.getUsername()) == null) {
+
+        UserLogin userLogin = new UserLogin();
+        userLogin.setUsername(request.getUsername());
+        userLogin.setPassword(request.getPassword());
+
+        customUserRepository.saveAndFlush(userLogin);
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
 }
