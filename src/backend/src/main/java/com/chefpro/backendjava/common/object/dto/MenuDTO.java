@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 public class MenuDTO {
 
-    private String id;
+    private Long id;
     private String title;
     private String description;
 

@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class ReservationDTO {
 
-  private String id;
+  private Long id;
   private String name;
   private String description;
   private OffsetDateTime date;

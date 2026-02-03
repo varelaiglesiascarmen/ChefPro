@@ -16,22 +16,20 @@ import java.util.List;
 public class ReservationController {
 
   private final ReservaService reservaService;
-  private final AuthenticationManager authenticationManager;
 
-  public ReservationController(ReservaService reservaService, AuthenticationManager authenticationManager) {
+  public ReservationController(ReservaService reservaService) {
     this.reservaService = reservaService;
-    this.authenticationManager = authenticationManager;
   }
 
 
-  @GetMapping("/reservas/chef")
+  @GetMapping("/chef")
   public List<ReservationDTO> getReservasDelChef(Authentication authentication) {
 
 
     return reservaService.listByChef(authentication);
   }
 
-  @GetMapping("/reservas/comensal")
+  @GetMapping("/comensal")
   public List<ReservationDTO> getReservasDelComensal(Authentication authentication) {
 
 

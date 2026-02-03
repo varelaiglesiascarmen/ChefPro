@@ -24,9 +24,9 @@ public class Plato {
   @Column(length = 300)
   private String description;
 
-  @ManyToOne(optional = false)
+  //@ManyToOne(optional = false)
   @JoinColumn(name = "chef_id", nullable = false)
-  private UserLogin chef;
+  private Long chefId;
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;

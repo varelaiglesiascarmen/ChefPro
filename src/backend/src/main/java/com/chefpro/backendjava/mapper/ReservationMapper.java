@@ -17,7 +17,7 @@ public class ReservationMapper {
     if (r == null) return null;
 
     ReservationDTO dto = new ReservationDTO();
-    dto.setId(r.getId() != null ? r.getId().toString() : null);
+    dto.setId(r.getId() != null ? r.getId() : null);
 
     // "name" no existe en Reservation: lo sacamos del menú
     dto.setName(r.getMenu() != null ? r.getMenu().getTitle() : null);
@@ -101,7 +101,7 @@ public class ReservationMapper {
     Set<String> allergens = (m.getAllergens() == null) ? Set.of() : m.getAllergens();
 
     return MenuDTO.builder()
-      .id(m.getId() != null ? m.getId().toString() : null)
+      .id(m.getId() != null ? m.getId() : null)
       .title(m.getTitle())
       .description(m.getDescription())
       .dishes(dishDtos)
