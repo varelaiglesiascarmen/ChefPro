@@ -24,7 +24,7 @@ public class ChefController {
   @GetMapping("/menus")
   public List<MenuDTO> getMenusDelChef(Authentication authentication) {
 
-    return menuService.listarPorChef(authentication);
+    return menuService.listByChef(authentication);
   }
 
 
@@ -32,7 +32,7 @@ public class ChefController {
   public ResponseEntity<MenuDTO> crearMenu(@RequestBody MenuCReqDto menuDto, Authentication authentication) {
 
 
-    menuService.crearMenu(menuDto, authentication);
+    menuService.createMenu(menuDto, authentication);
     return ResponseEntity.status(200).build();
   }
 

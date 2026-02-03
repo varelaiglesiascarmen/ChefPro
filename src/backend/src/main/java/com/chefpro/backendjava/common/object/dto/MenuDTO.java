@@ -3,7 +3,9 @@ package com.chefpro.backendjava.common.object.dto;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class MenuDTO {
 
     private String id;
@@ -20,7 +23,7 @@ public class MenuDTO {
     private String description;
 
     private List<PlatoDto> dishes;
-    private String allergens;
+    private Set<String> allergens;
 
     private BigDecimal pricePerPerson;
 
