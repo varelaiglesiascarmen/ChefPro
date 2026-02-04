@@ -39,7 +39,7 @@ export class LoginComponent {
       next: (res) => {
         this.isLoading = false;
 
-        if (res.success) {
+        if (res.success || res.token) {
           console.log('Login correcto:', res.user?.name);
           this.router.navigate(['/index']);
         } else {
