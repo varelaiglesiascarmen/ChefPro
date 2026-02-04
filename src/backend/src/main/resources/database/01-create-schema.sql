@@ -1,189 +1,202 @@
--- =========================================================
---  CHEFPRO - Esquema básico + datos de ejemplo
---  Tablas: users, menu, reservations
--- =========================================================
-
--- 1) Crear base de datos (si no existe) y usarla
-DROP DATABASE IF EXISTS chefpro;
-CREATE DATABASE chefpro
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_general_ci;
-
-USE chefpro;
-
--- =========================================================
--- 2) Tabla USERS
---    - Usuarios del sistema: ADMIN, CHEF, COMENSAL
--- =========================================================
-
-CREATE TABLE IF NOT EXISTS users (
-    id            VARCHAR(50)                      NOT NULL,
-    email         VARCHAR(150)                     NOT NULL,
-    password      VARCHAR(255)                     NOT NULL,
-    role          ENUM('ADMIN','CHEF','COMENSAL')  NOT NULL,
-    name          VARCHAR(100)                     NOT NULL,
-    phone_number  VARCHAR(20)                      NULL,
-    created_at    TIMESTAMP                        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_users PRIMARY KEY (id),
-    CONSTRAINT uq_users_email UNIQUE (email)
-);
-
--- =========================================================
--- 3) Tabla MENU
---    - Menús creados por los CHEF
---    - dishes y allergens se guardan como texto separado por comas
--- =========================================================
-
-CREATE TABLE IF NOT EXISTS menu (
-    id                      VARCHAR(50)  NOT NULL,
-    title                   VARCHAR(150) NOT NULL,
-    description             VARCHAR(300) NULL,
-    dishes                  TEXT         NOT NULL, -- Ej: 'Sopa,Entrecot,Flan'
-    allergens               TEXT         NOT NULL, -- Ej: 'Gluten,Lácteos,Huevo'
-    price_per_person        DECIMAL(10,2) NOT NULL,
-
-    is_delivery_available   BOOLEAN      NOT NULL DEFAULT FALSE,
-    can_cook_at_client_home BOOLEAN      NOT NULL DEFAULT FALSE,
-    is_pickup_available     BOOLEAN      NOT NULL DEFAULT FALSE,
-
-    chef_id                 VARCHAR(50)  NOT NULL, -- FK a users(id)
-    created_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT pk_menu PRIMARY KEY (id),
-    CONSTRAINT fk_menu_chef FOREIGN KEY (chef_id)
-        REFERENCES users(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
--- =========================================================
--- 4) Tabla RESERVATIONS
---    - Reservas realizadas por COMENSALES sobre MENÚS
---    - Incluye dirección de entrega y notas
--- =========================================================
-
-CREATE TABLE IF NOT EXISTS reservations (
-    id                VARCHAR(50)  NOT NULL,
-    user_id           VARCHAR(50)  NOT NULL, -- COMENSAL
-    menu_id           VARCHAR(50)  NOT NULL, -- MENÚ reservado
-
-    reservation_date  DATETIME     NOT NULL, -- Fecha/hora de la reserva (servicio)
-    number_of_people  INT          NOT NULL,
-
-    -- Tipo de servicio según la lógica de tu menú
-    service_type      ENUM('DELIVERY','HOME_COOKING','PICKUP') NOT NULL,
-
-    -- Dirección de entrega (se usa sobre todo si service_type = DELIVERY)
-    delivery_address      VARCHAR(200) NULL,
-    delivery_city         VARCHAR(100) NULL,
-    delivery_postal_code  VARCHAR(10)  NULL,
-    delivery_notes        VARCHAR(300) NULL,
-
-    status            ENUM('PENDING','CONFIRMED','CANCELLED') NOT NULL DEFAULT 'PENDING',
-    created_at        TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT pk_reservations PRIMARY KEY (id),
-    CONSTRAINT fk_reservation_user FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_reservation_menu FOREIGN KEY (menu_id)
-        REFERENCES menu(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
--- =========================================================
--- 5) DATOS DE EJEMPLO (SEED)
---    OJO: las contraseñas están en texto plano SOLO como ejemplo.
---    En vuestro entorno real debéis sustituirlas por hashes BCrypt.
--- =========================================================
-
--- 5.1 Usuarios de ejemplo
-INSERT INTO users (id, email, password, role, name, phone_number)
-VALUES
-    ('u_001', 'admin@chefpro.com',    'admin1234',    'ADMIN',   'Admin ChefPro',   '600000001'),
-    ('u_002', 'chef1@chefpro.com',    'chef1234',     'CHEF',    'Chef Mario',      '600000002'),
-    ('u_003', 'cliente1@chefpro.com', 'comensal1234', 'COMENSAL','Comensal Laura',  '600000003');
-
--- =========================================================
---  IMPORTANTE:
---  Una vez tengáis vuestro PasswordGenerator con BCrypt,
---  debéis actualizar estos passwords así (ejemplo):
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
---  UPDATE users SET password = '<HASH_BCRYPT_ADMIN>'
---  WHERE email = 'admin@chefpro.com';
+-- Host: 127.0.0.1    Database: chef_pro
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.4.32-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
 --
---  UPDATE users SET password = '<HASH_BCRYPT_CHEF>'
---  WHERE email = 'chef1@chefpro.com';
+-- Table structure for table `allergens_dishes`
 --
---  UPDATE users SET password = '<HASH_BCRYPT_COMENSAL>'
---  WHERE email = 'cliente1@chefpro.com';
--- =========================================================
 
+DROP TABLE IF EXISTS `allergens_dishes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `allergens_dishes` (
+  `menu_ID` int(11) NOT NULL,
+  `dish_ID` int(11) NOT NULL,
+  `allergen` varchar(50) NOT NULL,
+  PRIMARY KEY (`menu_ID`,`dish_ID`,`allergen`),
+  KEY `fk_official_allergen` (`allergen`),
+  CONSTRAINT `allergens_dishes_ibfk_1` FOREIGN KEY (`menu_ID`, `dish_ID`) REFERENCES `dishes` (`menu_ID`, `dish_ID`) ON DELETE CASCADE,
+  CONSTRAINT `fk_official_allergen` FOREIGN KEY (`allergen`) REFERENCES `official_allergens_list` (`allergen_name`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- 5.2 Menús de ejemplo
-INSERT INTO menu (
-    id, title, description, dishes, allergens, price_per_person,
-    is_delivery_available, can_cook_at_client_home, is_pickup_available,
-    chef_id
-) VALUES
-      (
-          'm_001',
-          'Menú Mediterráneo',
-          'Ensalada, paella y postre casero.',
-          'Ensalada,Paella,Flan de huevo',
-          'Gluten,Lácteos,Huevo,Marisco',
-          35.50,
-          TRUE,
-          FALSE,
-          TRUE,
-          'u_002' -- Chef Mario
-      ),
-      (
-          'm_002',
-          'Menú Vegano Ligero',
-          'Crema de verduras, hummus y fruta fresca.',
-          'Crema de verduras,Hummus,Fruta de temporada',
-          'Frutos secos,Legumbres',
-          28.00,
-          TRUE,
-          TRUE,
-          TRUE,
-          'u_002'
-      );
+--
+-- Table structure for table `chefs`
+--
 
--- 5.3 Reservas de ejemplo
-INSERT INTO reservations (
-    id, user_id, menu_id,
-    reservation_date, number_of_people,
-    service_type,
-    delivery_address, delivery_city, delivery_postal_code, delivery_notes,
-    status
-) VALUES
-      (
-          'r_001',
-          'u_003',     -- Comensal Laura
-          'm_001',     -- Menú Mediterráneo
-          '2026-02-10 21:00:00',
-          4,
-          'DELIVERY',
-          'Calle Falsa 123',
-          'Sevilla',
-          '41001',
-          'Llamar antes de llegar, por favor.',
-          'PENDING'
-      ),
-      (
-          'r_002',
-          'u_003',
-          'm_002',
-          '2026-02-12 14:30:00',
-          2,
-          'PICKUP',
-          NULL,
-          NULL,
-          NULL,
-          'Recoger en local a las 14:15.',
-          'CONFIRMED'
-      );
+DROP TABLE IF EXISTS `chefs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `chefs` (
+  `user_ID` int(11) NOT NULL,
+  `photo` varchar(255) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `prizes` text DEFAULT NULL,
+  PRIMARY KEY (`user_ID`),
+  CONSTRAINT `chefs_ibfk_1` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `diners`
+--
+
+DROP TABLE IF EXISTS `diners`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `diners` (
+  `user_ID` int(11) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`user_ID`),
+  CONSTRAINT `diners_ibfk_1` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dishes`
+--
+
+DROP TABLE IF EXISTS `dishes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dishes` (
+  `menu_ID` int(11) NOT NULL,
+  `dish_ID` int(11) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `description` text DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`menu_ID`,`dish_ID`),
+  CONSTRAINT `dishes_ibfk_1` FOREIGN KEY (`menu_ID`) REFERENCES `menu` (`menu_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `menu`
+--
+
+DROP TABLE IF EXISTS `menu`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `menu` (
+  `menu_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `chef_ID` int(11) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price_per_person` decimal(10,2) NOT NULL,
+  `min_number_diners` int(11) DEFAULT NULL,
+  `max_number_diners` int(11) DEFAULT NULL,
+  `kitchen_requirements` text DEFAULT NULL,
+  PRIMARY KEY (`menu_ID`),
+  KEY `chef_ID` (`chef_ID`),
+  CONSTRAINT `menu_ibfk_1` FOREIGN KEY (`chef_ID`) REFERENCES `chefs` (`user_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `official_allergens_list`
+--
+
+DROP TABLE IF EXISTS `official_allergens_list`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `official_allergens_list` (
+  `allergen_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`allergen_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reservations`
+--
+
+DROP TABLE IF EXISTS `reservations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reservations` (
+  `chef_ID` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `diner_ID` int(11) NOT NULL,
+  `menu_ID` int(11) NOT NULL,
+  `n_diners` int(11) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `status` enum('PENDING','CONFIRMED','REJECTED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`chef_ID`,`date`),
+  KEY `diner_ID` (`diner_ID`),
+  KEY `menu_ID` (`menu_ID`),
+  CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`chef_ID`) REFERENCES `chefs` (`user_ID`),
+  CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`diner_ID`) REFERENCES `diners` (`user_ID`),
+  CONSTRAINT `reservations_ibfk_3` FOREIGN KEY (`menu_ID`) REFERENCES `menu` (`menu_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reviews`
+--
+
+DROP TABLE IF EXISTS `reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reviews` (
+  `review_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `reviewed_user` int(11) NOT NULL,
+  `reviewer_user` int(11) NOT NULL,
+  `score` int(11) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `date` date DEFAULT curdate(),
+  PRIMARY KEY (`review_ID`),
+  KEY `reviewed_user` (`reviewed_user`),
+  KEY `reviewer_user` (`reviewer_user`),
+  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`reviewed_user`) REFERENCES `users` (`user_ID`),
+  CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`reviewer_user`) REFERENCES `users` (`user_ID`),
+  CONSTRAINT `chk_score` CHECK (`score` >= 1 and `score` <= 5)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `user_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `role` enum('ADMIN','CHEF','DINER') NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `lastname` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`user_ID`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `phone_number` (`phone_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-02-04 14:13:20
