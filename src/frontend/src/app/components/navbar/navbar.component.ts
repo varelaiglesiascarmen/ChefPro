@@ -5,9 +5,9 @@ import { CommonModule } from '@angular/common';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { AuthService } from '../../services/auth.service';
 import { FocusOnInitDirective } from '../../directives/focus-on-init.directive';
-import { SearchFilterComponent } from '../search-filter.component/search-filter.component';
+import { SearchFilterComponent } from '../search-filter/search-filter.component';
 import { User } from '../../models/auth.model';
-import { UserMenuComponent } from '../user-menu.component/user-menu.component';
+import { UserMenuComponent } from '../user-menu/user-menu.component';
 
 @Component({
   selector: 'app-navbar',
@@ -112,18 +112,6 @@ export class NavbarComponent implements OnInit {
     this.showFilterMenu = false;
   }
 
-  performSearch(filtrosOpcionales: any = null) {
-    const cleanText = this.searchText.trim();
-
-    if (cleanText || this.hasFilterActive || filtrosOpcionales) {
-      console.log('Ejecutando búsqueda:', {
-        texto: cleanText,
-        filtrosActivos: this.hasFilterActive,
-        nuevosFiltros: filtrosOpcionales
-      });
-    }
-  }
-
   toggleFilterMenu() {
     this.showFilterMenu = !this.showFilterMenu;
   }
@@ -134,14 +122,48 @@ export class NavbarComponent implements OnInit {
     this.performSearch(filtros);
   }
 
+  performSearch(filtrosOpcionales: any = null) {
+    const cleanText = this.searchText.trim();
+
+    const queryParams: any = {};
+
+    if (filtrosOpcionales && filtrosOpcionales.searchText) {
+      queryParams['q'] = filtrosOpcionales.searchText;
+      this.searchText = filtrosOpcionales.searchText;
+    } else if (cleanText) {
+      queryParams['q'] = cleanText;
+    }
+
+    if (filtrosOpcionales) {
+      if (filtrosOpcionales.date) queryParams['date'] = filtrosOpcionales.date;
+      if (filtrosOpcionales.dietIds && filtrosOpcionales.dietIds.length > 0) {
+        queryParams['diets'] = filtrosOpcionales.dietIds.join(',');
+      }
+      if (filtrosOpcionales.minPrice !== null) queryParams['min'] = filtrosOpcionales.minPrice;
+      if (filtrosOpcionales.maxPrice !== null) queryParams['max'] = filtrosOpcionales.maxPrice;
+      if (filtrosOpcionales.guestCount) queryParams['guests'] = filtrosOpcionales.guestCount;
+      if (filtrosOpcionales.onlyTopRated) queryParams['top'] = 'true';
+    }
+
+    if (Object.keys(queryParams).length === 0 && !this.hasFilterActive) {
+      return;
+    }
+
+    console.log('Navegando a /search-results con:', queryParams);
+
+    this.router.navigate(['/search-results'], { queryParams });
+
+    this.showFilterMenu = false;
+    this.isMenuOpen = false;
+    this.isSearchOpen = false;
+  }
+
   handleImageError(event: any) {
     event.target.src = '/logos/users.svg';
   }
 
   handleUserClick() {
-    // We check if the user exists
     if (this.currentUser) {
-      // Toggle the user menu instead of navigating directly
       this.isUserMenuOpen = !this.isUserMenuOpen;
     } else {
       this.router.navigate(['/login']);

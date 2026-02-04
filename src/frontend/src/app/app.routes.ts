@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
-import { HomePageComponent } from './components/home-page.component/home-page.component';
-import { LoginComponent } from './components/login.component/login.component';
-import { SignInComponent } from './components/sign-in.component/sign-in.component';
-import {IndexComponent} from './components/index.component/index.component';
-import { ContactComponent } from './components/contact.component/contact.component';
-import { AboutComponent } from './components/about.component/about.component';
-import { NotFoundComponent } from './components/not-found.component/not-found.component';
-import { ProfileComponent } from './components/profile.component/profile.component';
-import { SearchComponent } from './components/search.component/search.component';
-import { UserMenuComponent } from './components/user-menu.component/user-menu.component';
+import { HomePageComponent } from './components/home-page/home-page.component';
+import { LoginComponent } from './components/login/login.component';
+import { SignInComponent } from './components/sign-in/sign-in.component';
+import {IndexComponent} from './components/index/index.component';
+import { ContactComponent } from './components/contact/contact.component';
+import { AboutComponent } from './components/about/about.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { UserMenuComponent } from './components/user-menu/user-menu.component';
+import { SearchResultsComponent } from './components/search-results/search-results.component';
+import { CreateDishComponent } from './components/create-dish/create-dish.component';
+import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
 
 export const routes: Routes = [
   // If the path is empty (‘’), redirect to 'homepage'
@@ -38,11 +40,26 @@ export const routes: Routes = [
   // profile root
   { path: 'profile', component: ProfileComponent },
 
-  // search root
-  { path: 'search', component: SearchComponent },
-
   // user-menu root
   { path: 'user-menu', component: UserMenuComponent },
+
+  // search-results root
+  { path: 'search-results', component: SearchResultsComponent },
+
+  //create menu root
+  { path: 'create-menu', component: CreateDishComponent },
+
+  // edit-menu root
+  { path: 'edit-menu/:id', component: CreateDishComponent },
+
+  // create-dish root
+  { path: 'create-dish', component: CreateDishComponent },
+
+  // edit-dish root
+  { path: 'edit-dish/:id', component: CreateDishComponent },
+
+  // service-detail root
+  { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
 
   // If you write something strange, send it to the home page
   { path: '**', redirectTo: 'homepage' }
