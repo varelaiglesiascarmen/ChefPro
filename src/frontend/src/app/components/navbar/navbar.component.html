@@ -29,10 +29,12 @@
 
       @if (showFilterMenu) {
         <div class="filter-dropdown-container" @fadeInOut>
+
           <app-search-filter
             (close)="showFilterMenu = false"
             (apply)="onFilterApplied($event)">
           </app-search-filter>
+
         </div>
       }
 

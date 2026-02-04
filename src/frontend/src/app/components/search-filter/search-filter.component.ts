@@ -29,6 +29,7 @@ export class SearchFilterComponent implements OnInit {
   dietOptions: DietOption[] = [];
 
   // Form State
+  searchText: string = '';
   minPrice: number | null = null;
   maxPrice: number | null = null;
   guestCount: number | null = null;
@@ -76,6 +77,7 @@ export class SearchFilterComponent implements OnInit {
     this.guestCount = null;
     this.onlyTopRated = false;
     this.selectedDate = null;
+    this.searchText = '';
   }
 
   /*
@@ -93,7 +95,8 @@ export class SearchFilterComponent implements OnInit {
       maxPrice: this.maxPrice,
       guestCount: this.guestCount,
       onlyTopRated: this.onlyTopRated,
-      date: this.selectedDate
+      date: this.selectedDate,
+      searchText: this.searchText
     };
 
     this.apply.emit(filters);
