@@ -22,7 +22,7 @@ public class UserLogin {
 
     @Id
     @Column(length = 50)
-    private String id;
+    private Long id;
 
     @Column(name = "email", length = 150, nullable = false, unique = true)
     private String username;

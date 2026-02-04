@@ -13,10 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/auth")
@@ -99,7 +96,7 @@ public class LoginController {
   @PostMapping("/signin")
   public String signin(@RequestBody LoginRequestDto request) {
 
-      if(!userService.singUserIn(request)) {
+      if(userService.signInUser(request)) {
 
         return "Account created";
       }
