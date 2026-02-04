@@ -60,7 +60,7 @@ El proyecto utiliza tecnologías modernas y de alta demanda profesional para gar
 #### Base de Datos (MySQL Workbench)
 La persistencia se gestiona en MySQL.
 - El diseño se basa en un Esquema Entidad-Relación detallado que garantiza la integridad de los datos entre usuarios, servicios y reservas.
-![Esquema E/R]()
+<img width="1047" height="855" alt="image" src="https://github.com/user-attachments/assets/193c87ed-1b86-4d8d-9d4f-f4157747db8d" />
 - Se han incluido Seeders (datos de prueba) para permitir una revisión inmediata de la plataforma sin necesidad de carga manual de datos.
 
 #### Backend (Spring Boot)
