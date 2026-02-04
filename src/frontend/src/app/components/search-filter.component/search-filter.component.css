@@ -417,7 +417,60 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* Animations */
+/* calendary */
+.input-with-icon input[type="date"] {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: white;
+  border: 1px solid #D1C7BD;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  color: var(--dark-brown);
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+  min-height: 42px;
+  cursor: text;
+}
+
+.input-with-icon input[type="date"]:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 3px var(--gold-bg);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(24%) sepia(28%) saturate(733%) hue-rotate(352deg) brightness(94%) contrast(93%);
+  opacity: 0.6;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease, opacity 0.2s;
+  padding: 5px;
+  margin-left: 5px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.15);
+  background-color: var(--gold-bg);
+  border-radius: 50%;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  color: var(--dark-brown);
+  font-weight: 500;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+input[type="date"]:invalid::-webkit-datetime-edit {
+  color: #999;
+}
+
+/* mnu animation */
 @keyframes menuEnter {
   from {
     opacity: 0;
@@ -437,6 +490,7 @@ input[type="number"]::-webkit-inner-spin-button {
     border-radius: 0;
     box-shadow: none;
     border: none;
+    top: 0;
   }
 
   .decorative-triangle {

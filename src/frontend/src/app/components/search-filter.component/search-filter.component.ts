@@ -33,6 +33,8 @@ export class SearchFilterComponent implements OnInit {
   maxPrice: number | null = null;
   guestCount: number | null = null;
   onlyTopRated: boolean = false;
+  selectedDate: string | null = null;
+  minDate: string = '';
 
   // Slider Configuration
   sliderMin: number = 0;
@@ -43,6 +45,7 @@ export class SearchFilterComponent implements OnInit {
   // Lifecycle hook to initialize component data.
   ngOnInit() {
     this.loadDiets();
+    this.calculateMinDate();
   }
 
   // Fetches dietary options from the backend and initializes selection state.
@@ -55,6 +58,16 @@ export class SearchFilterComponent implements OnInit {
     });
   }
 
+  // Calculates today's date in YYYY-MM-DD format for the date picker min attribute.
+  calculateMinDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+
+    this.minDate = `${year}-${month}-${day}`;
+  }
+
   // Resets all filter fields to their default values.
   resetFilters() {
     this.dietOptions.forEach(d => d.selected = false);
@@ -62,6 +75,7 @@ export class SearchFilterComponent implements OnInit {
     this.maxPrice = null;
     this.guestCount = null;
     this.onlyTopRated = false;
+    this.selectedDate = null;
   }
 
   /*
@@ -78,7 +92,8 @@ export class SearchFilterComponent implements OnInit {
       minPrice: this.minPrice,
       maxPrice: this.maxPrice,
       guestCount: this.guestCount,
-      onlyTopRated: this.onlyTopRated
+      onlyTopRated: this.onlyTopRated,
+      date: this.selectedDate
     };
 
     this.apply.emit(filters);
