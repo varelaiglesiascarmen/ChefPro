@@ -13,7 +13,7 @@ export interface User {
   email: string;
   name: string;
   photoUrl?: string; // ? = Opcional
-  role: 'CHEF' | 'CLIENT' | 'ADMIN';
+  role: 'CHEF' | 'ADMIN' | 'DINER';
 
   // recommendation algorithm
   preferences?: {
@@ -29,6 +29,7 @@ export interface LoginResponse {
   token?: string;
   user?: User;
   message?: string;
+  role: 'DINER' | 'CHEF' | 'ADMIN';
 }
 
 // Object > register attempt, what the server should return
@@ -38,4 +39,5 @@ export interface RegisterRequest {
     username: string;
     email: string;
     password: string;
+    role: 'DINER' | 'CHEF';
 }

@@ -22,80 +22,84 @@
 
         <div class="form-group">
           <label>Nombre de usuario:</label>
-          <input type="text"
-                 name="username"
-                 [(ngModel)]="registerData.username"
-                 (blur)="checkUsername()"
-                 required
-                 placeholder="Nombre de usuario">
+          <input type="text" name="username" [(ngModel)]="registerData.username" (blur)="checkUsername()" required
+            placeholder="Nombre de usuario">
 
           @if (usernameStatus === 'TAKEN') {
-            <span class="status-msg error">El nombre de usuario no está disponible</span>
+          <span class="status-msg error">El nombre de usuario no está disponible</span>
           }
           @if (usernameStatus === 'PENDING') {
-            <span class="status-msg info">Comprobando disponibilidad...</span>
+          <span class="status-msg info">Comprobando disponibilidad...</span>
           }
         </div>
 
         <div class="form-group">
           <label>Correo electrónico:</label>
-          <input type="email"
-                 name="email"
-                 [(ngModel)]="registerData.email"
-                 (blur)="checkEmail()"
-                 placeholder="Correo electrónico"
-                 required>
+          <input type="email" name="email" [(ngModel)]="registerData.email" (blur)="checkEmail()"
+            placeholder="Correo electrónico" required>
 
           @if (emailStatus === 'TAKEN') {
-            <span class="status-msg error">Este correo ya está registrado</span>
+          <span class="status-msg error">Este correo ya está registrado</span>
           }
           @if (emailStatus === 'INVALID_FORMAT') {
-            <span class="status-msg warning">El correo debe llevar '@' y un dominio</span>
+          <span class="status-msg warning">El correo debe llevar '@' y un dominio</span>
           }
         </div>
 
         <div class="form-group">
           <label>Repita el correo electrónico:</label>
-          <input type="email" name="confirmEmail" [(ngModel)]="confirmEmail" placeholder="Repita el correo electrónico" required>
+          <input type="email" name="confirmEmail" [(ngModel)]="confirmEmail" placeholder="Repita el correo electrónico"
+            required>
         </div>
 
         <div class="form-group">
           <label>Contraseña:</label>
-          <input type="password"
-                 name="password"
-                 [(ngModel)]="registerData.password"
-                 (input)="calculateStrength()"
-                 required minlength="6"
-                 placeholder="Contraseña">
+          <input type="password" name="password" [(ngModel)]="registerData.password" (input)="calculateStrength()"
+            required minlength="6" placeholder="Contraseña">
 
           <div class="strength-container">
             <div class="strength-meter">
-              <div class="strength-bar"
-                   [class.weak]="passwordStrength === 1"
-                   [class.medium]="passwordStrength === 2"
-                   [class.strong]="passwordStrength === 3">
+              <div class="strength-bar" [class.weak]="passwordStrength === 1" [class.medium]="passwordStrength === 2"
+                [class.strong]="passwordStrength === 3">
               </div>
             </div>
-            <span class="strength-label"
-                  [class.text-weak]="passwordStrength === 1"
-                  [class.text-medium]="passwordStrength === 2"
-                  [class.text-strong]="passwordStrength === 3">
+            <span class="strength-label" [class.text-weak]="passwordStrength === 1"
+              [class.text-medium]="passwordStrength === 2" [class.text-strong]="passwordStrength === 3">
               {{ passwordStrengthText }}
             </span>
           </div>
 
           @if (passwordFeedback) {
-            <span class="status-msg info">{{ passwordFeedback }}</span>
+          <span class="status-msg info">{{ passwordFeedback }}</span>
           }
         </div>
 
         <div class="form-group">
           <label>Repite la contraseña:</label>
-          <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Repite la contraseña" required>
+          <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Repite la contraseña"
+            required>
+        </div>
+
+        <label class="group-label">¿Cómo quieres unirte?</label>
+
+        <div class="diet-grid">
+
+          <label class="checkbox-item" [class.selected]="registerData.role === 'DINER'">
+            <input type="radio" name="role" [value]="'DINER'" [(ngModel)]="registerData.role"
+              (change)="roleError = false">
+            <span>Comensal</span>
+          </label>
+
+          <label class="checkbox-item" [class.selected]="registerData.role === 'CHEF'">
+            <input type="radio" name="role" [value]="'CHEF'" [(ngModel)]="registerData.role"
+              (change)="roleError = false">
+            <span>Chef</span>
+          </label>
+
         </div>
 
         @if (errorMessage) {
-          <div class="error-message">{{ errorMessage }}</div>
+        <div class="error-message">{{ errorMessage }}</div>
         }
 
         <div class="actions">
