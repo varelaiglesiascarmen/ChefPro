@@ -9,6 +9,20 @@
 
   <div class="filter-body">
 
+    <div class="filter-group mobile-only-search">
+      <label class="group-label">¿Qué buscas hoy?</label>
+      <div class="input-with-icon">
+        <input
+          type="text"
+          placeholder="Ej: Paella, Sushi..."
+          [(ngModel)]="searchText"
+          (keyup.enter)="applyFilters()">
+
+        <img src="/logos/magnifier.svg" alt="Buscar" class="search-icon-svg">
+
+      </div>
+    </div>
+
     <div class="filter-group">
       <label class="group-label">Preferencias Alimentarias</label>
 

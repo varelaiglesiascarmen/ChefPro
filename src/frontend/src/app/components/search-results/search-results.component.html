@@ -1,0 +1,86 @@
+<div class="search-page-container">
+
+  <div class="results-header">
+    <div class="header-text">
+
+      <h1>
+        <span *ngIf="searchTerm">Resultados para "<em>{{ searchTerm }}</em>"</span>
+        <span *ngIf="!searchTerm">Explora nuestros Chefs</span>
+      </h1>
+
+      <p class="subtitle">
+        <span *ngIf="isLoading">Buscando...</span>
+        <span *ngIf="!isLoading">
+          {{ chefs.length }} {{ chefs.length === 1 ? 'experiencia encontrada' : 'experiencias encontradas' }}
+        </span>
+      </p>
+
+    </div>
+  </div>
+
+  <div class="results-grid-container">
+
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner-modern"></div>
+      <p>Buscando chefs...</p>
+    </div>
+
+    <div *ngIf="!isLoading && chefs.length > 0" class="chefs-grid">
+
+      <div *ngFor="let chef of chefs" class="chef-card">
+
+        <div class="card-image-wrapper">
+          <img [src]="chef.photoUrl || 'assets/images/default-chef.jpg'" alt="{{ chef.name }}" class="chef-img"
+            (error)="chef.photoUrl = 'assets/images/default-chef.jpg'">
+
+          <div class="rating-badge">★ {{ chef.rating }}</div>
+        </div>
+
+        <div class="card-body">
+          <div class="chef-header">
+            <h3>{{ chef.name }}</h3>
+            <span class="location-pill">📍 {{ chef.location }}</span>
+          </div>
+
+          <div class="specialties-container">
+            <span *ngFor="let spec of chef.specialties | slice:0:3" class="tag">{{ spec }}</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="card-footer">
+            <div class="price-block">
+              <span class="label">Precio por persona: </span>
+              <span class="amount"> {{ chef.pricePerPerson }} €</span>
+            </div>
+            <button class="btn-solicitar" (click)="onReserve(chef)">Solicitar</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && chefs.length === 0" class="empty-state">
+      <p>No se encontraron chefs.</p>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="showLoginModal" class="modal-overlay" (click)="closeLoginModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>¡Hola!</h3>
+      <button class="close-btn" (click)="closeLoginModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Para reservar a tu chef privado, necesitamos saber quién eres. Inicia sesión para continuar y asegurar tu
+        experiencia gastronómica única.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeLoginModal()">Cancelar</button>
+      <button class="btn-confirm" (click)="goToLogin()">Login</button>
+    </div>
+    <p>Si no tienes cuenta, <a href="/register">regístrate aquí</a></p>
+  </div>
+</div>
