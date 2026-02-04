@@ -36,7 +36,7 @@
           <span class="field-label">Desde</span>
           <div class="input-wrapper">
             <input type="number" [(ngModel)]="minPrice" (change)="validateInput(true)"
-              (keydown)="preventInvalidChars($event)" min="0" appFocusOnInit>
+              (keydown)="preventInvalidChars($event)" min="0">
             <span class="currency-symbol">€</span>
           </div>
         </div>
@@ -47,7 +47,7 @@
           <span class="field-label">Hasta</span>
           <div class="input-wrapper">
             <input type="number" [(ngModel)]="maxPrice" (change)="validateInput(false)"
-              (keydown)="preventInvalidChars($event)" min="0" appFocusOnInit>
+              (keydown)="preventInvalidChars($event)" min="0">
             <span class="currency-symbol">€</span>
           </div>
         </div>
@@ -72,10 +72,21 @@
     </div>
 
     <div class="filter-group">
+      <label class="group-label">Fecha del Evento</label>
+      <div class="input-with-icon">
+        <input type="date"
+               [(ngModel)]="selectedDate"
+               [min]="minDate"
+               placeholder="Selecciona fecha">
+      </div>
+      <small class="helper-text">Solo mostraremos chefs disponibles para este día.</small>
+    </div>
+
+    <div class="filter-group">
       <label class="group-label">Número de Comensales</label>
       <div class="input-with-icon">
         <input type="number" placeholder="¿Cuantos seréis?" [(ngModel)]="guestCount" min="1"
-          (keydown)="preventInvalidChars($event)" appFocusOnInit>
+          (keydown)="preventInvalidChars($event)">
       </div>
       <small class="helper-text">Si nos ofreces el número exacto de comensales podremos recomendarte los mejores servicios disponibles.</small>
     </div>

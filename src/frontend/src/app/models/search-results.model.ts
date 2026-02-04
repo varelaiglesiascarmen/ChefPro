@@ -34,6 +34,7 @@ export interface ChefFilter {
   maxPrice?: number | null;
   guestCount?: number | null;
   onlyTopRated?: boolean;
+  date?: string | null;
 
   // Pagination
   page?: number;
