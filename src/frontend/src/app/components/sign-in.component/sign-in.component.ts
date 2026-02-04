@@ -16,32 +16,44 @@ export class SignInComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  // DATA INITIALIZATION
+  // We use ‘null as any’ in the role so that it starts empty and forces the user to choose.
   registerData: RegisterRequest = {
     name: '',
     surname: '',
     username: '',
     email: '',
-    password: ''
+    password: '',
+    role: null as any
   };
 
   confirmEmail: string = '';
   confirmPassword: string = '';
 
-  // Username and Email availability status
+  // Variable to control whether the user attempted to register without choosing a role
+  roleError: boolean = false;
+
+  // Availability statuses (Asynchronous validation)
   usernameStatus: 'PENDING' | 'AVAILABLE' | 'TAKEN' | null = null;
   emailStatus: 'PENDING' | 'AVAILABLE' | 'TAKEN' | 'INVALID_FORMAT' | null = null;
 
-  // Password
+  // Password strength variables
   passwordStrength: number = 0;
   passwordFeedback: string = '';
   passwordStrengthText: string = '';
 
+  // Loading and error handling
   isLoading = false;
   errorMessage = '';
 
-  // check username
+  // ROLE SELECTION LOGIC (CHEF vs DINER)
+  selectRole(role: 'DINER' | 'CHEF') {
+    this.registerData.role = role;
+    this.roleError = false;
+  }
+
+  // userbar validatioon methods
   checkUsername() {
-    // Si está vacío, limpiamos estado y salimos
     if (!this.registerData.username.trim()) {
       this.usernameStatus = null;
       return;
@@ -55,12 +67,11 @@ export class SignInComponent {
           this.usernameStatus = isAvailable ? 'AVAILABLE' : 'TAKEN';
         },
         error: () => {
-          this.usernameStatus = null; // In case of error, we clear the status.
+          this.usernameStatus = null;
         }
       });
   }
 
-  // check email
   checkEmail() {
     const email = this.registerData.email;
 
@@ -69,6 +80,7 @@ export class SignInComponent {
       return;
     }
 
+    // Simple regex for email format validation
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
       this.emailStatus = 'INVALID_FORMAT';
@@ -88,7 +100,7 @@ export class SignInComponent {
       });
   }
 
-  // strength calculator
+  // calculate password strength
   calculateStrength() {
     const pass = this.registerData.password;
     if (!pass) {
@@ -109,7 +121,6 @@ export class SignInComponent {
 
     this.passwordStrength = score;
 
-    // Short text to display next to the bar
     if (score === 1) this.passwordStrengthText = 'Débil';
     else if (score === 2) this.passwordStrengthText = 'Media';
     else if (score === 3) this.passwordStrengthText = 'Fuerte';
@@ -122,41 +133,57 @@ export class SignInComponent {
     }
   }
 
+  // registration method
   onRegister() {
+
+    // Validate required fields
     if (!this.registerData.name || !this.registerData.surname || !this.registerData.username || !this.registerData.email || !this.registerData.password) {
       this.errorMessage = 'Por favor, rellena todos los campos obligatorios.';
       return;
     }
 
+    // validate username and email availability
     if (this.usernameStatus === 'TAKEN' || this.emailStatus === 'TAKEN' || this.emailStatus === 'INVALID_FORMAT') {
-      this.errorMessage = 'Revisa los campos marcados en rojo.';
+      this.errorMessage = 'El nombre de usuario o correo ya existen.';
       return;
     }
 
-    if (this.passwordStrength < 3) {
-      this.errorMessage = 'La contraseña no es segura.';
+    // validate that the email is the same in the inputs
+    if (this.registerData.email !== this.confirmEmail) {
+      this.errorMessage = 'El correo no coincide.';
       return;
     }
 
-    if (this.registerData.email !== this.confirmEmail || this.registerData.password !== this.confirmPassword) {
-      this.errorMessage = 'Los campos de confirmación no coinciden.';
+    // validate that the pasword is the same in the inputs
+    if (this.registerData.password !== this.confirmPassword) {
+      this.errorMessage = 'La contraseña no coincide.';
       return;
     }
 
+    // validate rol strength
+    if (!this.registerData.role) {
+      this.roleError = true;
+      this.errorMessage = 'Por favor, seleccione Comensal o Chef.';
+      return;
+    }
+
+    // send to backend
     this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.register(this.registerData).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/login']);
+        // Navigate to index on successful registration
+        this.router.navigate(['/index']);
       },
       error: (err) => {
         this.isLoading = false;
+        // Handle specific error messages
         if (err.message === 'USER_EXISTS') {
            this.errorMessage = 'El usuario o correo ya existen.';
         } else {
-           this.errorMessage = 'Error en el registro.';
+           this.errorMessage = 'Error en el registro. Inténtalo de nuevo.';
         }
       }
     });

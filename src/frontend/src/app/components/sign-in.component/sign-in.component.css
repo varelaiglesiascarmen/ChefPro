@@ -118,6 +118,99 @@
   background-color: #fff;
 }
 
+/* rol selecrt */
+.role-group {
+  width: 100%;
+  max-width: 550px;
+  margin-bottom: 25px;
+}
+
+.group-label {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+  margin-left: 15px;
+}
+
+.diet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 0 5px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: var(--input-bg);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checkbox-item:hover {
+  background-color: #fff;
+  border-color: #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.checkbox-item.selected {
+  background-color: #fff;
+  border-color: var(--gold-btn);
+  box-shadow: 0 4px 10px rgba(166, 124, 0, 0.1);
+}
+
+.checkbox-item span {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.checkbox-item input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: all 0.2s ease;
+  margin: 0;
+  padding: 0;
+}
+
+.checkbox-item input[type="radio"]:hover {
+  border-color: var(--gold-btn);
+}
+
+.checkbox-item input[type="radio"]:checked {
+  background-color: var(--gold-btn);
+  border-color: var(--gold-btn);
+}
+
+/* check */
+.checkbox-item input[type="radio"]::before {
+  content: "✔";
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  transform: scale(0);
+  transition: transform 0.2s;
+}
+
+.checkbox-item input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
 .actions {
   display: flex;
   justify-content: center;

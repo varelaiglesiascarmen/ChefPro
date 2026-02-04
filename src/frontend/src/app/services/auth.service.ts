@@ -87,12 +87,12 @@ export class AuthService {
     );
   }
 
-      /**
-       catchError(() => of(true))
+  /**
+   catchError(() => of(true))
 
-        Meaning: “If I try to ask the backend if the user exists and the backend gives
-        me an error (or does not have that endpoint), I will assume that the user is free.”
-       */
+    Meaning: “If I try to ask the backend if the user exists and the backend gives
+    me an error (or does not have that endpoint), I will assume that the user is free.”
+   */
 
   // logout > Clear user session
   logout(): void {
@@ -133,19 +133,22 @@ export class AuthService {
 
   // decode JWT token to extract user role
   private decodeUserFromToken(username: string, token: string): User {
-    let role: 'CLIENT' | 'CHEF' | 'ADMIN' = 'CLIENT';
+    let role: 'DINER' | 'CHEF' | 'ADMIN' = 'DINER';
 
     try {
       const payloadPart = token.split('.')[1];
       const payloadDecoded = atob(payloadPart);
       const values = JSON.parse(payloadDecoded);
+
+      // search for response from the back
       const tokenRole = values.role || values.roles || values.authority;
 
+      // allocation logic
       if (tokenRole === 'CHEF') role = 'CHEF';
       if (tokenRole === 'ADMIN') role = 'ADMIN';
 
     } catch (e) {
-      console.warn('No se pudo leer el rol del token, asignando CLIENT por defecto');
+      console.warn('No se pudo leer el rol del token, asignando DINER por defecto');
     }
 
     return {
@@ -153,8 +156,9 @@ export class AuthService {
       username: username,
       name: username,
       email: 'temp@email.com',
-      role: role,
+      role: role, 
       photoUrl: ''
     };
   }
 }
+

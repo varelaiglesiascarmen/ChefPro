@@ -52,29 +52,17 @@ export class LoginComponent {
       error: (err) => {
         this.isLoading = false;
 
-        // --------------- mock data in -----------------
-
-        console.error('Error de conexión:', err);
-        this.errorMessage = 'Ocurrió un error de conexión. Inténtalo más tarde.';
-
-        // --------------- mock data out -----------------
-
-        /* --- REAL CODE ---
-
         console.error('Error HTTP:', err.status);
 
-        if (err.status === 401) {
-          // 401 significa "No autorizado" (Contraseña mal)
+        if (err.status === 401 || err.status === 403) {
           this.errorMessage = 'Usuario o contraseña incorrectos.';
         } else if (err.status === 0) {
-          // 0 significa que el servidor está apagado o no hay internet
           this.errorMessage = 'No se pudo conectar con el servidor.';
         } else if (err.status === 500) {
           this.errorMessage = 'Error interno del servidor. Inténtalo luego.';
         } else {
           this.errorMessage = 'Ocurrió un error inesperado.';
         }
-        --------------------------------------------------------- */
       }
     });
   }
