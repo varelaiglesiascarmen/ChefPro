@@ -8,6 +8,8 @@ import java.security.Principal;
 @RestController
 public class Controller {
 
+
+  //TODO REVISAR SI SE PUEDE ELIMINAR, /ME EN LOGIN CONTROLLER HACE ESTO
     @GetMapping("/whoami")
     public String whoAmI(Principal principal) {
         return "Estás logueado como: " + principal.getName();

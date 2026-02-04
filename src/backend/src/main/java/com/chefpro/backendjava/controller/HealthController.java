@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/health")
 public class HealthController {
 
+  //TODO TAMBIEN PUEDE SOBRAR, YA QUE TENEMOS UN HEALTH EN LOGIN CONTROLLER PARA TEMAS DE DEBUG
     @GetMapping
     public String health() {
         return "ChefPro Backend OK";

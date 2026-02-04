@@ -18,7 +18,7 @@ public class MenuCReqDto {
     private String title;
     private String description;
 
-    private List<PlatoDto> dishes;
+    private List<Long> dishesId;
     private String allergens;
 
     private BigDecimal pricePerPerson;

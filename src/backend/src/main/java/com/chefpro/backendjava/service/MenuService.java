@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface MenuService {
 
-  void crearMenu (MenuCReqDto dto, Authentication authentication);
+  void createMenu (MenuCReqDto dto, Authentication authentication);
 
-  List<MenuDTO> listarPorChef(Authentication authentication);
+  List<MenuDTO> listByChef(Authentication authentication);
 
   void deleteMenu(Authentication authentication, Long idMenu);
 

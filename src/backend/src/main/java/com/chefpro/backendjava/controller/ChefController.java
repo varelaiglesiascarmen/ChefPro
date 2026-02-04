@@ -13,6 +13,8 @@ import java.util.List;
 @RequestMapping("/api/chef")
 public class ChefController {
 
+  //TODO Las respuestas de POST y DELETE retornan status 200 vacío, podrían retornar 201
+
   private final MenuService menuService;
   private final PlatoService platoService;
 
@@ -24,7 +26,7 @@ public class ChefController {
   @GetMapping("/menus")
   public List<MenuDTO> getMenusDelChef(Authentication authentication) {
 
-    return menuService.listarPorChef(authentication);
+    return menuService.listByChef(authentication);
   }
 
 
@@ -32,10 +34,11 @@ public class ChefController {
   public ResponseEntity<MenuDTO> crearMenu(@RequestBody MenuCReqDto menuDto, Authentication authentication) {
 
 
-    menuService.crearMenu(menuDto, authentication);
+    menuService.createMenu(menuDto, authentication);
     return ResponseEntity.status(200).build();
   }
 
+  //TODO se podría pasar el parametro por url @DeleteMapping("/menus/{id}")
   @DeleteMapping("/menus")
   public ResponseEntity<MenuDTO> deleteMenu(Authentication authentication, @RequestBody Long idMenu) {
 

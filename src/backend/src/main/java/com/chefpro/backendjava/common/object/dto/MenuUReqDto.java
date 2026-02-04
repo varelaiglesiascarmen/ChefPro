@@ -15,10 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuUReqDto {
 
+
+    private Long id;
     private String title;
     private String description;
 
-    private List<PlatoDto> dishes;
+    private List<Long> dishes;
     private String allergens;
 
     private BigDecimal pricePerPerson;
