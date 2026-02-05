@@ -1,6 +1,6 @@
 package com.chefpro.backendjava.service.impl;
 
-import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
+import com.chefpro.backendjava.common.object.dto.SignUpReqDto; // ✅ CAMBIO
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import com.chefpro.backendjava.common.object.entity.Diner;
 import com.chefpro.backendjava.common.object.entity.UserLogin;
@@ -52,9 +52,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public Boolean signUp(LoginRequestDto signUpRequest) {
+  public Boolean signUp(SignUpReqDto signUpRequest) {
 
-    if (signUpRequest == null || signUpRequest.getUsername() == null || signUpRequest.getPassword() == null) {
+    if (signUpRequest == null
+      || signUpRequest.getUsername() == null
+      || signUpRequest.getPassword() == null
+      || signUpRequest.getEmail() == null) {
       return false;
     }
 
@@ -62,25 +65,31 @@ public class UserServiceImpl implements UserService {
       return false;
     }
 
-    // Crear UserLogin
     UserLogin userLogin = new UserLogin();
     userLogin.setUsername(signUpRequest.getUsername());
-    userLogin.setEmail(signUpRequest.getUsername());
+    userLogin.setEmail(signUpRequest.getEmail());
     userLogin.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-    userLogin.setRole(UserRoleEnum.DINER);
-    userLogin.setName("Usuario");
-    userLogin.setLastname("Nuevo");
+
+
+    UserRoleEnum role = UserRoleEnum.DINER;
+    if (signUpRequest.getRole() != null && !signUpRequest.getRole().isBlank()) {
+      try {
+        role = UserRoleEnum.valueOf(signUpRequest.getRole().toUpperCase());
+      } catch (IllegalArgumentException ignored) {
+        role = UserRoleEnum.DINER;
+      }
+    }
+    userLogin.setRole(role);
+
+    userLogin.setName(signUpRequest.getName() != null ? signUpRequest.getName() : "Usuario");
+    userLogin.setLastname(signUpRequest.getSurname() != null ? signUpRequest.getSurname() : "Nuevo");
 
     UserLogin savedUser = customUserRepository.saveAndFlush(userLogin);
 
-    // Crear Diner asociado - NO establezcas el ID manualmente
     Diner diner = new Diner();
-    diner.setUser(savedUser);  // SOLO establece la relación
-    // NO hagas: diner.setId(savedUser.getId());
-
+    diner.setUser(savedUser);
     dinerRepository.save(diner);
 
     return true;
   }
 }
-
