@@ -79,6 +79,10 @@ export class SearchResultsComponent implements OnInit {
     });
   }
 
+  goToChefDetail(id: number) {
+    this.router.navigate(['/service-detail', 'chef', id]);
+  }
+
   onReserve(chef: Chef) {
     if (!this.currentUser) {
       this.showLoginModal = true;

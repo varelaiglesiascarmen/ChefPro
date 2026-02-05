@@ -1,1 +1,335 @@
-<p>service-detail-page.component works!</p>
+<div *ngIf="isLoading" class="loading-container">
+  <div class="spinner-modern"></div>
+  <p>Cargando información...</p>
+</div>
+
+<div *ngIf="!isLoading && data" class="detail-page fadeIn">
+
+  <button class="btn-back" (click)="goBack()">← Volver</button>
+
+  <ng-container *ngIf="viewType === 'chef'">
+
+    <header class="chef-hero" [style.backgroundImage]="'url(' + data.coverUrl + ')'">
+      <div class="overlay"></div>
+      <div class="chef-identity">
+        <img [src]="data.photoUrl" class="chef-avatar" alt="Foto de perfil">
+        <div class="chef-text">
+          <h1>{{ data.fullName }}</h1>
+
+          <div *ngIf="data.prizes && data.prizes.length > 0" class="prizes-container">
+            <span *ngFor="let prize of data.prizes" class="prizes-badge">{{ prize }}</span>
+          </div>
+
+          <div class="meta-info">
+            <span>📍 {{ data.location }}</span>
+            <span>⭐ {{ data.rating }} ({{ data.reviewsCount }} reseñas)</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-container">
+
+      <div class="main-column">
+
+        <section class="section-box">
+          <h2>Bio del Chef</h2>
+          <p class="bio">{{ data.bio }}</p>
+
+          <div *ngIf="data.languages && data.languages.length > 0" class="languages-section">
+            <h4 class="subsection-title">Idiomas que habla el chef</h4>
+            <div class="tags-wrapper">
+              <span *ngFor="let lang of data.languages" class="pill-tag">{{ lang }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-box">
+          <h2>Mis Menús</h2>
+          <div class="mini-menu-grid">
+            <div *ngFor="let menu of data.menus" class="mini-menu-card" (click)="goToMenu(menu.id)">
+              <div class="mini-content">
+                <div class="mini-header">
+                  <strong>{{ menu.title }}</strong>
+                  <span class="dish-count-badge" *ngIf="menu.dishesCount">{{ menu.dishesCount }} Platos</span>
+                </div>
+                <p class="mini-desc">{{ menu.description }}</p>
+                <span class="price">{{ menu.price }}€ <small>/pers</small></span>
+              </div>
+              <div class="mini-action">
+                <span class="arrow">➔</span>
+              </div>
+            </div>
+
+            <div *ngIf="data.menus.length === 0" class="empty-state-small">
+              <p>Este chef aún no ha publicado menús disponibles.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sticky-card">
+          <div class="sticky-header">
+            <h3>Reservar a {{ data.name }}</h3>
+            <p>Personaliza tu experiencia gastronómica</p>
+          </div>
+
+          <div class="form-group mb-small relative-container">
+            <label class="label-bold">Elige el menú</label>
+
+            <div *ngIf="isDropdownOpen" class="dropdown-backdrop" (click)="isDropdownOpen = false"></div>
+
+            <div class="custom-dropdown-trigger" [class.active]="isDropdownOpen" (click)="toggleDropdown()">
+              <span *ngIf="!selectedMenuId" style="color: #999;">-- Selecciona una opción --</span>
+
+              <span *ngIf="selectedMenuId" style="color: #333; font-weight: 500;">
+                {{ selectedMenu.title }} ({{ selectedMenu.minDiners }}-{{ selectedMenu.maxDiners }} pers.)
+              </span>
+
+              <svg class="dropdown-arrow" [class.rotated]="isDropdownOpen" width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+
+            <div *ngIf="isDropdownOpen" class="custom-dropdown-options fadeIn">
+              <div class="dropdown-item disabled">-- Selecciona una opción --</div>
+
+              <div *ngFor="let menu of data.menus" class="dropdown-item" [class.selected]="menu.id === selectedMenuId"
+                (click)="selectMenu(menu.id)">
+                <span class="item-title">{{ menu.title }}</span>
+                <span class="item-subtitle">{{ menu.minDiners }}-{{ menu.maxDiners }} pers. • {{ menu.price }}€</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group mb-small" [class.disabled-section]="!selectedMenuId">
+            <label class="label-bold">
+              ¿Cuantos sereís?
+              <span *ngIf="selectedMenu" style="font-weight:normal; color:#666; font-size:0.9em;">
+                ({{ selectedMenu.minDiners }} - {{ selectedMenu.maxDiners }})
+              </span>
+            </label>
+
+            <div class="guest-counter">
+              <button (click)="updateGuests(-1)" class="counter-btn"
+                [disabled]="!selectedMenu || reservationGuests <= selectedMenu.minDiners">
+                -
+              </button>
+
+              <span class="counter-value">{{ reservationGuests }}</span>
+
+              <button (click)="updateGuests(1)" class="counter-btn"
+                [disabled]="!selectedMenu || reservationGuests >= selectedMenu.maxDiners">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group" [style.opacity]="selectedMenuId ? '1' : '0.5'"
+            [style.pointer-events]="selectedMenuId ? 'auto' : 'none'">
+            <label style="font-weight: 600; display:block; margin-bottom:5px;">Selecciona la fecha</label>
+
+            <calendar [busyDates]="data.busyDates || []" (dateSelected)="updateDate($event)">
+            </calendar>
+
+            <p *ngIf="reservationDate" class="selected-date-text" style="margin-top: 5px; font-weight: bold;">
+              Fecha: {{ reservationDate | date:'mediumDate' }}
+            </p>
+          </div>
+
+          <button class="btn-primary-action full-width" (click)="requestReservation()"
+            [disabled]="!selectedMenuId || !reservationDate">
+            Mandar la comanda al Chef
+          </button>
+
+          <p class="secure-note">La comanda debe ser acepatada en 24 hr por el Chef. ¡Te avisaremos cuando sepamos su repuesta!</p>
+        </div>
+      </aside>
+
+    </div>
+
+    <section *ngIf="data.reviewsList && data.reviewsList.length > 0" class="reviews-section">
+      <div class="reviews-wrapper">
+        <h2>Lo que dicen los comensales</h2>
+
+        <div class="carousel-container">
+          <div *ngFor="let review of data.reviewsList" class="review-card">
+            <div class="review-header">
+              <span class="review-user">{{ review.user }}</span>
+              <span class="review-date">{{ review.date }}</span>
+            </div>
+
+            <div class="review-rating">
+              <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= review.rating">★</span>
+            </div>
+
+            <p class="review-text">"{{ review.text }}"</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <ng-container *ngIf="viewType === 'menu'">
+
+    <div class="menu-layout-container">
+
+      <div class="menu-layout">
+
+        <div class="menu-image-col">
+          <img [src]="data.photoUrl" class="menu-main-img" alt="Foto del menú">
+        </div>
+
+        <div class="menu-info-col">
+          <div class="menu-header">
+            <span class="label-tag">Menú Completo</span>
+            <h1>{{ data.title }}</h1>
+            <div class="price-display-inline">
+              <span class="amount">{{ data.price }}€</span> <span class="unit">/ persona</span>
+            </div>
+            <br />
+            <div class="chef-link" (click)="goToChefProfile(data.chefId)">
+              <span>Diseñado por <strong>Chef {{ data.chefName }}</strong></span>
+            </div>
+          </div>
+
+          <p class="description">{{ data.description }}</p>
+
+          <div class="requirements-section">
+            <div class="req-title-row">
+              <h4>Requisitos de tu cocina</h4>
+              <div class="info-tooltip-wrapper">
+                <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <div class="tooltip-text tooltip-right">
+                  Equipamiento necesario que el chef necesita que tengas disponible.
+                </div>
+              </div>
+            </div>
+            <div class="req-value">{{ data.requirements }}</div>
+          </div>
+
+          <div class="courses-list">
+            <h3>Selección del Chef</h3>
+            <div *ngFor="let dish of data.dishes" class="course-item">
+              <span class="course-type">{{ dish.category }}</span>
+              <div class="course-detail">
+                <span class="course-name">{{ dish.title }}</span>
+                <span class="course-desc">{{ dish.description }}</span>
+                <div class="dish-allergens" *ngIf="dish.allergenIds && dish.allergenIds.length > 0">
+                  <div *ngFor="let algId of dish.allergenIds" class="allergen-number-wrapper">
+                    <span class="allergen-number">{{ algId }}</span>
+                    <span class="tooltip-text tooltip-top">{{ getAllergenName(algId) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reservation-wide-container"> <div class="reservation-grid">
+
+          <div class="res-col-left">
+            <h3>Configura tu evento</h3>
+
+            <div class="form-group">
+              <label class="label-bold">1. Selecciona fecha</label>
+              <div class="calendar-sidebar-wrapper">
+                <calendar [busyDates]="data.busyDates || []" (dateSelected)="updateDate($event)">
+                </calendar>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="label-bold">
+                2. Comensales
+                <span style="font-weight:normal; color:#999;">({{data.minDiners}}-{{data.maxDiners}})</span>
+              </label>
+              <div class="guest-counter">
+                <button (click)="updateGuests(-1)" class="counter-btn" [disabled]="reservationGuests <= data.minDiners">-</button>
+                <span class="counter-value">{{ reservationGuests }}</span>
+                <button (click)="updateGuests(1)" class="counter-btn" [disabled]="reservationGuests >= data.maxDiners">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="res-col-right">
+            <h3>Resumen de la Comanda</h3>
+
+            <div class="summary-card">
+              <div class="summary-row">
+                <span class="sum-label">Menú:</span>
+                <span class="sum-value highlight">{{ data.title }}</span>
+              </div>
+
+              <div class="summary-row">
+                <span class="sum-label">Comensales:</span>
+                <span class="sum-value">{{ reservationGuests }} personas</span>
+              </div>
+
+              <div class="summary-row">
+                <span class="sum-label">Fecha:</span>
+                <span class="sum-value" [class.missing]="!reservationDate">
+                  {{ reservationDate ? (reservationDate | date:'fullDate') : 'Selecciona una fecha...' }}
+                </span>
+              </div>
+
+              <div class="summary-row">
+                <span class="sum-label">Dirección:</span>
+                <span class="sum-value">
+                  <span *ngIf="currentUser">📍 {{ currentUser.address || 'Dirección principal (Perfil)' }}</span>
+                  <span *ngIf="!currentUser" style="color:#A67C00; cursor:pointer;" (click)="showLoginModal=true">
+                    Inicia sesión para ver tu dirección
+                  </span>
+                </span>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="total-row">
+                <span>Total estimado</span>
+                <span class="total-amount">{{ (data.price * reservationGuests) | number:'1.2-2' }}€</span>
+              </div>
+
+              <button class="btn-primary-action full-width" (click)="requestReservation()"
+                 [disabled]="!reservationDate">
+                Enviar Comanda al Chef
+              </button>
+
+              <p class="secure-note">
+                El chef confirmará si tiene disponibilidad para desplazarse a tu dirección en la fecha indicada.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <div *ngIf="showLoginModal" class="modal-overlay" (click)="closeLoginModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>¡Inicia sesión!</h3>
+        <button class="close-btn" (click)="closeLoginModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Para reservar una experiencia con nuestros chefs, necesitamos saber quién eres.</p>
+        <p class="modal-subtitle">Es rápido, seguro y necesario para contactar con el chef.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeLoginModal()">Cancelar</button>
+        <button class="btn-confirm" (click)="goToLogin()">Ir a Login</button>
+      </div>
+      <p class="signup-hint">¿No tienes cuenta? <a href="/signup">Regístrate aquí</a></p>
+    </div>
+  </div>
+
+</div>

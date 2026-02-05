@@ -22,12 +22,12 @@
 
     <div *ngIf="isLoading" class="loading-state">
       <div class="spinner-modern"></div>
-      <p>Buscando chefs...</p>
+      <p>Encendiendo fogones...</p>
     </div>
 
     <div *ngIf="!isLoading && chefs.length > 0" class="chefs-grid">
 
-      <div *ngFor="let chef of chefs" class="chef-card">
+      <div *ngFor="let chef of chefs" class="chef-card" (click)="goToChefDetail(chef.id)">
 
         <div class="card-image-wrapper">
           <img [src]="chef.photoUrl || 'assets/images/default-chef.jpg'" alt="{{ chef.name }}" class="chef-img"
@@ -53,7 +53,8 @@
               <span class="label">Precio por persona: </span>
               <span class="amount"> {{ chef.pricePerPerson }} €</span>
             </div>
-            <button class="btn-solicitar" (click)="onReserve(chef)">Solicitar</button>
+
+            <button class="btn-solicitar" (click)="$event.stopPropagation(); onReserve(chef)">Solicitar</button>
           </div>
         </div>
 
@@ -81,6 +82,6 @@
       <button class="btn-cancel" (click)="closeLoginModal()">Cancelar</button>
       <button class="btn-confirm" (click)="goToLogin()">Login</button>
     </div>
-    <p>Si no tienes cuenta, <a href="/register">regístrate aquí</a></p>
+    <p>Si no tienes cuenta, <a href="/signup">regístrate aquí</a></p>
   </div>
 </div>
