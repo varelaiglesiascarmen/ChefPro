@@ -9,7 +9,7 @@
   --warning-yellow: #B58900;
 }
 
-.register-page {
+.signup-page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,7 +17,7 @@
   padding: 20px;
 }
 
-.register-container {
+.signup-container {
   display: flex;
   max-width: 1300px;
   width: 95%;
@@ -77,7 +77,7 @@
   line-height: 1.1;
 }
 
-.register-form {
+.signup-form {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -218,7 +218,7 @@
   margin-bottom: 25px;
 }
 
-.btn-register {
+.btn-signup {
   background-color: var(--gold-btn);
   color: white;
   border: none;
@@ -233,13 +233,13 @@
   font-family: inherit;
 }
 
-.btn-register:hover:not(:disabled) {
+.btn-signup:hover:not(:disabled) {
   background-color: var(--gold-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-.btn-register:disabled {
+.btn-signup:disabled {
   background-color: #ccc;
   cursor: not-allowed;
   transform: none;
@@ -342,7 +342,7 @@
 
 /* responsive design */
 @media (max-width: 900px) {
-  .register-container {
+  .signup-container {
     flex-direction: column;
     align-items: center;
     gap: 40px;

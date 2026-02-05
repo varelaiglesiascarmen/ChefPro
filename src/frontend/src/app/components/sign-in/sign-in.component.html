@@ -1,5 +1,5 @@
-<div class="register-page">
-  <div class="register-container">
+<div class="signup-page">
+  <div class="signup-container">
 
     <div class="logo-column">
       <img src="/logos/largeWebsiteLogo.svg" alt="Chef Pro Logo" class="brand-logo">
@@ -8,21 +8,21 @@
     <div class="form-column">
       <h2 class="form-title">¡Regístrate!</h2>
 
-      <form (ngSubmit)="onRegister()" class="register-form">
+      <form (ngSubmit)="onsignup()" class="signup-form">
 
         <div class="form-group">
           <label>Nombre:</label>
-          <input type="text" name="name" [(ngModel)]="registerData.name" placeholder="Nombre" required>
+          <input type="text" name="name" [(ngModel)]="signupData.name" placeholder="Nombre" required>
         </div>
 
         <div class="form-group">
           <label>Apellidos:</label>
-          <input type="text" name="surname" [(ngModel)]="registerData.surname" placeholder="Apellidos" required>
+          <input type="text" name="surname" [(ngModel)]="signupData.surname" placeholder="Apellidos" required>
         </div>
 
         <div class="form-group">
           <label>Nombre de usuario:</label>
-          <input type="text" name="username" [(ngModel)]="registerData.username" (blur)="checkUsername()" required
+          <input type="text" name="username" [(ngModel)]="signupData.username" (blur)="checkUsername()" required
             placeholder="Nombre de usuario">
 
           @if (usernameStatus === 'TAKEN') {
@@ -35,7 +35,7 @@
 
         <div class="form-group">
           <label>Correo electrónico:</label>
-          <input type="email" name="email" [(ngModel)]="registerData.email" (blur)="checkEmail()"
+          <input type="email" name="email" [(ngModel)]="signupData.email" (blur)="checkEmail()"
             placeholder="Correo electrónico" required>
 
           @if (emailStatus === 'TAKEN') {
@@ -54,7 +54,7 @@
 
         <div class="form-group">
           <label>Contraseña:</label>
-          <input type="password" name="password" [(ngModel)]="registerData.password" (input)="calculateStrength()"
+          <input type="password" name="password" [(ngModel)]="signupData.password" (input)="calculateStrength()"
             required minlength="6" placeholder="Contraseña">
 
           <div class="strength-container">
@@ -84,14 +84,14 @@
 
         <div class="diet-grid">
 
-          <label class="checkbox-item" [class.selected]="registerData.role === 'DINER'">
-            <input type="radio" name="role" [value]="'DINER'" [(ngModel)]="registerData.role"
+          <label class="checkbox-item" [class.selected]="signupData.role === 'DINER'">
+            <input type="radio" name="role" [value]="'DINER'" [(ngModel)]="signupData.role"
               (change)="roleError = false">
             <span>Comensal</span>
           </label>
 
-          <label class="checkbox-item" [class.selected]="registerData.role === 'CHEF'">
-            <input type="radio" name="role" [value]="'CHEF'" [(ngModel)]="registerData.role"
+          <label class="checkbox-item" [class.selected]="signupData.role === 'CHEF'">
+            <input type="radio" name="role" [value]="'CHEF'" [(ngModel)]="signupData.role"
               (change)="roleError = false">
             <span>Chef</span>
           </label>
@@ -103,7 +103,7 @@
         }
 
         <div class="actions">
-          <button type="submit" class="btn-register" [disabled]="isLoading">
+          <button type="submit" class="btn-signup" [disabled]="isLoading">
             {{ isLoading ? 'Registrando...' : 'Regístrate' }}
           </button>
         </div>

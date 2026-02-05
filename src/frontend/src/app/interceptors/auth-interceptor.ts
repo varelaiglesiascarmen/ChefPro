@@ -7,8 +7,8 @@ next > if the request is not corrupt, let it continue
 */
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // localStorage.getItem('token') > we look for the token in local storage
-  const token = localStorage.getItem('token');
+  // localStorage.getItem('chefpro_token'); > we look for the token in local storage
+  const token = localStorage.getItem('chefpro_token');
 
   /*
   When reaching the if statement, check if there is a token. If there is,

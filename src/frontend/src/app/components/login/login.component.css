@@ -109,7 +109,7 @@ input:focus {
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-.register-footer {
+.signup-footer {
   margin-top: 30px;
   font-size: 0.85rem;
   width: 100%;
@@ -117,13 +117,13 @@ input:focus {
   text-align: left;
 }
 
-.register-footer a {
+.signup-footer a {
   color:  #333;
   font-weight: bold;
   text-decoration: underline;
 }
 
-.register-footer a:hover {
+.signup-footer a:hover {
   color: #8a6800;
 }
 
@@ -175,7 +175,7 @@ input:focus {
   }
 
   input {
-    width: 90%; 
+    width: 90%;
   }
 
   .btn-submit {
