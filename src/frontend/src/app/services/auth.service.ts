@@ -25,24 +25,32 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  login(credentials: LoginRequest): Observable<User> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+  login(credentials: LoginRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
+        // 1. Guardamos el token
         if (response.token) {
           localStorage.setItem('chefpro_token', response.token);
         }
-      }),
-      switchMap(() => this.getUserData()),
-      tap(user => {
-        this.setSession(user);
+        // 2. Guardamos el usuario que YA viene en la respuesta (response.user)
+        if (response.user) {
+          this.setSession(response.user);
+        }
       }),
       catchError(this.handleError)
     );
   }
 
-  signup(data: signupRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/signup`, data).pipe(
-      tap(() => console.log('Registro en /signup exitoso')),
+  signup(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/signup`, data).pipe(
+      tap(response => {
+        if (response.token) {
+          localStorage.setItem('chefpro_token', response.token);
+        }
+        if (response.user) {
+          this.setSession(response.user);
+        }
+      }),
       catchError(this.handleError)
     );
   }
