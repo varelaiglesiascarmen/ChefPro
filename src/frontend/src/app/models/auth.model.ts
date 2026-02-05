@@ -10,6 +10,7 @@ export interface User {
   rating_avg: number;
   reviews_count: number;
   languages?: string[];
+  photoUrl?: string;
 }
 
 /* SERVICE MODULE (MENUS & DISHES) */

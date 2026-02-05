@@ -10,7 +10,7 @@ import { User } from '../../models/auth.model';
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, SearchFilterComponent],
+  imports: [CommonModule],
   templateUrl: './search-results.component.html',
   styleUrl: './search-results.component.css'
 })

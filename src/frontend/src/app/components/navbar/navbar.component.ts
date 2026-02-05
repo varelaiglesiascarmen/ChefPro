@@ -14,7 +14,6 @@ import { UserMenuComponent } from '../user-menu/user-menu.component';
   standalone: true,
   imports: [
     RouterLink,
-    RouterLinkActive,
     FormsModule,
     CommonModule,
     FocusOnInitDirective,
