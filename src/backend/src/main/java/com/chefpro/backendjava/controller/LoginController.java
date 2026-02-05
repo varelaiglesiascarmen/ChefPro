@@ -1,7 +1,7 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.common.security.JwtUtil;
-import com.chefpro.backendjava.common.object.dto.SignUpReqDto;          // ✅ AÑADIR
+import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginResponseDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
@@ -48,8 +48,6 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
-    // OJO: aquí estás usando findByEmail pero le pasas username.
-    // Lo dejo igual porque pides cambios mínimos.
     UserLoginDto userFound = userService.findByEmail(request.getUsername());
 
     UserLoginDto userLoginDto = new UserLoginDto();
