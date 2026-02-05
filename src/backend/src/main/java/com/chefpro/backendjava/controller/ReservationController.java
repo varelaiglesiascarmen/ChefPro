@@ -3,7 +3,7 @@ package com.chefpro.backendjava.controller;
 import com.chefpro.backendjava.common.object.dto.ReservationsCReqDto;
 import com.chefpro.backendjava.common.object.dto.ReservationDTO;
 import com.chefpro.backendjava.common.object.dto.ReservationsUReqDto;
-import com.chefpro.backendjava.service.ReservaService;
+import com.chefpro.backendjava.service.ReservationService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,27 +16,30 @@ import java.util.List;
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
-  private final ReservaService reservaService;
+  private final ReservationService reservationService;
 
-  public ReservationController(ReservaService reservaService) {
-    this.reservaService = reservaService;
+  public ReservationController(ReservationService reservationService) {
+    this.reservationService = reservationService;
   }
 
   @GetMapping("/chef")
   public ResponseEntity<List<ReservationDTO>> getReservasDelChef(Authentication authentication) {
-    List<ReservationDTO> reservations = reservaService.listByChef(authentication);
+    List<ReservationDTO> reservations = reservationService.listByChef(authentication);
     return ResponseEntity.ok(reservations);
   }
 
   @GetMapping("/comensal")
   public ResponseEntity<List<ReservationDTO>> getReservasDelComensal(Authentication authentication) {
-    List<ReservationDTO> reservations = reservaService.listByClient(authentication);
+    List<ReservationDTO> reservations = reservationService.listByClient(authentication);
     return ResponseEntity.ok(reservations);
   }
 
   @PostMapping
-  public ResponseEntity<Void> crearReservas(@RequestBody ReservationsCReqDto reservationsDto, Authentication authentication) {
-    reservaService.createReservations(reservationsDto, authentication);
+  public ResponseEntity<Void> crearReservas(
+    @RequestBody ReservationsCReqDto reservationsDto,
+    Authentication authentication
+  ) {
+    reservationService.createReservations(reservationsDto, authentication);
     return ResponseEntity.status(201).build();
   }
 
@@ -46,16 +49,13 @@ public class ReservationController {
     @RequestParam Long chefId,
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
   ) {
-    reservaService.deleteReservation(authentication, chefId, date);
+    reservationService.deleteReservation(authentication, chefId, date);
     return ResponseEntity.status(204).build();
   }
 
-  @PatchMapping
-  public ResponseEntity<ReservationDTO> patchReservas(
-    Authentication authentication,
-    @RequestBody ReservationsUReqDto reservaUpdateDto
-  ) {
-    ReservationDTO updated = reservaService.updateReservations(authentication, reservaUpdateDto);
+  @PatchMapping("/status")
+  public ResponseEntity<ReservationDTO> updateReservationStatus(Authentication authentication, @RequestBody ReservationsUReqDto reservaUpdateDto) {
+    ReservationDTO updated = reservationService.updateReservationStatus(authentication, reservaUpdateDto);
     return ResponseEntity.ok(updated);
   }
 }

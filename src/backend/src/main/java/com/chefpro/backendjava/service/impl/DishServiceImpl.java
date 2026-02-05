@@ -5,7 +5,7 @@ import com.chefpro.backendjava.common.object.dto.DishCReqDto;
 import com.chefpro.backendjava.common.object.dto.DishUReqDto;
 import com.chefpro.backendjava.common.object.entity.*;
 import com.chefpro.backendjava.repository.*;
-import com.chefpro.backendjava.service.PlatoService;
+import com.chefpro.backendjava.service.DishService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component("platoService")
-public class PlatoServiceImpl implements PlatoService {
+@Component("dishService")
+public class DishServiceImpl implements DishService {
 
   private final ChefRepository chefRepository;
   private final MenuRepository menuRepository;
@@ -23,7 +23,7 @@ public class PlatoServiceImpl implements PlatoService {
   private final AllergenDishRepository allergenDishRepository;
   private final OfficialAllergenRepository officialAllergenRepository;
 
-  public PlatoServiceImpl(ChefRepository chefRepository, MenuRepository menuRepository, DishRepository dishRepository, AllergenDishRepository allergenDishRepository, OfficialAllergenRepository officialAllergenRepository) {
+  public DishServiceImpl(ChefRepository chefRepository, MenuRepository menuRepository, DishRepository dishRepository, AllergenDishRepository allergenDishRepository, OfficialAllergenRepository officialAllergenRepository) {
     this.chefRepository = chefRepository;
     this.menuRepository = menuRepository;
     this.dishRepository = dishRepository;
@@ -93,7 +93,7 @@ public class PlatoServiceImpl implements PlatoService {
   }
 
   @Override
-  public List<DishDto> getDish(Authentication authentication, String nombrePlato) {
+  public List<DishDto> getDish(Authentication authentication, String dishName) {
 
     // 1. Obtener el chef autenticado
     Chef chef = chefRepository.findByUser_Username(authentication.getName())
@@ -102,8 +102,8 @@ public class PlatoServiceImpl implements PlatoService {
     List<Dish> dishes;
 
     // 2. Si se proporciona nombre de plato, buscar por título
-    if (nombrePlato != null && !nombrePlato.isEmpty()) {
-      dishes = dishRepository.findByChefIdAndTitleContaining(chef.getId(), nombrePlato);
+    if (dishName != null && !dishName.isEmpty()) {
+      dishes = dishRepository.findByChefIdAndTitleContaining(chef.getId(), dishName);
     } else {
       // 3. Si no hay filtro, devolver todos los platos del chef
       dishes = dishRepository.findAllByChefId(chef.getId());
@@ -140,14 +140,14 @@ public class PlatoServiceImpl implements PlatoService {
 
   @Override
   @Transactional
-  public void deleteDish(Authentication authentication, Long menuId, Long dishId) {
+  public void deleteDish(Authentication authentication, Long menuId, Long idDish) {
 
     // 1. Obtener el chef autenticado
     Chef chef = chefRepository.findByUser_Username(authentication.getName())
       .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
 
     // 2. Buscar el plato con su clave compuesta
-    Dish.DishId dishIdObj = new Dish.DishId(menuId, dishId);
+    Dish.DishId dishIdObj = new Dish.DishId(menuId, idDish);
     Dish dish = dishRepository.findById(dishIdObj)
       .orElseThrow(() -> new IllegalArgumentException("Dish not found"));
 

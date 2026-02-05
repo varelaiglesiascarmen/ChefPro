@@ -2,6 +2,7 @@ package com.chefpro.backendjava.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,20 +38,82 @@ public class SecurityConfig {
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       )
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/auth/login", "/api/auth/health").permitAll()
+        // ========================================
+        // SWAGGER/OPENAPI - DEBE ESTAR PRIMERO
+        // ========================================
+        .requestMatchers(
+          "/swagger-ui/**",
+          "/v3/api-docs/**",
+          "/swagger-ui.html",
+          "/swagger-resources/**",
+          "/webjars/**"
+        ).permitAll()
+
+        // ========================================
+        // RUTAS DE AUTENTICACIÓN PÚBLICAS
+        // ========================================
+        .requestMatchers(
+          "/api/auth/login",
+          "/api/auth/signup",
+          "/api/auth/health",
+          "/api/auth/logout"
+        ).permitAll()
+
+        // ========================================
+        // RECURSOS ESTÁTICOS PÚBLICOS (Frontend)
+        // ========================================
         .requestMatchers(
           "/", "/index.html", "/favicon.ico",
           "/assets/**", "/static/**", "/public/**",
           "/**/*.css", "/**/*.js", "/**/*.map"
         ).permitAll()
 
-        .requestMatchers("/api/chef/**").hasAuthority("ROLE_CHEF")  // Cambiado a hasAuthority
-        .requestMatchers("/api/reservations/chef/**").hasAuthority("ROLE_CHEF")
-        .requestMatchers("/api/reservations/comensal/**").hasAuthority("ROLE_DINER")
-        .requestMatchers("/api/reservations/**").authenticated()
+        // ========================================
+        // ENDPOINTS PÚBLICOS DE MENÚS
+        // ========================================
+        .requestMatchers(HttpMethod.GET, "/api/chef/menus/public").permitAll()
+
+        // ========================================
+        // RUTAS PROTEGIDAS POR ROL - CHEF
+        // ========================================
+        .requestMatchers("/api/chef/**").hasAuthority("ROLE_CHEF")
+
+        // ========================================
+        // RUTAS DE RESERVACIONES
+        // ========================================
+        // Crear reserva - solo DINER
+        .requestMatchers(HttpMethod.POST, "/api/reservations").hasAuthority("ROLE_DINER")
+
+        // Actualizar estado de reserva - solo CHEF
+        .requestMatchers(HttpMethod.PATCH, "/api/reservations/status").hasAuthority("ROLE_CHEF")
+
+        // Eliminar reserva - cualquier usuario autenticado (chef o diner propietario)
+        .requestMatchers(HttpMethod.DELETE, "/api/reservations").authenticated()
+
+        // Ver reservas del chef - solo CHEF
+        .requestMatchers(HttpMethod.GET, "/api/reservations/chef").hasAuthority("ROLE_CHEF")
+
+        // Ver reservas del comensal - solo DINER
+        .requestMatchers(HttpMethod.GET, "/api/reservations/comensal").hasAuthority("ROLE_DINER")
+
+        // ========================================
+        // RUTAS PROTEGIDAS POR ROL - COMENSAL
+        // ========================================
         .requestMatchers("/api/comensal/**").hasAuthority("ROLE_DINER")
+
+        // ========================================
+        // RUTAS PROTEGIDAS POR ROL - ADMIN
+        // ========================================
         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
 
+        // ========================================
+        // ENDPOINT DE USUARIO AUTENTICADO
+        // ========================================
+        .requestMatchers("/api/auth/me").authenticated()
+
+        // ========================================
+        // CUALQUIER OTRA RUTA REQUIERE AUTENTICACIÓN
+        // ========================================
         .anyRequest().authenticated()
       )
       .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

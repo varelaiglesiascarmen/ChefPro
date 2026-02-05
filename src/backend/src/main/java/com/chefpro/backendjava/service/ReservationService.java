@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface ReservaService {
+public interface ReservationService {
 
   List<ReservationDTO> listByChef(Authentication authentication);
 
@@ -16,5 +16,5 @@ public interface ReservaService {
 
   void deleteReservation(Authentication authentication, Long chefId, LocalDate date);
 
-  ReservationDTO updateReservations(Authentication authentication, ReservationsUReqDto uReq);
+  ReservationDTO updateReservationStatus(Authentication authentication, ReservationsUReqDto uReq);
 }

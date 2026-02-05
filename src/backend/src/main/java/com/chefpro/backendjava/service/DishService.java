@@ -7,15 +7,14 @@ import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
-public interface PlatoService {
+public interface DishService {
 
 
-  //TODO no olvidar que el eespañol no existe, siempre ingles, TODO INGLES
     void createDish(Authentication auth, DishCReqDto cReq);
 
-    List<DishDto> getDish(Authentication authentication, String nombrePlato);
+    List<DishDto> getDish(Authentication authentication, String dishName);
 
-    void deleteDish(Authentication authentication, Long idMenu, Long idPlato);
+    void deleteDish(Authentication authentication, Long idMenu, Long idDish);
 
     DishDto updateDish(Authentication authentication, DishUReqDto uReq);
 

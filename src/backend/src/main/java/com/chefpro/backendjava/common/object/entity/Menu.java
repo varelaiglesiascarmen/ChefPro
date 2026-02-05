@@ -48,7 +48,7 @@ public class Menu {
   // Relación con dishes
   @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  private List<Dish> platos = new ArrayList<>();
+  private List<Dish> dishes = new ArrayList<>();
 
   // Relación con reservations
   @OneToMany(mappedBy = "menu")
@@ -56,15 +56,15 @@ public class Menu {
   private List<Reservation> reservations = new ArrayList<>();
 
   // Método helper para añadir platos
-  public void addPlato(Dish plato) {
-    platos.add(plato);
-    plato.setMenu(this);
-    plato.setMenuId(this.id);
+  public void addPlato(Dish dish) {
+    dishes.add(dish);
+    dish.setMenu(this);
+    dish.setMenuId(this.id);
   }
 
   // Método helper para remover platos
-  public void removePlato(Dish plato) {
-    platos.remove(plato);
-    plato.setMenu(null);
+  public void removePlato(Dish dish) {
+    dishes.remove(dish);
+    dish.setMenu(null);
   }
 }

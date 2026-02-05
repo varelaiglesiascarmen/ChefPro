@@ -19,21 +19,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/auth")
 public class LoginController {
 
+  private final AuthenticationManager authenticationManager;
+  private final JwtUtil jwtUtil;
+  private final UserService userService;
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-    private final UserService userService;
-
-
-    public LoginController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-        this.userService = userService;
-    }
-
+  public LoginController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService) {
+    this.authenticationManager = authenticationManager;
+    this.jwtUtil = jwtUtil;
+    this.userService = userService;
+  }
 
   @PostMapping("/login")
-  public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request){
+  public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
 
     Authentication authentication = authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
@@ -68,7 +65,7 @@ public class LoginController {
 
   @GetMapping("/health")
   public String health() {
-      return "OK";
+    return "OK";
   }
 
   @GetMapping("/me")
@@ -93,15 +90,47 @@ public class LoginController {
     return ResponseEntity.ok(userLoginDto);
   }
 
+  @PostMapping("/signup")
+  public ResponseEntity<LoginResponseDto> signup(@RequestBody LoginRequestDto request) {
 
-  //TODO creo que el termino correcto es signUp; FALLA
-  @PostMapping("/signin")
-  public String signin(@RequestBody LoginRequestDto request) {
+    if (userService.signUp(request)) {
+      // Auto-login después del registro
+      Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+          request.getUsername(),
+          request.getPassword()
+        )
+      );
 
-      if(userService.signInUser(request)) {
+      UserDetails user = (UserDetails) authentication.getPrincipal();
+      String token = jwtUtil.generateToken(user);
 
-        return "Account created";
-      }
-      return "Check your data, something is incorrect, such as mail already in use or a missing field left blank.";
+      String role = user.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .findFirst()
+        .orElse(null);
+
+      UserLoginDto userFound = userService.findByEmail(request.getUsername());
+
+      UserLoginDto userLoginDto = new UserLoginDto();
+      userLoginDto.setId(userFound.getId());
+      userLoginDto.setName(userFound.getName());
+      userLoginDto.setEmail(userFound.getEmail());
+      userLoginDto.setRole(role);
+
+      LoginResponseDto response = new LoginResponseDto();
+      response.setToken(token);
+      response.setUser(userLoginDto);
+
+      return ResponseEntity.status(201).body(response);
+    }
+
+    return ResponseEntity.status(400).build();
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout() {
+
+    return ResponseEntity.ok().build();
   }
 }

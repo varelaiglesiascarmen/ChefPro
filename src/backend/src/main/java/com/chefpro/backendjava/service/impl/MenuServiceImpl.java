@@ -1,8 +1,10 @@
 package com.chefpro.backendjava.service.impl;
 
+import com.chefpro.backendjava.common.object.dto.DishDto;
 import com.chefpro.backendjava.common.object.dto.MenuCReqDto;
 import com.chefpro.backendjava.common.object.dto.MenuDTO;
 import com.chefpro.backendjava.common.object.dto.MenuUReqDto;
+import com.chefpro.backendjava.common.object.entity.AllergenDish;
 import com.chefpro.backendjava.common.object.entity.Chef;
 import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.repository.ChefRepository;
@@ -14,8 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Component("MenuService")
+@Component("menuService")
 public class MenuServiceImpl implements MenuService {
 
   private final MenuRepository menuRepository;
@@ -30,6 +33,8 @@ public class MenuServiceImpl implements MenuService {
   @Override
   @Transactional
   public void createMenu(MenuCReqDto dto, Authentication authentication) {
+
+    System.out.println("AUTH NAME = " + authentication.getName());
 
     Chef chef = chefRepository.findByUser_Username(authentication.getName())
       .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
@@ -56,29 +61,67 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<MenuDTO> listByChef(Authentication authentication) {
 
-    List<Menu> menus =
-      menuRepository.findByChef_User_Username(authentication.getName());
+    Chef chef = chefRepository.findByUser_Username(authentication.getName())
+      .orElseThrow(() -> new RuntimeException("Chef not found"));
+
+    List<Menu> menus = menuRepository.findByChefIdWithDishes(chef.getId());
+
+    // Cargar alérgenos en una segunda query (Hibernate lo hace automáticamente)
+    menus.forEach(menu ->
+      menu.getDishes().forEach(dish ->
+        dish.getAllergenDishes().size() // Forzar carga lazy
+      )
+    );
 
     return menus.stream()
-      .map(menu -> MenuDTO.builder()
-        .id(menu.getId())
-        .title(menu.getTitle())
-        .description(menu.getDescription())
-        .pricePerPerson(menu.getPricePerPerson())
-
-        .dishes(List.of())
-        .allergens(Set.of())
-        .deliveryAvailable(false)
-        .cookAtClientHome(false)
-        .pickupAvailable(false)
-
-        .chefUsername(authentication.getName())
-        .createdAt(null)
-        .build()
-      )
+      .map(this::convertToDto)
       .toList();
+  }
+
+  private MenuDTO convertToDto(Menu menu) {
+    List<DishDto> dishes = menu.getDishes().stream()
+      .map(dish -> {
+        List<String> allergens = dish.getAllergenDishes().stream()
+          .map(AllergenDish::getAllergen)
+          .collect(Collectors.toList());
+
+        String creatorName = menu.getChef().getUser().getName() != null && menu.getChef().getUser().getLastname() != null
+          ? menu.getChef().getUser().getName() + " " + menu.getChef().getUser().getLastname()
+          : menu.getChef().getUser().getUsername();
+
+        return DishDto.builder()
+          .menuId(dish.getMenuId())
+          .dishId(dish.getDishId())
+          .title(dish.getTitle())
+          .description(dish.getDescription())
+          .category(dish.getCategory())
+          .creator(creatorName)
+          .allergens(allergens)
+          .build();
+      })
+      .collect(Collectors.toList());
+
+    Set<String> allergens = menu.getDishes().stream()
+      .flatMap(dish -> dish.getAllergenDishes().stream())
+      .map(AllergenDish::getAllergen)
+      .collect(Collectors.toSet());
+
+    return MenuDTO.builder()
+      .id(menu.getId())
+      .title(menu.getTitle())
+      .description(menu.getDescription())
+      .pricePerPerson(menu.getPricePerPerson())
+      .dishes(dishes)
+      .allergens(allergens)
+      .deliveryAvailable(false)
+      .cookAtClientHome(false)
+      .pickupAvailable(false)
+      .chefUsername(menu.getChef().getUser().getUsername())
+      .createdAt(null)
+      .build();
   }
 
   @Override
@@ -146,6 +189,25 @@ public class MenuServiceImpl implements MenuService {
       .chefUsername(authentication.getName())
       .createdAt(null)
       .build();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<MenuDTO> listAllMenus() {
+
+    // Obtener todos los menús con sus platos
+    List<Menu> menus = menuRepository.findAllWithDishes();
+
+    // Cargar alérgenos (forzar carga lazy)
+    menus.forEach(menu ->
+      menu.getDishes().forEach(dish ->
+        dish.getAllergenDishes().size()
+      )
+    );
+
+    return menus.stream()
+      .map(this::convertToDto)
+      .toList();
   }
 
 }

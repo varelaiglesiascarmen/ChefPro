@@ -6,15 +6,16 @@ import com.chefpro.backendjava.common.object.dto.ReservationsUReqDto;
 import com.chefpro.backendjava.common.object.entity.*;
 import com.chefpro.backendjava.mapper.ReservationMapper;
 import com.chefpro.backendjava.repository.*;
-import com.chefpro.backendjava.service.ReservaService;
+import com.chefpro.backendjava.service.ReservationService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@Component("reservaService")
-public class ReservaServiceImpl implements ReservaService {
+@Component("reservationService")
+public class ReservationServiceImpl implements ReservationService {
 
   private final ReservaRepository reservaRepository;
   private final MenuRepository menuRepository;
@@ -23,12 +24,12 @@ public class ReservaServiceImpl implements ReservaService {
   private final ChefRepository chefRepository;
   private final DinerRepository dinerRepository;
 
-  public ReservaServiceImpl(ReservaRepository reservaRepository,
-                            MenuRepository menuRepository,
-                            ReservationMapper reservationMapper,
-                            CustomUserRepository userRepository,
-                            ChefRepository chefRepository,
-                            DinerRepository dinerRepository) {
+  public ReservationServiceImpl(ReservaRepository reservaRepository,
+                                MenuRepository menuRepository,
+                                ReservationMapper reservationMapper,
+                                CustomUserRepository userRepository,
+                                ChefRepository chefRepository,
+                                DinerRepository dinerRepository) {
     this.reservaRepository = reservaRepository;
     this.menuRepository = menuRepository;
     this.reservationMapper = reservationMapper;
@@ -73,15 +74,23 @@ public class ReservaServiceImpl implements ReservaService {
   @Transactional
   public void createReservations(ReservationsCReqDto dto, Authentication authentication) {
 
-    // 1. Obtener el usuario autenticado (debe ser un Diner)
+    // 1. Obtener el usuario autenticado
     UserLogin user = userRepository
       .findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
+    // 2. Buscar o crear el Diner
     Diner diner = dinerRepository.findById(user.getId())
-      .orElseThrow(() -> new RuntimeException("Diner not found"));
+      .orElseGet(() -> {
+        // Si no existe, crear uno nuevo
+        Diner newDiner = new Diner();
+        newDiner.setId(user.getId());
+        newDiner.setUser(user);
+        newDiner.setAddress(dto.getAddress()); // Usar la dirección de la reserva como dirección por defecto
+        return dinerRepository.save(newDiner);
+      });
 
-    // 2. Validaciones
+    // 3. Validaciones
     if (dto.getChefId() == null) {
       throw new IllegalArgumentException("chefId is required");
     }
@@ -95,11 +104,11 @@ public class ReservaServiceImpl implements ReservaService {
       throw new IllegalArgumentException("numberOfDiners must be greater than 0");
     }
 
-    // 3. Obtener el Chef
+    // 4. Obtener el Chef
     Chef chef = chefRepository.findById(dto.getChefId())
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
-    // 4. Obtener el Menu y verificar que pertenece al chef
+    // 5. Obtener el Menu y verificar que pertenece al chef
     Menu menu = menuRepository.findById(dto.getMenuId())
       .orElseThrow(() -> new RuntimeException("Menu not found"));
 
@@ -107,7 +116,7 @@ public class ReservaServiceImpl implements ReservaService {
       throw new IllegalArgumentException("This menu does not belong to the specified chef");
     }
 
-    // 5. Verificar que el número de comensales está dentro del rango del menú
+    // 6. Verificar que el número de comensales está dentro del rango del menú
     if (menu.getMinNumberDiners() != null && dto.getNumberOfDiners() < menu.getMinNumberDiners()) {
       throw new IllegalArgumentException("Number of diners is below minimum required: " + menu.getMinNumberDiners());
     }
@@ -115,33 +124,30 @@ public class ReservaServiceImpl implements ReservaService {
       throw new IllegalArgumentException("Number of diners exceeds maximum allowed: " + menu.getMaxNumberDiners());
     }
 
-    // 6. Verificar que no existe ya una reserva para ese chef en esa fecha
+    // 7. Verificar que no existe ya una reserva para ese chef en esa fecha
     Reservation.ReservationId reservationId = new Reservation.ReservationId(chef.getId(), dto.getDate());
     if (reservaRepository.existsById(reservationId)) {
       throw new IllegalArgumentException("This chef already has a reservation for this date");
     }
 
-    // 7. Crear la reserva
+    // 8. Crear la reserva
     Reservation reservation = reservationMapper.toEntity(dto, chef, diner, menu);
     reservaRepository.save(reservation);
   }
 
   @Override
   @Transactional
-  public void deleteReservation(Authentication authentication, Long chefId, java.time.LocalDate date) {
+  public void deleteReservation(Authentication authentication, Long chefId, LocalDate date) {
 
-    // 1. Obtener el usuario autenticado
     UserLogin authUser = userRepository
       .findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    // 2. Buscar la reserva por clave compuesta
     Reservation.ReservationId reservationId = new Reservation.ReservationId(chefId, date);
     Reservation reservation = reservaRepository
       .findById(reservationId)
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-    // 3. Verificar permisos: solo el diner que hizo la reserva o el chef pueden borrarla
     boolean isDiner = reservation.getDiner().getId().equals(authUser.getId());
     boolean isChef = reservation.getChef().getId().equals(authUser.getId());
 
@@ -149,66 +155,39 @@ public class ReservaServiceImpl implements ReservaService {
       throw new RuntimeException("Not allowed to delete this reservation");
     }
 
-    // 4. Eliminar la reserva
     reservaRepository.deleteById(reservationId);
   }
 
   @Override
   @Transactional
-  public ReservationDTO updateReservations(Authentication authentication, ReservationsUReqDto uReq) {
+  public ReservationDTO updateReservationStatus(Authentication authentication, ReservationsUReqDto uReq) {
 
-    // 1. Validaciones
     if (uReq.getChefId() == null || uReq.getDate() == null) {
       throw new IllegalArgumentException("chefId and date are required to identify the reservation");
     }
 
-    // 2. Obtener el usuario autenticado
+    if (uReq.getStatus() == null) {
+      throw new IllegalArgumentException("status is required");
+    }
+
     UserLogin authUser = userRepository
       .findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    // 3. Buscar la reserva por clave compuesta
+    Chef chef = chefRepository.findById(authUser.getId())
+      .orElseThrow(() -> new RuntimeException("Only chefs can update reservation status"));
+
     Reservation.ReservationId reservationId = new Reservation.ReservationId(uReq.getChefId(), uReq.getDate());
     Reservation reservation = reservaRepository
       .findById(reservationId)
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-    // 4. Verificar permisos
-    boolean isDiner = reservation.getDiner().getId().equals(authUser.getId());
-    boolean isChef = reservation.getChef().getId().equals(authUser.getId());
-
-    if (!isDiner && !isChef) {
-      throw new RuntimeException("Not allowed to update this reservation");
+    if (!reservation.getChef().getId().equals(chef.getId())) {
+      throw new RuntimeException("You can only update your own reservations");
     }
 
-    // 5. Obtener nuevo menú si se proporciona
-    Menu newMenu = null;
-    if (uReq.getMenuId() != null) {
-      newMenu = menuRepository.findById(uReq.getMenuId())
-        .orElseThrow(() -> new RuntimeException("Menu not found"));
+    reservation.setStatus(uReq.getStatus());
 
-      // Verificar que el nuevo menú pertenece al mismo chef
-      if (!newMenu.getChef().getId().equals(reservation.getChef().getId())) {
-        throw new IllegalArgumentException("The new menu must belong to the same chef");
-      }
-
-      // Verificar rango de comensales si se cambia el menú
-      Integer numberOfDiners = uReq.getNumberOfDiners() != null
-        ? uReq.getNumberOfDiners()
-        : reservation.getNumberOfDiners();
-
-      if (newMenu.getMinNumberDiners() != null && numberOfDiners < newMenu.getMinNumberDiners()) {
-        throw new IllegalArgumentException("Number of diners is below minimum required for this menu");
-      }
-      if (newMenu.getMaxNumberDiners() != null && numberOfDiners > newMenu.getMaxNumberDiners()) {
-        throw new IllegalArgumentException("Number of diners exceeds maximum allowed for this menu");
-      }
-    }
-
-    // 6. Aplicar actualización
-    reservationMapper.applyUpdate(reservation, uReq, newMenu);
-
-    // 7. Guardar y devolver
     Reservation saved = reservaRepository.save(reservation);
     return reservationMapper.toDto(saved);
   }
