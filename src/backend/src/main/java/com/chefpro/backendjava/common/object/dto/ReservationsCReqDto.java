@@ -1,22 +1,21 @@
 package com.chefpro.backendjava.common.object.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ReservationsCReqDto {
 
-  private String name;
-  private String description;
-  private OffsetDateTime date;
-  private String location;
-  private Long customerId;
+  private Long chefId;
+  private LocalDate date;
   private Long menuId;
-  private int numberOfSeats;
-
+  private Integer numberOfDiners;
+  private String address;
 }

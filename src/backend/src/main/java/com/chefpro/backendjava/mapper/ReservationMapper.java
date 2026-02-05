@@ -1,56 +1,57 @@
 package com.chefpro.backendjava.mapper;
 
 import com.chefpro.backendjava.common.object.dto.*;
+import com.chefpro.backendjava.common.object.entity.Chef;
+import com.chefpro.backendjava.common.object.entity.Diner;
 import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.common.object.entity.Reservation;
 import org.springframework.stereotype.Component;
-
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class ReservationMapper {
 
   // ENTITY -> DTO
-  public ReservationDTO toDto(Reservation r, String chefUsername) {
+  public ReservationDTO toDto(Reservation r) {
     if (r == null) return null;
 
-    ReservationDTO dto = new ReservationDTO();
-    dto.setId(r.getId() != null ? r.getId() : null);
+    // Obtener nombres para información adicional
+    String chefName = r.getChef() != null && r.getChef().getUser() != null
+      ? r.getChef().getUser().getName() + " " + r.getChef().getUser().getLastname()
+      : null;
 
-    // "name" no existe en Reservation: lo sacamos del menú
-    dto.setName(r.getMenu() != null ? r.getMenu().getTitle() : null);
+    String dinerName = r.getDiner() != null && r.getDiner().getUser() != null
+      ? r.getDiner().getUser().getName() + " " + r.getDiner().getUser().getLastname()
+      : null;
 
-    dto.setDescription(r.getAdditionalNotes());
-    dto.setLocation(r.getDeliveryAddress());
-    dto.setCustomerId(r.getComensalId());
+    String menuTitle = r.getMenu() != null ? r.getMenu().getTitle() : null;
 
-    if (r.getReservationDate() != null) {
-      dto.setDate(
-        r.getReservationDate()
-          .atZone(ZoneId.systemDefault())
-          .toOffsetDateTime()
-      );
-    }
-
-    dto.setMenu(mapMenu(r.getMenu(), chefUsername));
-
-    return dto;
+    return ReservationDTO.builder()
+      .chefId(r.getChefId())
+      .date(r.getDate())
+      .dinerId(r.getDiner() != null ? r.getDiner().getId() : null)
+      .menuId(r.getMenu() != null ? r.getMenu().getId() : null)
+      .numberOfDiners(r.getNumberOfDiners())
+      .address(r.getAddress())
+      .status(r.getStatus())
+      .chefName(chefName)
+      .dinerName(dinerName)
+      .menuTitle(menuTitle)
+      .build();
   }
 
-  // CREATE REQ -> ENTITY
-  public Reservation toEntity(ReservationsCReqDto dto, Long comensalId, Long chefId, Menu menu) {
+  // DTO CREATE -> ENTITY
+  public Reservation toEntity(ReservationsCReqDto dto, Chef chef, Diner diner, Menu menu) {
     if (dto == null) return null;
 
     return Reservation.builder()
-      .comensalId(comensalId)
-      .chefId(chefId)
+      .chefId(chef != null ? chef.getId() : null)
+      .date(dto.getDate())
+      .chef(chef)
+      .diner(diner)
       .menu(menu)
-      .reservationDate(dto.getDate() != null ? dto.getDate().toLocalDateTime() : null)
-      .deliveryAddress(dto.getLocation())
-      .additionalNotes(dto.getDescription())
-      .numberOfDiners(dto.getNumberOfSeats())
+      .numberOfDiners(dto.getNumberOfDiners())
+      .address(dto.getAddress())
+      .status(Reservation.ReservationStatus.PENDING)
       .build();
   }
 
@@ -58,60 +59,24 @@ public class ReservationMapper {
   public void applyUpdate(Reservation reservation, ReservationsUReqDto uReq, Menu newMenuOrNull) {
     if (reservation == null || uReq == null) return;
 
-    if (uReq.getDate() != null) {
-      reservation.setReservationDate(uReq.getDate().toLocalDateTime());
+    // Actualizar número de comensales
+    if (uReq.getNumberOfDiners() != null && uReq.getNumberOfDiners() > 0) {
+      reservation.setNumberOfDiners(uReq.getNumberOfDiners());
     }
 
-    if (uReq.getLocation() != null && !uReq.getLocation().isBlank()) {
-      reservation.setDeliveryAddress(uReq.getLocation());
+    // Actualizar dirección
+    if (uReq.getAddress() != null && !uReq.getAddress().isBlank()) {
+      reservation.setAddress(uReq.getAddress());
     }
 
-    if (uReq.getDescription() != null) {
-      reservation.setAdditionalNotes(uReq.getDescription());
+    // Actualizar estado
+    if (uReq.getStatus() != null) {
+      reservation.setStatus(uReq.getStatus());
     }
 
-    if (uReq.getNumberOfSeats() > 0) {
-      reservation.setNumberOfDiners(uReq.getNumberOfSeats());
-    }
-
-    // Si decides permitir cambio de menú:
+    // Actualizar menú si se proporciona uno nuevo
     if (newMenuOrNull != null) {
       reservation.setMenu(newMenuOrNull);
-
-      reservation.setChefId(newMenuOrNull.getChefId());
     }
-  }
-
-
-  // Menu -> MenuDTO
-  private MenuDTO mapMenu(Menu m, String chefUsername) {
-    if (m == null) return null;
-
-    List<PlatoDto> dishDtos = (m.getDishes() == null)
-      ? List.of()
-      : m.getDishes().stream()
-      .map(p -> PlatoDto.builder()
-        .id(p.getId())
-        .title(p.getTitle())
-        .description(p.getDescription())
-        .build()
-      )
-      .toList();
-
-    Set<String> allergens = (m.getAllergens() == null) ? Set.of() : m.getAllergens();
-
-    return MenuDTO.builder()
-      .id(m.getId() != null ? m.getId() : null)
-      .title(m.getTitle())
-      .description(m.getDescription())
-      .dishes(dishDtos)
-      .allergens(allergens)
-      .pricePerPerson(m.getPricePerPerson())
-      .deliveryAvailable(m.isDeliveryAvailable())
-      .cookAtClientHome(m.isCookAtClientHome())
-      .pickupAvailable(m.isPickupAvailable())
-      .chefUsername(chefUsername) // ✅ username REAL, no id
-      .createdAt(m.getCreatedAt())
-      .build();
   }
 }

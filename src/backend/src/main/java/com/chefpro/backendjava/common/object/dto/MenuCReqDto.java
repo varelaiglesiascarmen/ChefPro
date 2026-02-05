@@ -15,19 +15,14 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuCReqDto {
 
-    private String title;
-    private String description;
+  private String title;
+  private String description;
+  private BigDecimal pricePerPerson;
 
-    private List<Long> dishesId;
-    private String allergens;
+  private Integer minNumberDiners;
+  private Integer maxNumberDiners;
+  private String kitchenRequirements;
 
-    private BigDecimal pricePerPerson;
-
-    private boolean deliveryAvailable;
-    private boolean cookAtClientHome;
-    private boolean pickupAvailable;
-
-    private String chefUsername;
-
-    private Instant createdAt;
+  private List<Long> dishIds;
 }
+

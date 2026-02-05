@@ -1,6 +1,7 @@
 package com.chefpro.backendjava.common.object.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,14 +10,14 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlatoUReqDto {
+@Builder
+public class DishDto {
 
-  private Long id;
-  private String name;
+  private Long menuId;
+  private Long dishId;
+  private String title;
   private String description;
+  private String category;
   private String creator;
-  private Boolean vegan;
-  private Boolean vegetarian;
-  private Boolean allergies;
-  private List<IngredientsDto> ingredients;
+  private List<String> allergens;
 }

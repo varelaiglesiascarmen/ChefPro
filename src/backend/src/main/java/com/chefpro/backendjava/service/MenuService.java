@@ -14,4 +14,6 @@ public interface MenuService {
   void deleteMenu(Authentication authentication, Long idMenu);
 
   MenuDTO updateMenu (Authentication authentication, MenuUReqDto uReq);
+
+  List<MenuDTO> listAllMenus();
 }
