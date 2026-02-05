@@ -25,45 +25,34 @@ export class LoginComponent {
   ) {}
 
   onLogin() {
-    this.errorMessage = '';
-
-    if (!this.loginData.username || !this.loginData.password) {
-      this.errorMessage = 'Usuario o contraseña incorrectos.';
-      return;
-    }
-
-    this.isLoading = true;
-
-    this.authService.login(this.loginData).subscribe({
-      // successful response
-      next: (res) => {
-        this.isLoading = false;
-
-        if (res.success || res.token) {
-          console.log('Login correcto:', res.user?.name);
-          this.router.navigate(['/index']);
-        } else {
-          // server responds “200 OK” but with error logic (ex. incorrect password)
-          this.errorMessage = res.message || 'Error al iniciar sesión';
-        }
-      },
-
-      // unsuccessful response
-      error: (err) => {
-        this.isLoading = false;
-
-        console.error('Error HTTP:', err.status);
-
-        if (err.status === 401 || err.status === 403) {
-          this.errorMessage = 'Usuario o contraseña incorrectos.';
-        } else if (err.status === 0) {
-          this.errorMessage = 'No se pudo conectar con el servidor.';
-        } else if (err.status === 500) {
-          this.errorMessage = 'Error interno del servidor. Inténtalo luego.';
-        } else {
-          this.errorMessage = 'Ocurrió un error inesperado.';
-        }
-      }
-    });
+  this.errorMessage = '';
+  if (!this.loginData.username || !this.loginData.password) {
+    this.errorMessage = 'Usuario o contraseña obligatorios.';
+    return;
   }
+
+  this.isLoading = true;
+
+  this.authService.login(this.loginData).subscribe({
+    next: (res: any) => { 
+      this.isLoading = false;
+
+      if (res && res.token) {
+        console.log('Login correcto:', res.user?.name);
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+
+        this.router.navigate(['/index']);
+      }
+    },
+    error: (err) => {
+      this.isLoading = false;
+      if (err.status === 401) {
+        this.errorMessage = 'Credenciales inválidas.';
+      } else {
+        this.errorMessage = 'Error de conexión con el servidor.';
+      }
+    }
+  });
+}
 }
