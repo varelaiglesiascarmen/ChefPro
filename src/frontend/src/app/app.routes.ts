@@ -9,7 +9,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { UserMenuComponent } from './components/user-menu/user-menu.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
-import { CreateDishComponent } from './components/create-dish/create-dish.component';
+import { CreateMenuComponent } from './components/create-menu/create-menu.component';
 import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
 
 export const routes: Routes = [
@@ -47,16 +47,10 @@ export const routes: Routes = [
   { path: 'search-results', component: SearchResultsComponent },
 
   //create menu root
-  { path: 'create-menu', component: CreateDishComponent },
+  { path: 'create-menu', component: CreateMenuComponent },
 
   // edit-menu root
-  { path: 'edit-menu/:id', component: CreateDishComponent },
-
-  // create-dish root
-  { path: 'create-dish', component: CreateDishComponent },
-
-  // edit-dish root
-  { path: 'edit-dish/:id', component: CreateDishComponent },
+  { path: 'edit-menu/:id', component: CreateMenuComponent },
 
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
