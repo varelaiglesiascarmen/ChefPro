@@ -13,8 +13,6 @@ import java.util.List;
 @RequestMapping("/api/chef")
 public class ChefController {
 
-  //TODO Las respuestas de POST y DELETE retornan status 200 vacío, podrían retornar 201
-
   private final MenuService menuService;
   private final PlatoService platoService;
 
@@ -35,7 +33,7 @@ public class ChefController {
 
 
     menuService.createMenu(menuDto, authentication);
-    return ResponseEntity.status(200).build();
+    return ResponseEntity.status(201).build();
   }
 
   //TODO se podría pasar el parametro por url @DeleteMapping("/menus/{id}")
@@ -45,7 +43,7 @@ public class ChefController {
 
     menuService.deleteMenu(authentication, idMenu);
 
-    return ResponseEntity.status(200).build();
+    return ResponseEntity.status(204).build();
   }
 
   @PatchMapping("/menus")
@@ -55,33 +53,31 @@ public class ChefController {
   }
 
   @GetMapping("/plato")
-  public List<PlatoDto> getPlato(Authentication authentication, @RequestParam(required = false) String nombrePlato) {
+  public List<DishDto> getPlato(Authentication authentication, @RequestParam(required = false) String nombrePlato) {
 
 
-    return platoService.getPlatos(authentication, nombrePlato);
+    return platoService.getDish(authentication, nombrePlato);
   }
 
   @PostMapping("/plato")
-  public ResponseEntity<PlatoDto> createPlato(Authentication authentication, @RequestBody PlatoCReqDto platoCreateRequest) {
+  public ResponseEntity<DishDto> createPlato(Authentication authentication, @RequestBody DishCReqDto platoCreateRequest) {
 
 
-    platoService.createPlato(authentication, platoCreateRequest);
+    platoService.createDish(authentication, platoCreateRequest);
 
-    return ResponseEntity.status(200).build();
+    return ResponseEntity.status(201).build();
   }
 
   @DeleteMapping("/plato")
-  public ResponseEntity<PlatoDto> deletePlato(Authentication authentication, @RequestBody Long idPlato) {
-
-
-    platoService.deletePlato(authentication, idPlato);
-
-    return ResponseEntity.status(200).build();
+  public ResponseEntity<Void> deletePlato(Authentication authentication, @RequestParam Long menuId, @RequestParam Long dishId
+  ) {
+    platoService.deleteDish(authentication, menuId, dishId);
+    return ResponseEntity.status(204).build();
   }
 
   @PatchMapping("/plato")
-  public PlatoDto patchPlato(Authentication authentication, @RequestBody PlatoUReqDto platoUpdateRequest) {
-
-    return platoService.updatePlato(authentication, platoUpdateRequest);
+  public ResponseEntity<DishDto> patchPlato(Authentication authentication, @RequestBody DishUReqDto platoUpdateRequest) {
+    DishDto updatedDish = platoService.updateDish(authentication, platoUpdateRequest);
+    return ResponseEntity.ok(updatedDish);
   }
 }

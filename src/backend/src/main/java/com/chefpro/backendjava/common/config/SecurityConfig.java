@@ -37,26 +37,23 @@ public class SecurityConfig {
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       )
       .authorizeHttpRequests(auth -> auth
-        // Endpoints públicos
         .requestMatchers("/api/auth/login", "/api/auth/health").permitAll()
-        // Permitir raíz y recursos estáticos
         .requestMatchers(
           "/", "/index.html", "/favicon.ico",
           "/assets/**", "/static/**", "/public/**",
           "/**/*.css", "/**/*.js", "/**/*.map"
         ).permitAll()
 
-        // Endpoints protegidos por rol
-        .requestMatchers("/api/chef/**").hasRole("CHEF")
-        .requestMatchers("/api/comensal/**").hasRole("COMENSAL")
-        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+        .requestMatchers("/api/chef/**").hasAuthority("ROLE_CHEF")  // Cambiado a hasAuthority
+        .requestMatchers("/api/reservations/chef/**").hasAuthority("ROLE_CHEF")
+        .requestMatchers("/api/reservations/comensal/**").hasAuthority("ROLE_DINER")
+        .requestMatchers("/api/reservations/**").authenticated()
+        .requestMatchers("/api/comensal/**").hasAuthority("ROLE_DINER")
+        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
 
-        // Todo lo demás requiere autenticación (incluyendo /api/auth/me)
         .anyRequest().authenticated()
       )
-      // Agregar filtro JWT ANTES del filtro de autenticación por defecto
       .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-      // Deshabilitar form login y http basic
       .formLogin(form -> form.disable())
       .httpBasic(basic -> basic.disable());
 

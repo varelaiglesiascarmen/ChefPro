@@ -17,18 +17,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.customUserRepository = customUserRepository;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserLogin userLogin = customUserRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    UserLogin userLogin = customUserRepository.findByUsername(username)
+      .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
+    String roleName = userLogin.getRole().name();
 
-        String roleName = userLogin.getRole().name(); // USER o CHEF
-
-        return User.builder()
-                .username(userLogin.getUsername())
-                .password(userLogin.getPassword())
-                .roles(roleName)
-                .build();
-    }
+    return User.builder()
+      .username(userLogin.getUsername())
+      .password(userLogin.getPassword())
+      .authorities("ROLE_" + roleName)  // Cambiado
+      .build();
+  }
 }

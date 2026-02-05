@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/chefpro
-    username: chefpro_user
-    password: chefPro01;
+    url: jdbc:mysql://localhost:3306/chef_pro
+    username: root
+    password: chefpr01;
 
   jpa:
     hibernate:
@@ -14,3 +14,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
+
+logging:
+  level:
+    org:
+      springframework:
+        security=DEBUG:

@@ -8,5 +8,6 @@ import java.util.List;
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     // Menús creados por un chef concreto
-    List<Menu> findByChefUsername(String chefUsername);
+    List<Menu> findByChef_User_Username(String username);
+
 }

@@ -93,6 +93,8 @@ public class LoginController {
     return ResponseEntity.ok(userLoginDto);
   }
 
+
+  //TODO creo que el termino correcto es signUp; FALLA
   @PostMapping("/signin")
   public String signin(@RequestBody LoginRequestDto request) {
 

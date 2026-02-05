@@ -11,14 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PlatoDto {
+public class DishUReqDto {
 
-  private Long id;
+  private Long menuId;
+  private Long dishId;
   private String title;
   private String description;
-  private String creator;
-  private Boolean vegan;
-  private Boolean vegetarian;
-  private Boolean allergies;
-  private List<IngredientsDto> ingredients;
+  private String category;
+  private List<String> allergens;
 }
