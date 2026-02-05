@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, User } from '../models/auth.model';
 import { environment } from '../../environments/environment';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -102,4 +103,5 @@ export class AuthService {
     console.error('Error en el proceso de autenticación:', error);
     return throwError(() => error);
   }
+
 }

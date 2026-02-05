@@ -1,0 +1,70 @@
+<div class="chef-creator">
+  <div class="header">
+    <h1>Panel de Creación: Nuevo Menú</h1>
+  </div>
+
+  <div class="card">
+    <h3>Detalles del Menú</h3>
+    <input [(ngModel)]="menuForm.title" placeholder="Título del Menú (Obligatorio)">
+    <textarea [(ngModel)]="menuForm.description" placeholder="Descripción general para los comensales..."></textarea>
+
+    <div class="row-3">
+      <input type="number" [(ngModel)]="menuForm.price_per_person" placeholder="Precio por persona (€)">
+      <input type="number" [(ngModel)]="menuForm.min_number_diners" placeholder="Mín. Comensales">
+      <input type="number" [(ngModel)]="menuForm.max_number_diners" placeholder="Máx. Comensales">
+    </div>
+
+    <div class="kitchen-tasks">
+      <label>🍳 Requisitos de tu cocina (Task List para el cliente)</label>
+      <textarea [(ngModel)]="menuForm.kitchen_requirements"
+                placeholder="Ej: - Necesito horno precalentado&#10;- 4 fuegos&#10;- Un espacio despejado en la encimera"></textarea>
+    </div>
+  </div>
+
+  <div class="dishes-container">
+    <div class="dishes-header">
+      <h3>Platos del Menú ({{dishes.length}}/6)</h3>
+      <button (click)="addDish()" [disabled]="dishes.length >= 6" class="btn-add">+ Añadir Plato</button>
+    </div>
+
+    <div *ngFor="let dish of dishes; let i = index" class="dish-card">
+      <div class="dish-row">
+        <select [(ngModel)]="dish.category">
+          <option>Aperitivo</option>
+          <option>Entrante</option>
+          <option>Plato Principal</option>
+          <option>Postre</option>
+          <option>Café</option>
+        </select>
+        <input [(ngModel)]="dish.title" [placeholder]="'Nombre del plato ' + (i+1)">
+      </div>
+
+      <textarea [(ngModel)]="dish.description" placeholder="Descripción del plato..."></textarea>
+
+      <div class="allergen-section">
+        <p>Selecciona los alérgenos presentes:</p>
+        <div class="allergen-grid">
+          <label *ngFor="let alg of officialAllergens" [class.selected]="dish.allergenIds.includes(alg.id)">
+            <input type="checkbox" (change)="toggleAllergen(i, alg.id)">
+            <span class="alg-num">{{alg.id}}</span> {{alg.name}}
+          </label>
+        </div>
+      </div>
+
+      <div class="dish-footer">
+        <div class="file-input">
+          <label>Foto del plato (Max 2MB):</label>
+          <input type="file" (change)="onFileSelected($event, i)" accept="image/*">
+        </div>
+        <button class="btn-remove" (click)="removeDish(i)" *ngIf="dishes.length > 1">Eliminar plato</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn-save" [disabled]="!isFormValid()" (click)="saveMenu()">
+      PUBLICAR MENÚ Y IR A MI PERFIL
+    </button>
+    <p *ngIf="!isFormValid()" class="warning">Rellena todos los campos y marca al menos un alérgeno por plato.</p>
+  </div>
+</div>

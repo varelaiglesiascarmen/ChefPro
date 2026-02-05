@@ -1,0 +1,82 @@
+.allergen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  background: #fdfdfd;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.allergen-grid label {
+  font-size: 0.85rem;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+
+.allergen-grid label:hover { background: #f0f0f0; }
+
+.allergen-grid label.active {
+  background: #fff3e0;
+  border-color: #e67e22;
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.alg-id {
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.active .alg-id {
+  background: #e67e22;
+  color: white;
+}
+
+.btn-primary:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.kitchen-tasks textarea {
+  background-color: #fff9f0;
+  border: 1px dashed #e67e22;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.allergen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.alg-num {
+  font-weight: bold;
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.selected .alg-num {
+  background: #e67e22;
+  color: white;
+}
+
+.btn-save:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
