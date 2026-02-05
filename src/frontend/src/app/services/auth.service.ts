@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
-import { LoginRequest, LoginResponse, User, signupRequest } from '../models/auth.model';
+import { LoginRequest, LoginResponse, User } from '../models/auth.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -12,7 +12,9 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = `${environment.apiUrl}/auth`;
+
+  // URL base: http://localhost:8081/api/auth
+  private authUrl = `${environment.apiUrl}/auth`;
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public user$ = this.currentUserSubject.asObservable();
@@ -25,49 +27,55 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  login(credentials: LoginRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+  // LOGIN
+  login(credentials: LoginRequest): Observable<User> {
+    return this.http.post<any>(`${this.authUrl}/login`, credentials).pipe(
       tap(response => {
         if (response.token) {
           localStorage.setItem('chefpro_token', response.token);
         }
-        if (response.user) {
-          this.setSession(response.user);
-        }
       }),
+      switchMap(() => this.getUserData()),
+      tap(fullUser => this.setSession(fullUser)),
       catchError(this.handleError)
     );
   }
 
-  signup(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/signup`, data).pipe(
+  // SIGNUP
+  signup(data: any): Observable<User> {
+    return this.http.post<any>(`${this.authUrl}/signup`, data).pipe(
       tap(response => {
         if (response.token) {
           localStorage.setItem('chefpro_token', response.token);
         }
-        if (response.user) {
-          this.setSession(response.user);
-        }
       }),
+      switchMap(() => this.getUserData()),
+      tap(fullUser => this.setSession(fullUser)),
       catchError(this.handleError)
     );
   }
 
+  // GET USER DATA
   getUserData(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/me`).pipe(
-      tap(user => this.currentUserSubject.next(user)),
+    return this.http.get<User>(`${this.authUrl}/me`).pipe(
+      tap(user => {
+        this.currentUserSubject.next(user);
+        localStorage.setItem('chefpro_user', JSON.stringify(user));
+      }),
       catchError(this.handleError)
     );
   }
 
-  checkUsernameAvailability(username: string) {
-    return this.http.get<boolean>(`${this.apiUrl}/check-username?username=${username}`);
+  // CHECK USERNAME & EMAIL AVAILABILITY
+  checkUsernameAvailability(username: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.authUrl}/check-username?username=${username}`);
   }
 
-  checkEmailAvailability(email: string) {
-    return this.http.get<boolean>(`${this.apiUrl}/check-email?email=${email}`);
+  checkEmailAvailability(email: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.authUrl}/check-email?email=${email}`);
   }
 
+  // LOGOUT
   logout(): void {
     localStorage.removeItem('chefpro_user');
     localStorage.removeItem('chefpro_token');
@@ -80,15 +88,18 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
+  // RESTORE SESSION
   private restoreSession(): void {
-    const userJson = localStorage.getItem('chefpro_user');
     const token = localStorage.getItem('chefpro_token');
-    if (userJson && token) {
-      this.currentUserSubject.next(JSON.parse(userJson));
+    if (token) {
+      this.getUserData().subscribe({
+        error: () => this.logout()
+      });
     }
   }
 
   private handleError(error: HttpErrorResponse) {
+    console.error('Error en el proceso de autenticación:', error);
     return throwError(() => error);
   }
 }
