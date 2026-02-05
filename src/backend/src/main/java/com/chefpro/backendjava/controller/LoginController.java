@@ -1,6 +1,7 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.common.security.JwtUtil;
+import com.chefpro.backendjava.common.object.dto.SignUpReqDto;          // ✅ AÑADIR
 import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginResponseDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
@@ -40,7 +41,6 @@ public class LoginController {
     );
 
     UserDetails user = (UserDetails) authentication.getPrincipal();
-
     String token = jwtUtil.generateToken(user);
 
     String role = user.getAuthorities().stream()
@@ -48,6 +48,8 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
+    // OJO: aquí estás usando findByEmail pero le pasas username.
+    // Lo dejo igual porque pides cambios mínimos.
     UserLoginDto userFound = userService.findByEmail(request.getUsername());
 
     UserLoginDto userLoginDto = new UserLoginDto();
@@ -91,10 +93,11 @@ public class LoginController {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<LoginResponseDto> signup(@RequestBody LoginRequestDto request) {
+  public ResponseEntity<LoginResponseDto> signup(@RequestBody SignUpReqDto request) {
 
     if (userService.signUp(request)) {
-      // Auto-login después del registro
+
+      // Auto-login después del registro (usa username/password del signup)
       Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
           request.getUsername(),
@@ -130,7 +133,6 @@ public class LoginController {
 
   @PostMapping("/logout")
   public ResponseEntity<Void> logout() {
-
     return ResponseEntity.ok().build();
   }
 }
