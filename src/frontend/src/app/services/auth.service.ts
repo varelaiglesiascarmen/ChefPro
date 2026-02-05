@@ -28,11 +28,9 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        // 1. Guardamos el token
         if (response.token) {
           localStorage.setItem('chefpro_token', response.token);
         }
-        // 2. Guardamos el usuario que YA viene en la respuesta (response.user)
         if (response.user) {
           this.setSession(response.user);
         }
@@ -60,6 +58,14 @@ export class AuthService {
       tap(user => this.currentUserSubject.next(user)),
       catchError(this.handleError)
     );
+  }
+
+  checkUsernameAvailability(username: string) {
+    return this.http.get<boolean>(`${this.apiUrl}/check-username?username=${username}`);
+  }
+
+  checkEmailAvailability(email: string) {
+    return this.http.get<boolean>(`${this.apiUrl}/check-email?email=${email}`);
   }
 
   logout(): void {
