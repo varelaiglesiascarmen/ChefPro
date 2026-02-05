@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { RegisterRequest } from '../../models/auth.model';
+import { signupRequest } from '../../models/auth.model';
 
 @Component({
   selector: 'app-sign-in',
@@ -18,7 +18,7 @@ export class SignInComponent {
 
   // DATA INITIALIZATION
   // We use ‘null as any’ in the role so that it starts empty and forces the user to choose.
-  registerData: RegisterRequest = {
+  signupData: signupRequest = {
     name: '',
     surname: '',
     username: '',
@@ -30,7 +30,7 @@ export class SignInComponent {
   confirmEmail: string = '';
   confirmPassword: string = '';
 
-  // Variable to control whether the user attempted to register without choosing a role
+  // Variable to control whether the user attempted to signup without choosing a role
   roleError: boolean = false;
 
   // Availability statuses (Asynchronous validation)
@@ -48,20 +48,20 @@ export class SignInComponent {
 
   // ROLE SELECTION LOGIC (CHEF vs DINER)
   selectRole(role: 'DINER' | 'CHEF') {
-    this.registerData.role = role;
+    this.signupData.role = role;
     this.roleError = false;
   }
 
   // userbar validatioon methods
   checkUsername() {
-    if (!this.registerData.username.trim()) {
+    if (!this.signupData.username.trim()) {
       this.usernameStatus = null;
       return;
     }
 
     this.usernameStatus = 'PENDING';
 
-    this.authService.checkUsernameAvailability(this.registerData.username)
+    this.authService.checkUsernameAvailability(this.signupData.username)
       .subscribe({
         next: (isAvailable) => {
           this.usernameStatus = isAvailable ? 'AVAILABLE' : 'TAKEN';
@@ -73,7 +73,7 @@ export class SignInComponent {
   }
 
   checkEmail() {
-    const email = this.registerData.email;
+    const email = this.signupData.email;
 
     if (!email.trim()) {
       this.emailStatus = null;
@@ -102,7 +102,7 @@ export class SignInComponent {
 
   // calculate password strength
   calculateStrength() {
-    const pass = this.registerData.password;
+    const pass = this.signupData.password;
     if (!pass) {
       this.passwordStrength = 0;
       this.passwordFeedback = '';
@@ -134,10 +134,10 @@ export class SignInComponent {
   }
 
   // registration method
-  onRegister() {
+  onsignup() {
 
     // Validate required fields
-    if (!this.registerData.name || !this.registerData.surname || !this.registerData.username || !this.registerData.email || !this.registerData.password) {
+    if (!this.signupData.name || !this.signupData.surname || !this.signupData.username || !this.signupData.email || !this.signupData.password) {
       this.errorMessage = 'Por favor, rellena todos los campos obligatorios.';
       return;
     }
@@ -149,19 +149,19 @@ export class SignInComponent {
     }
 
     // validate that the email is the same in the inputs
-    if (this.registerData.email !== this.confirmEmail) {
+    if (this.signupData.email !== this.confirmEmail) {
       this.errorMessage = 'El correo no coincide.';
       return;
     }
 
     // validate that the pasword is the same in the inputs
-    if (this.registerData.password !== this.confirmPassword) {
+    if (this.signupData.password !== this.confirmPassword) {
       this.errorMessage = 'La contraseña no coincide.';
       return;
     }
 
     // validate rol strength
-    if (!this.registerData.role) {
+    if (!this.signupData.role) {
       this.roleError = true;
       this.errorMessage = 'Por favor, seleccione Comensal o Chef.';
       return;
@@ -171,7 +171,7 @@ export class SignInComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.register(this.registerData).subscribe({
+    this.authService.signup(this.signupData).subscribe({
       next: () => {
         this.isLoading = false;
         // Navigate to index on successful registration
