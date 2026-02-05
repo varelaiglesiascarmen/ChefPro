@@ -3,10 +3,9 @@ package com.chefpro.backendjava.common.object.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "reservations")
@@ -15,81 +14,67 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@IdClass(Reservation.ReservationId.class)
 public class Reservation {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  // Relación con el comensal (UserLogin)
-  //@ManyToOne(optional = false)
-  @JoinColumn(name = "comensal_id", nullable = false)
-  private Long comensalId;
-
-  // Relación con el chef (UserLogin)
-  //@ManyToOne(optional = false)
-  @JoinColumn(name = "chef_id", nullable = false)
+  @Column(name = "chef_ID", nullable = false)
   private Long chefId;
 
-  // Relación con el menú reservado
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "menu_id", nullable = false)
+  @Id
+  @Column(name = "date", nullable = false)
+  private LocalDate date;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "chef_ID", insertable = false, updatable = false)
+  private Chef chef;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "diner_ID", nullable = false)
+  private Diner diner;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "menu_ID", nullable = false)
   private Menu menu;
 
-  @Column(name = "reservation_date", nullable = false)
-  private LocalDateTime reservationDate;
-
-  @Column(name = "number_of_diners", nullable = false)
+  @Column(name = "n_diners", nullable = false)
   private Integer numberOfDiners;
 
-  @Column(name = "delivery_address", length = 300, nullable = false)
-  private String deliveryAddress;
+  @Column(name = "address", length = 255)
+  private String address;
 
-  // Estado: PENDIENTE, ACEPTADA, RECHAZADA, CANCELADA, COMPLETADA
-  @Column(length = 20, nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
   @Builder.Default
-  private String status = "PENDIENTE";
-
-  // Alergias del comensal
-  @ElementCollection
-  @CollectionTable(name = "reservation_allergies", joinColumns = @JoinColumn(name = "reservation_id"))
-  @Column(name = "allergy", length = 100)
-  @Builder.Default
-  private List<String> allergies = new ArrayList<>();
-
-  @Column(name = "dietary_preferences", length = 500)
-  private String dietaryPreferences;
-
-  @Column(name = "additional_notes", length = 1000)
-  private String additionalNotes;
-
-  // Valoración (1-5 estrellas) después de completar
-  @Column(name = "rating")
-  private Integer rating;
-
-  @Column(name = "rating_comment", length = 1000)
-  private String ratingComment;
+  private ReservationStatus status = ReservationStatus.PENDING;
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
-
-  @Column(name = "updated_at")
-  private Instant updatedAt;
 
   @PrePersist
   public void prePersist() {
     if (createdAt == null) {
       createdAt = Instant.now();
     }
-    if (updatedAt == null) {
-      updatedAt = Instant.now();
+    if (status == null) {
+      status = ReservationStatus.PENDING;
     }
   }
 
-  @PreUpdate
-  public void preUpdate() {
-    updatedAt = Instant.now();
+  // Enum para el status
+  public enum ReservationStatus {
+    PENDING,
+    CONFIRMED,
+    REJECTED,
+    CANCELLED
+  }
+
+  // Clase interna para la clave compuesta
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ReservationId implements Serializable {
+    private Long chefId;
+    private LocalDate date;
   }
 }
-
-

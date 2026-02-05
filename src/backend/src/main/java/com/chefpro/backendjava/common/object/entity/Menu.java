@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "menu")
@@ -19,54 +17,54 @@ import java.util.Set;
 public class Menu {
 
   @Id
-  @Column(length = 50)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "menu_ID")
   private Long id;
 
-  @Column(length = 150, nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "chef_ID", nullable = false)
+  private Chef chef;
+
+  @Column(name = "title", length = 150, nullable = false)
   private String title;
 
-  @Column(length = 300)
+  @Lob
+  @Column(name = "description")
   private String description;
-
-  // Many menus can include many dishes
-  @ManyToMany
-  @JoinTable(
-    name = "menu_dish",
-    joinColumns = @JoinColumn(name = "menu_id"),
-    inverseJoinColumns = @JoinColumn(name = "dish_id")
-  )
-  @Builder.Default
-  private List<Plato> dishes = new java.util.ArrayList<>();
-
-  // Allergens stored as a separate table (recommended vs comma-separated string)
-  @ElementCollection
-  @CollectionTable(name = "menu_allergen", joinColumns = @JoinColumn(name = "menu_id"))
-  @Column(name = "allergen", length = 100, nullable = false)
-  @Builder.Default
-  private Set<String> allergens = new LinkedHashSet<>();
 
   @Column(name = "price_per_person", nullable = false, precision = 10, scale = 2)
   private BigDecimal pricePerPerson;
 
-  @Column(name = "is_delivery_available", nullable = false)
-  private boolean deliveryAvailable;
+  @Column(name = "min_number_diners")
+  private Integer minNumberDiners;
 
-  @Column(name = "can_cook_at_client_home", nullable = false)
-  private boolean cookAtClientHome;
+  @Column(name = "max_number_diners")
+  private Integer maxNumberDiners;
 
-  @Column(name = "is_pickup_available", nullable = false)
-  private boolean pickupAvailable;
+  @Lob
+  @Column(name = "kitchen_requirements")
+  private String kitchenRequirements;
 
-  //@ManyToOne(optional = false)
-  @JoinColumn(name = "chef_id", nullable = false)
-  private Long chefId;
+  // Relación con dishes
+  @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<Dish> dishes = new ArrayList<>();
 
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private Instant createdAt;
+  // Relación con reservations
+  @OneToMany(mappedBy = "menu")
+  @Builder.Default
+  private List<Reservation> reservations = new ArrayList<>();
 
-  @PrePersist
-  public void prePersist() {
-    if (createdAt == null) createdAt = Instant.now();
+  // Método helper para añadir platos
+  public void addPlato(Dish dish) {
+    dishes.add(dish);
+    dish.setMenu(this);
+    dish.setMenuId(this.id);
+  }
+
+  // Método helper para remover platos
+  public void removePlato(Dish dish) {
+    dishes.remove(dish);
+    dish.setMenu(null);
   }
 }

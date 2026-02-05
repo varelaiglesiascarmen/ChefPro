@@ -7,5 +7,5 @@ public interface UserService {
 
   UserLoginDto findByEmail(String email);
 
-  Boolean signInUser(LoginRequestDto singInRequest);
+  Boolean signUp(LoginRequestDto signUpRequest);
 }

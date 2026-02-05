@@ -2,13 +2,7 @@ package com.chefpro.backendjava.common.object.entity;
 
 import java.time.Instant;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,33 +14,40 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserLogin {
 
-    @Id
-    @Column(length = 50)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY) // si user_ID es AUTO_INCREMENT (lo normal)
+  @Column(name = "user_ID")
+  private Long id;
 
-    @Column(name = "email", length = 150, nullable = false, unique = true)
-    private String username;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", nullable = false, length = 20)
+  private UserRoleEnum role;
 
-    @Column(length = 255, nullable = false)
-    private String password;
+  @Column(name = "username", length = 50, nullable = false, unique = true)
+  private String username;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private UserRoleEnum role;
+  @Column(name = "password", length = 255, nullable = false)
+  private String password;
 
-    @Column(length = 100, nullable = false)
-    private String name;
+  @Column(name = "email", length = 100, nullable = false, unique = true)
+  private String email;
 
-    @Column(name = "phone_number", length = 20)
-    private String phoneNumber;
+  @Column(name = "phone_number", length = 20)
+  private String phoneNumber;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "name", length = 100, nullable = false)
+  private String name;
 
-    @PrePersist
-    public void prePersist() {
-        if (createdAt == null) {
-            createdAt = Instant.now();
-        }
+  @Column(name = "lastname", length = 100, nullable = false)
+  private String lastname;
+
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
+
+  @PrePersist
+  public void prePersist() {
+    if (createdAt == null) {
+      createdAt = Instant.now();
     }
+  }
 }

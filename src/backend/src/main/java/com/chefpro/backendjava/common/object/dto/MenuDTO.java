@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class MenuDTO {
     private String title;
     private String description;
 
-    private List<PlatoDto> dishes;
+    private List<DishDto> dishes;
     private Set<String> allergens;
 
     private BigDecimal pricePerPerson;

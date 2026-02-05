@@ -1,23 +1,23 @@
 package com.chefpro.backendjava.common.object.dto;
 
+import com.chefpro.backendjava.common.object.entity.Reservation;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ReservationsUReqDto {
 
-  private Long id;
-  private String name;
-  private String description;
-  private OffsetDateTime date;
-  private String location;
-  private Long customerId;
-  private MenuDTO menu;
-  private int numberOfSeats;
+  private Long chefId;
+  private java.time.LocalDate date;
 
+
+  private Integer numberOfDiners;
+  private String address;
+  private Long menuId;
+  private Reservation.ReservationStatus status;
 }

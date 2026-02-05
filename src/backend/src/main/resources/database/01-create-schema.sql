@@ -18,6 +18,8 @@
 --
 -- Table structure for table `allergens_dishes`
 --
+CREATE DATABASE IF NOT EXISTS chef_pro;
+USE chef_pro;
 
 DROP TABLE IF EXISTS `allergens_dishes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
