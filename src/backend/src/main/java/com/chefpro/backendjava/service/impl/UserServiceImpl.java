@@ -41,7 +41,8 @@ public class UserServiceImpl implements UserService {
       UserLoginDto userLoginDto = new UserLoginDto();
       userLoginDto.setId(userLogin.getId());
       userLoginDto.setName(userLogin.getName());
-      userLoginDto.setEmail(userLogin.getUsername());
+      userLoginDto.setEmail(userLogin.getEmail());
+      userLoginDto.setPhoneNumber(userLogin.getPhoneNumber());
       userLoginDto.setRole(userLogin.getRole().name());
 
       return userLoginDto;
@@ -66,8 +67,11 @@ public class UserServiceImpl implements UserService {
     }
 
     UserLogin userLogin = new UserLogin();
+    userLogin.setName(signUpRequest.getName());
+    userLogin.setLastname(signUpRequest.getSurname());
     userLogin.setUsername(signUpRequest.getUsername());
     userLogin.setEmail(signUpRequest.getEmail());
+    userLogin.setPhoneNumber(signUpRequest.getPhoneNumber());
     userLogin.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
 
