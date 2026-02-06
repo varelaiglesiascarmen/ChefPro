@@ -30,8 +30,8 @@
       <div *ngFor="let chef of chefs" class="chef-card" (click)="goToChefDetail(chef.id)">
 
         <div class="card-image-wrapper">
-          <img [src]="chef.photoUrl || 'assets/images/default-chef.jpg'" alt="{{ chef.name }}" class="chef-img"
-            (error)="chef.photoUrl = 'assets/images/default-chef.jpg'">
+          <img [src]="chef.photoUrl || '/logos/users.svg'" alt="{{ chef.name }}" class="chef-img"
+            (error)="chef.photoUrl = '/logos/users.svg'">
 
           <div class="rating-badge">★ {{ chef.rating }}</div>
         </div>

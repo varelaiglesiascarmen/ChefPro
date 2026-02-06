@@ -32,6 +32,25 @@
   margin: 0;
 }
 
+.photo-preview-group .photo-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.photo-preview-group .profile-photo-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #C5A059;
+  flex-shrink: 0;
+}
+
+.photo-preview-group input {
+  flex: 1;
+}
+
 .btn-config {
   background: #C5A059;
   color: white;

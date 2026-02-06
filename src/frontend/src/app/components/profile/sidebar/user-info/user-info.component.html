@@ -11,9 +11,12 @@
     <form [formGroup]="profileForm" class="chef-form">
 
       <div class="form-row">
-        <div class="form-group">
+        <div class="form-group photo-preview-group">
           <label>URL Foto de Perfil</label>
-          <input formControlName="photo" [readonly]="!editMode">
+          <div class="photo-input-wrapper">
+            <img [src]="profilePhotoUrl" alt="Foto de perfil" class="profile-photo-preview">
+            <input formControlName="photo" [readonly]="!editMode" placeholder="URL de la imagen">
+          </div>
         </div>
         <div class="form-group">
           <label>Nombre de Usuario *</label>

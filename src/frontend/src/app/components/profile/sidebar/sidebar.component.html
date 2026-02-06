@@ -1,7 +1,7 @@
 <aside class="sidebar-container">
   <div class="profile-summary">
     <div class="avatar-wrapper">
-      <img [src]="user?.photo || 'assets/default-chef.png'" alt="Chef Photo" class="chef-avatar">
+      <img [src]="user?.photo || '/logos/users.svg'" alt="Chef Photo" class="chef-avatar">
     </div>
     <div class="chef-meta">
       <h3>{{ user?.name || 'Chef' }} {{ user?.lastname || '' }}</h3>
@@ -22,7 +22,8 @@
       </a>
     </ng-container>
 
-    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes' : 'Mis Reservas' }}
+    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes' : 'Mis
+      Reservas' }}
     </a>
   </nav>
 
