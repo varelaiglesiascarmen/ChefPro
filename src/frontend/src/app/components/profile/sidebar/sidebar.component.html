@@ -17,13 +17,17 @@
     </a>
 
     <ng-container *ngIf="role === 'CHEF'">
+      <a routerLink="calendar" routerLinkActive="active" class="nav-item">Mi Calendario
+      </a>
+      <a routerLink="user-calendar" routerLinkActive="active" class="nav-item">Agenda y Disponibilidad
+      </a>
       <a routerLink="menus" routerLinkActive="active" class="nav-item">Mis Menús
       </a>
-      <a routerLink="calendar" routerLinkActive="active" class="nav-item">Calendario
+      <a routerLink="new-menu" routerLinkActive="active" class="nav-item create-highlight">Crear Nuevo Menú
       </a>
     </ng-container>
 
-    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes' : 'Mis
+    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes de reservas' : 'Mis
       Reservas' }}
     </a>
   </nav>
