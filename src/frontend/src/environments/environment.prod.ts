@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '{API_URL}'
+  apiUrl: 'https://chefpro-production.up.railway.app/api'
 };

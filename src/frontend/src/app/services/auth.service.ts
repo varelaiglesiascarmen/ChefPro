@@ -20,7 +20,7 @@ export class AuthService {
   // ==========================================
   // DEVELOPER MODE BLOCK (isDevMode)
   // ==========================================
-  private isDevMode = true; // CHANGE TO 'false' TO CONNECT TO REAL BACKEND
+  private isDevMode = false; // CHANGE TO 'false' TO CONNECT TO REAL BACKEND
 
   private getMockUser(role: 'CHEF' | 'DINER' = 'CHEF'): User {
     return {

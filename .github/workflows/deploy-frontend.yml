@@ -30,10 +30,11 @@ on:
   push:
     branches:
       - main
+      - feat/vercel-deploy
     paths:
       - 'src/frontend/**'
   pull_request:
-    branches: [main]
+    branches: [main, feat/vercel-deploy]
     paths:
       - 'src/frontend/**'
   workflow_dispatch:
@@ -45,7 +46,7 @@ env:
 jobs:
   # ─── PRODUCTION deploy (push to main) ────────────────────
   deploy-production:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: production
 

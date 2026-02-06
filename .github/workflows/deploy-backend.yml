@@ -23,6 +23,7 @@ on:
   push:
     branches:
       - main
+      - feat/vercel-deploy
     # Only runs if backend files change
     paths:
       - 'src/backend/**'
