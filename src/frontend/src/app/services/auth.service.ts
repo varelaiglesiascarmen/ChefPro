@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, User } from '../models/auth.model';
 import { environment } from '../../environments/environment';
@@ -69,7 +69,7 @@ export class AuthService {
   // SIGNUP CON BYPASS
   signup(data: any): Observable<User> {
     if (this.isDevMode) {
-      console.warn('⚠️ MODO DEV: Saltando registro real');
+      console.warn('MODO DEV: Saltando registro real');
       const mock = this.getMockUser(data.role || 'CHEF');
       localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
@@ -109,6 +109,7 @@ export class AuthService {
     return this.http.get<boolean>(`${this.authUrl}/check-email?email=${email}`);
   }
 
+  // LOGOUT
   logout(): void {
     localStorage.removeItem('chefpro_user');
     localStorage.removeItem('chefpro_token');
@@ -121,6 +122,7 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
+  // RESTORE SESSION
   private restoreSession(): void {
     const token = localStorage.getItem('chefpro_token');
     const userJson = localStorage.getItem('chefpro_user');

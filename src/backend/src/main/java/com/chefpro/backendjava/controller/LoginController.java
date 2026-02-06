@@ -1,11 +1,12 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.common.security.JwtUtil;
-import com.chefpro.backendjava.common.object.dto.SignUpReqDto;          // ✅ AÑADIR
+import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginResponseDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import com.chefpro.backendjava.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,14 +49,13 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
-    // OJO: aquí estás usando findByEmail pero le pasas username.
-    // Lo dejo igual porque pides cambios mínimos.
     UserLoginDto userFound = userService.findByEmail(request.getUsername());
 
     UserLoginDto userLoginDto = new UserLoginDto();
     userLoginDto.setId(userFound.getId());
     userLoginDto.setName(userFound.getName());
     userLoginDto.setEmail(userFound.getEmail());
+    userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
     userLoginDto.setRole(role);
 
     LoginResponseDto response = new LoginResponseDto();
@@ -93,7 +93,7 @@ public class LoginController {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<LoginResponseDto> signup(@RequestBody SignUpReqDto request) {
+  public ResponseEntity<LoginResponseDto> signup(@RequestBody @Valid SignUpReqDto request) {
 
     if (userService.signUp(request)) {
 
@@ -119,6 +119,7 @@ public class LoginController {
       userLoginDto.setId(userFound.getId());
       userLoginDto.setName(userFound.getName());
       userLoginDto.setEmail(userFound.getEmail());
+      userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
       userLoginDto.setRole(role);
 
       LoginResponseDto response = new LoginResponseDto();
