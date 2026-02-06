@@ -15,6 +15,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   make a copy of the request to add the token to the header, thus ensuring that
   all future requests automatically carry the user's identity.
   */
+  if (req.url.includes('/login') || req.url.includes('/signup')) {
+    return next(req);
+  }
+
   if (token) {
     const cloned = req.clone({
       setHeaders: {
