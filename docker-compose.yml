@@ -20,7 +20,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       # Initialization scripts (executed only on first run)
       - ./src/backend/src/main/resources/database/01-create-schema.sql:/docker-entrypoint-initdb.d/01-create-schema.sql:ro
@@ -48,7 +48,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
-      - "8081:8081"
+      - "18081:8081"
     volumes:
       - ./src/backend:/app
       # Maven cache to avoid downloading dependencies each time
@@ -71,7 +71,7 @@ services:
     restart: unless-stopped
     working_dir: /app
     ports:
-      - "4200:4200"
+      - "14200:4200"
     volumes:
       - ./src/frontend:/app
       # node_modules inside the container (avoids conflicts with host)
