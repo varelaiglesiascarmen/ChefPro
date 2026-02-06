@@ -158,7 +158,7 @@ CREATE TABLE `reviews` (
   `reviewer_user` int(11) NOT NULL,
   `score` int(11) NOT NULL,
   `comment` text DEFAULT NULL,
-  `date` date DEFAULT curdate(),
+  `date` date DEFAULT (CURDATE()),
   PRIMARY KEY (`review_ID`),
   KEY `reviewed_user` (`reviewed_user`),
   KEY `reviewer_user` (`reviewer_user`),

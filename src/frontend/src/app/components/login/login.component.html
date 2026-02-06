@@ -11,32 +11,25 @@
 
         <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
 
-          <input type="text"
-                 name="username"
-                 [(ngModel)]="loginData.username"
-                 placeholder="Nombre de usuario"
-                 required
-                 appFocusOnInit>
+          <input type="text" name="username" [(ngModel)]="loginData.username" placeholder="Nombre de usuario" required
+            (focus)="clearError()" appFocusOnInit>
 
-          <input type="password"
-                 name="password"
-                 [(ngModel)]="loginData.password"
-                 placeholder="****************"
-                 required appFocusOnInit>
+          <input type="password" name="password" [(ngModel)]="loginData.password" placeholder="****************"
+            (focus)="clearError()" required>
 
           <a href="#" class="forgot-link">¿Has olvidado tu contraseña?</a>
 
           @if (errorMessage) {
-            <div class="error-alert">
-              {{ errorMessage }}
-            </div>
+          <div class="error-alert">
+            {{ errorMessage }}
+          </div>
           }
 
           <button type="submit" class="btn-submit" [disabled]="isLoading">
             @if (isLoading) {
-              <span class="loader"></span> Cargando...
+            <span class="loader"></span> Cargando...
             } @else {
-              Iniciar sesión
+            Iniciar sesión
             }
           </button>
 

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+    <marker id="a-f" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#14ffec"/>
+    </marker>
+  </defs>
+
+  <rect width="560" height="300" rx="12" fill="#f8f9fa"/>
+
+  <!-- Docker boundary -->
+  <rect x="140" y="10" width="400" height="230" rx="10" fill="#1a1a2e" stroke="#0d7377" stroke-width="2" stroke-dasharray="6,3" filter="url(#shadow)"/>
+  <text x="340" y="32" text-anchor="middle" fill="#14ffec" font-size="13" font-weight="700">🐳 Docker Desktop</text>
+
+  <!-- MySQL -->
+  <rect x="170" y="50" width="140" height="60" rx="8" fill="#2d2d2d" stroke="#ffa500" stroke-width="1.5"/>
+  <text x="240" y="75" text-anchor="middle" fill="#ffa500" font-size="12" font-weight="700">🗄️ MySQL 8.0</text>
+  <text x="240" y="95" text-anchor="middle" fill="#ccc" font-size="10">Puerto interno: 3306</text>
+
+  <!-- Backend -->
+  <rect x="350" y="50" width="160" height="60" rx="8" fill="#2d2d2d" stroke="#e94560" stroke-width="1.5"/>
+  <text x="430" y="75" text-anchor="middle" fill="#e94560" font-size="12" font-weight="700">☕ Backend (Java)</text>
+  <text x="430" y="95" text-anchor="middle" fill="#ccc" font-size="10">Puerto interno: 8080</text>
+
+  <!-- Frontend -->
+  <rect x="250" y="145" width="160" height="60" rx="8" fill="#2d2d2d" stroke="#00b4d8" stroke-width="1.5"/>
+  <text x="330" y="170" text-anchor="middle" fill="#00b4d8" font-size="12" font-weight="700">⚡ Frontend (Angular)</text>
+  <text x="330" y="190" text-anchor="middle" fill="#ccc" font-size="10">Puerto interno: 4200</text>
+
+  <!-- Arrows inside Docker -->
+  <line x1="310" y1="80" x2="345" y2="80" stroke="#14ffec" stroke-width="1.5" marker-end="url(#a-f)"/>
+  <line x1="345" y1="80" x2="310" y2="80" stroke="#14ffec" stroke-width="1.5"/>
+  <line x1="360" y1="145" x2="400" y2="115" stroke="#14ffec" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+  <!-- Browser -->
+  <rect x="10" y="100" width="110" height="55" rx="8" fill="#fff" stroke="#90be6d" stroke-width="2" filter="url(#shadow)"/>
+  <text x="65" y="125" text-anchor="middle" fill="#333" font-size="12" font-weight="700">🌐 Navegador</text>
+  <text x="65" y="140" text-anchor="middle" fill="#666" font-size="9">Tu ordenador</text>
+
+  <!-- Port labels -->
+  <text x="280" y="268" text-anchor="middle" fill="#333" font-size="11" font-weight="600">Puertos expuestos al navegador:</text>
+  <text x="165" y="288" fill="#ffa500" font-size="11" font-weight="600">localhost:13306</text>
+  <text x="295" y="288" fill="#e94560" font-size="11" font-weight="600">localhost:18080</text>
+  <text x="430" y="288" fill="#00b4d8" font-size="11" font-weight="600">localhost:14200</text>
+</svg>

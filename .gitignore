@@ -68,6 +68,10 @@ testem.log
 /typings
 __screenshots__/
 
+# Docker
+.env
+
 # System files
 .DS_Store
 Thumbs.db
+.vercel

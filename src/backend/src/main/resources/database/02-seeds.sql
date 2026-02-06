@@ -3,6 +3,13 @@
 -- Host: 127.0.0.1    Database: chef_pro
 -- ------------------------------------------------------
 -- Server version	5.5.5-10.4.32-MariaDB
+--
+-- Test users (username / password → role):
+--   admin   / admin1234    → ADMIN
+--   gordon  / chef1234     → CHEF
+--   dani    / chef1234     → CHEF
+--   juan    / comensal1234 → DINER
+--   ana     / comensal1234 → DINER
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -101,7 +108,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'ADMIN','admin','$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4hZ1a8/9ue','admin@app.com','600000000','Super','Admin','2026-02-04 12:14:54'),(2,'CHEF','gordon','$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4hZ1a8/9ue','gordon@kitchen.com','611111111','Gordon','Ramz','2026-02-04 12:14:54'),(3,'CHEF','dani','$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4hZ1a8/9ue','dani@garcia.com','622222222','Dani','Garcia','2026-02-04 12:14:54'),(4,'DINER','juan','$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4hZ1a8/9ue','juan@gmail.com','633333333','Juan','Pérez','2026-02-04 12:14:54'),(5,'DINER','ana','$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4hZ1a8/9ue','ana@hotmail.com','644444444','Ana','López','2026-02-04 12:14:54');
+INSERT INTO `users` VALUES (1,'ADMIN','admin','$2a$10$6maG.SKdrCRX16NKsJZ5TewH/z.GqeLKHgjSsSB.9RoFi2psh8NeW','admin@app.com','600000000','Super','Admin','2026-02-04 12:14:54'),(2,'CHEF','gordon','$2a$10$.jvy7lGrZg/153is3Xmm.uX4rs89y4/YKNx7CfBUj/KXLqwqbH.le','gordon@kitchen.com','611111111','Gordon','Ramz','2026-02-04 12:14:54'),(3,'CHEF','dani','$2a$10$.jvy7lGrZg/153is3Xmm.uX4rs89y4/YKNx7CfBUj/KXLqwqbH.le','dani@garcia.com','622222222','Dani','Garcia','2026-02-04 12:14:54'),(4,'DINER','juan','$2a$10$D18OcHT11Des2Bnk6fngjupe4mSvBLMtrV1RQk.yil7craNt2aN6q','juan@gmail.com','633333333','Juan','Pérez','2026-02-04 12:14:54'),(5,'DINER','ana','$2a$10$D18OcHT11Des2Bnk6fngjupe4mSvBLMtrV1RQk.yil7craNt2aN6q','ana@hotmail.com','644444444','Ana','López','2026-02-04 12:14:54');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

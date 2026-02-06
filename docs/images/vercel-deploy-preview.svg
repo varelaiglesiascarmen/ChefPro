@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 210" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a-d" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L4,6 L8,0" fill="#14ffec"/>
+    </marker>
+    <marker id="a-d2" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L4,6 L8,0" fill="#00b4d8"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="460" height="210" rx="12" fill="#f8f9fa"/>
+
+  <!-- PR -->
+  <rect x="110" y="10" width="240" height="42" rx="8" fill="#2d2d2d" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="230" y="36" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Abrir PR contra main</text>
+
+  <line x1="230" y1="52" x2="230" y2="70" stroke="#14ffec" stroke-width="2" marker-end="url(#a-d)"/>
+
+  <!-- Same steps -->
+  <rect x="80" y="73" width="300" height="42" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="230" y="99" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Mismos pasos, pero sin --prod</text>
+
+  <line x1="230" y1="115" x2="230" y2="133" stroke="#00b4d8" stroke-width="2" marker-end="url(#a-d2)"/>
+
+  <!-- Preview URL -->
+  <rect x="50" y="136" width="360" height="55" rx="8" fill="#1a1a2e" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="230" y="159" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">🔗 URL temporal única</text>
+  <text x="230" y="178" text-anchor="middle" fill="#80d8ff" font-size="11">chefpro-frontend-abc123.vercel.app</text>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a-h" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#14ffec"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="520" height="200" rx="12" fill="#f8f9fa"/>
+
+  <!-- Header -->
+  <text x="260" y="24" text-anchor="middle" fill="#333" font-size="13" font-weight="700">Tu ordenador (localhost) ↔ Docker</text>
+
+  <!-- MySQL row -->
+  <rect x="20" y="42" width="160" height="40" rx="8" fill="#fff" stroke="#ffa500" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="100" y="67" text-anchor="middle" fill="#333" font-size="11" font-weight="600">localhost:13306</text>
+
+  <line x1="185" y1="62" x2="320" y2="62" stroke="#ffa500" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#a-h)"/>
+  <text x="253" y="55" text-anchor="middle" fill="#ffa500" font-size="9">→</text>
+
+  <rect x="325" y="42" width="175" height="40" rx="8" fill="#2d2d2d" stroke="#ffa500" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="412" y="67" text-anchor="middle" fill="#ffa500" font-size="11" font-weight="600">🗄️ MySQL :3306</text>
+
+  <!-- Backend row -->
+  <rect x="20" y="98" width="160" height="40" rx="8" fill="#fff" stroke="#e94560" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="100" y="123" text-anchor="middle" fill="#333" font-size="11" font-weight="600">localhost:18080</text>
+
+  <line x1="185" y1="118" x2="320" y2="118" stroke="#e94560" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#a-h)"/>
+  <text x="253" y="111" text-anchor="middle" fill="#e94560" font-size="9">→</text>
+
+  <rect x="325" y="98" width="175" height="40" rx="8" fill="#2d2d2d" stroke="#e94560" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="412" y="123" text-anchor="middle" fill="#e94560" font-size="11" font-weight="600">☕ Backend :8080</text>
+
+  <!-- Frontend row -->
+  <rect x="20" y="154" width="160" height="40" rx="8" fill="#fff" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="100" y="179" text-anchor="middle" fill="#333" font-size="11" font-weight="600">localhost:14200</text>
+
+  <line x1="185" y1="174" x2="320" y2="174" stroke="#00b4d8" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#a-h)"/>
+  <text x="253" y="167" text-anchor="middle" fill="#00b4d8" font-size="9">→</text>
+
+  <rect x="325" y="154" width="175" height="40" rx="8" fill="#2d2d2d" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="412" y="179" text-anchor="middle" fill="#00b4d8" font-size="11" font-weight="600">⚡ Frontend :4200</text>
+</svg>
