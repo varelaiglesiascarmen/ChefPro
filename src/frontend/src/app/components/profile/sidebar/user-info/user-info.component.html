@@ -3,7 +3,7 @@
     <div class="card-header">
       <h2>Mi Perfil {{ role === 'CHEF' ? 'Profesional' : 'Gourmet' }}</h2>
       <button class="btn-config" (click)="editMode ? saveChanges() : toggleEdit()"
-              [disabled]="editMode && profileForm.invalid">
+        [disabled]="editMode && profileForm.invalid">
         {{ editMode ? 'Guardar Cambios' : 'Configuración' }}
       </button>
     </div>
@@ -14,14 +14,19 @@
         <div class="form-group photo-preview-group">
           <label>URL Foto de Perfil</label>
           <div class="photo-input-wrapper">
-            <img [src]="profilePhotoUrl" alt="Foto de perfil" class="profile-photo-preview">
+            <img [src]="profilePhotoUrl" (error)="handleImageError($event)" alt="Foto de perfil"
+              class="profile-photo-preview">
             <input formControlName="photo" [readonly]="!editMode" placeholder="URL de la imagen">
           </div>
+          <small class="error"
+            *ngIf="profileForm.get('photo')?.invalid && profileForm.get('photo')?.touched && editMode">La URL no es
+            válida.</small>
         </div>
         <div class="form-group">
           <label>Nombre de Usuario *</label>
           <input formControlName="username" [readonly]="!editMode">
-          <small class="error" *ngIf="profileForm.get('username')?.hasError('alreadyExists')">Este usuario ya existe.</small>
+          <small class="error" *ngIf="profileForm.get('username')?.hasError('alreadyExists')">Este usuario ya
+            existe.</small>
         </div>
       </div>
 
@@ -51,7 +56,7 @@
               <button type="button" *ngIf="editMode" (click)="removePrizeTag(i)">×</button>
             </span>
             <input *ngIf="editMode" [(ngModel)]="currentPrizeInput" [ngModelOptions]="{standalone: true}"
-                   (keydown.enter)="addPrizeTag($event)" placeholder="Pulsa Enter para añadir">
+              (keydown.enter)="addPrizeTag($event)" placeholder="Pulsa Enter para añadir">
           </div>
         </div>
       </ng-container>
@@ -76,7 +81,8 @@
               <input formControlName="confirmEmail">
             </div>
           </div>
-          <small class="error-msg" *ngIf="profileForm.get('emailGroup')?.hasError('mismatch')">Los emails no coinciden.</small>
+          <small class="error-msg" *ngIf="profileForm.get('emailGroup')?.hasError('mismatch')">Los emails no
+            coinciden.</small>
         </div>
 
         <div formGroupName="passGroup">
@@ -90,7 +96,8 @@
               <input type="password" formControlName="confirmPassword">
             </div>
           </div>
-          <small class="error-msg" *ngIf="profileForm.get('passGroup')?.hasError('mismatch')">Las contraseñas no coinciden.</small>
+          <small class="error-msg" *ngIf="profileForm.get('passGroup')?.hasError('mismatch')">Las contraseñas no
+            coinciden.</small>
         </div>
 
         <div class="danger-zone">
