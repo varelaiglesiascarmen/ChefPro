@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, User } from '../models/auth.model';
 import { environment } from '../../environments/environment';
@@ -49,7 +49,7 @@ export class AuthService {
   // LOGIN CON BYPASS
   login(credentials: LoginRequest): Observable<User> {
     if (this.isDevMode) {
-      console.warn('⚠️ MODO DEV: Saltando login real');
+      console.warn('MODO DEV: Saltando login real');
       const mock = this.getMockUser();
       localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);

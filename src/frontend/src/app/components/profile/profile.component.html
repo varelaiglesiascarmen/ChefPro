@@ -4,7 +4,9 @@
 
     <aside class="sidebar">
       <div class="chef-info-min">
-        <img [src]="chefProfile.photo || 'assets/default-chef.png'" class="avatar">
+        <div class="avatar-frame">
+          <img [src]="chefProfile.photo || 'assets/default-chef.png'" class="avatar">
+        </div>
         <h3>Chef {{ user.name }}</h3>
         <span class="badge-role">Professional Chef</span>
       </div>
@@ -19,7 +21,7 @@
         <button [class.active]="activeTab === 'calendar'" (click)="activeTab = 'calendar'">Calendario</button>
       </nav>
 
-      <button class="btn-logout" (click)="authService.logout()">Cerrar Sesión</button>
+      <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
     </aside>
 
     <main class="content-area">
@@ -27,35 +29,57 @@
       <section *ngIf="activeTab === 'info'" class="tab-card card">
         <div class="header-row">
           <h2>Información Profesional</h2>
-          <button class="btn-edit" (click)="editMode = !editMode">
-            {{ editMode ? 'Guardar' : 'Editar' }}
-          </button>
+          <div class="actions">
+            <button class="btn-edit" (click)="editMode = !editMode" *ngIf="!editMode">Editar Perfil</button>
+            <button class="btn-save-gourmet" (click)="updateProfile()" *ngIf="editMode">Guardar Cambios</button>
+            <button class="btn-cancel" (click)="editMode = false" *ngIf="editMode">Cancelar</button>
+          </div>
         </div>
-        <div class="profile-form">
-          <label>Biografía</label>
-          <textarea [(ngModel)]="chefProfile.bio" [disabled]="!editMode"></textarea>
 
-          <label>Premios y Reconocimientos</label>
-          <input [(ngModel)]="chefProfile.prizes" [disabled]="!editMode">
+        <div class="profile-form">
+          <div class="photo-edit" *ngIf="editMode">
+            <label class="label-subtitle">URL de Foto de Perfil</label>
+            <input [(ngModel)]="chefProfile.photo" placeholder="https://ejemplo.com/foto.jpg">
+          </div>
+
+          <div class="form-group">
+            <label class="label-bold">Biografía</label>
+            <textarea [(ngModel)]="chefProfile.bio" [disabled]="!editMode"
+                      placeholder="Escribe tu trayectoria y pasión culinaria..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="label-bold">Premios y Reconocimientos</label>
+            <input [(ngModel)]="chefProfile.prizes" [disabled]="!editMode"
+                   placeholder="Ej: Estrella Michelin 2023, Sol Repsol...">
+          </div>
 
           <div class="user-static-info">
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Teléfono:</strong> {{ user.phone_number }}</p>
+            <div class="info-item">
+              <span class="label-subtitle">Email de contacto</span>
+              <p>{{ user.email }}</p>
+            </div>
+            <div class="info-item">
+              <span class="label-subtitle">Teléfono</span>
+              <p>{{ user.phone_number || 'No especificado' }}</p>
+            </div>
           </div>
         </div>
       </section>
 
       <section *ngIf="activeTab === 'menus'" class="tab-card">
         <div class="header-row">
-          <h2>Mis Menús</h2>
-          <button class="btn-gold" (click)="router.navigate(['/create-menu'])">+ Nuevo Menú</button>
+          <h2>Gestión de Menús</h2>
+          <button class="btn-gold" (click)="router.navigate(['/new-menu'])">+ Nuevo Menú</button>
         </div>
         <div class="menu-grid">
           <div *ngFor="let menu of myMenus" class="mini-menu-card card">
-            <h4>{{ menu.title }}</h4>
-            <p class="price">{{ menu.price_per_person }}€/pers</p>
-            <div class="actions">
-              <button class="btn-small">Editar</button>
+            <div class="menu-header">
+              <h4>{{ menu.title }}</h4>
+              <span class="price-tag">{{ menu.price_per_person }}€/pers</span>
+            </div>
+            <div class="menu-actions">
+              <button class="btn-small">Ver Detalles</button>
               <button class="btn-small btn-danger" (click)="deleteMenu(menu.menu_ID)">Eliminar</button>
             </div>
           </div>
@@ -63,18 +87,55 @@
       </section>
 
       <section *ngIf="activeTab === 'orders'" class="tab-card">
-        <h2>Buzón de Comandas</h2>
+        <div class="header-row">
+          <h2>Buzón de Solicitudes</h2>
+        </div>
         <div class="orders-list">
           <div *ngFor="let order of pendingOrders" class="order-item card">
             <div class="order-info">
-              <span class="date">{{ order.date | date:'dd/MM/yyyy' }}</span>
-              <p><strong>Comensal:</strong> {{ order.diner_ID }} ({{ order.n_diners }} personas)</p>
-              <p><strong>Dirección:</strong> {{ order.address }}</p>
+              <div class="date-badge">{{ order.date | date:'dd MMM yyyy' }}</div>
+              <div class="order-details">
+                <p><strong>Comensal:</strong> {{ order.diner_ID }}</p>
+                <p><strong>Nº Personas:</strong> {{ order.n_diners }}</p>
+                <p><strong>Ubicación:</strong> {{ order.address }}</p>
+              </div>
             </div>
             <div class="order-btns">
               <button class="btn-accept" (click)="updateStatus(order, 'CONFIRMED')">Aceptar</button>
               <button class="btn-reject" (click)="updateStatus(order, 'REJECTED')">Rechazar</button>
             </div>
+          </div>
+          <div class="empty-state" *ngIf="pendingOrders.length === 0">
+            <p>No tienes solicitudes pendientes en este momento.</p>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="activeTab === 'calendar'" class="tab-card card">
+        <div class="header-row">
+          <h2>Calendario de Servicio</h2>
+          <div class="month-label">{{ currentDate | date:'MMMM yyyy' }}</div>
+        </div>
+
+        <div class="calendar-container">
+          <div class="calendar-grid">
+            <div class="weekday">L</div><div class="weekday">M</div><div class="weekday">X</div>
+            <div class="weekday">J</div><div class="weekday">V</div><div class="weekday">S</div>
+            <div class="weekday">D</div>
+
+            <div *ngFor="let item of calendarDays"
+                 class="calendar-day"
+                 [class.has-res]="item.reservation"
+                 [class.confirmed]="item.reservation?.status === 'CONFIRMED'"
+                 [class.pending]="item.reservation?.status === 'PENDING'">
+              <span class="day-num">{{ item.day }}</span>
+              <div *ngIf="item.reservation" class="indicator-dot"></div>
+            </div>
+          </div>
+
+          <div class="calendar-legend">
+            <div class="legend-item"><span class="dot gold"></span> Confirmado</div>
+            <div class="legend-item"><span class="dot brown"></span> Pendiente</div>
           </div>
         </div>
       </section>
@@ -82,8 +143,15 @@
     </main>
   </div>
 
-  <div *ngIf="role === 'DINER'" class="diner-view">
-    <h1>Mi Perfil de Comensal</h1>
+  <div *ngIf="role === 'DINER'" class="diner-view fadeIn">
+    <div class="diner-header">
+      <h1>Panel de Comensal</h1>
+      <p>Bienvenido de nuevo, {{ user.name }}</p>
     </div>
+    <div class="card gourmet-card">
+      <p>Aquí podrás ver el historial de tus experiencias gastronómicas y tus reservas activas.</p>
+      <button class="btn-logout-diner" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </div>
 
 </div>
