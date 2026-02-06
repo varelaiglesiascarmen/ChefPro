@@ -23,7 +23,7 @@
 Chef Pro es una plataforma web intermodular que democratiza el acceso a servicios de cocina privada. A diferencia de los modelos tradicionales de lujo, nuestra aplicación permite que cocineros autónomos ofrezcan menús personalizados para el día a día, haciendo la alimentación saludable accesible para todos los niveles adquisitivos.
 
 ## Documentación del Proyecto
-Puedes consultar la documentación completa del proyecto [aquí]()
+Puedes consultar la documentación completa del proyecto [aquí](https://docs.google.com/document/d/149vU7cCthScFZymlBXtt--7FiIHLeSaiUq4z7XcG_sY/edit?usp=sharing)
 
 ## ¿Por qué Chef Pro?
 Tras realizar un análisis de mercado *(benchmarking)* contra plataformas como *"Take a Chef"*, identificamos barreras que Chef Pro elimina:
