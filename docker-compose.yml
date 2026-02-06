@@ -1,15 +1,15 @@
 # ============================================================================
-# ChefPro – Docker Compose (Desarrollo)
+# ChefPro – Docker Compose (Development)
 # ============================================================================
-# Levanta el entorno completo:   docker compose up
-# Solo la base de datos:         docker compose up db
-# Parar todo:                    docker compose down
-# Borrar datos de MySQL:         docker compose down -v
+# Start the entire environment:  docker compose up
+# Database only:                 docker compose up db
+# Stop everything:               docker compose down
+# Delete MySQL data:             docker compose down -v
 # ============================================================================
 
 services:
   # --------------------------------------------------------------------------
-  # MySQL 8.0
+  # MySQL 8.0 Database
   # --------------------------------------------------------------------------
   db:
     image: mysql:8.0
@@ -22,10 +22,10 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      # Scripts de inicialización (se ejecutan solo la primera vez)
+      # Initialization scripts (executed only on first run)
       - ./src/backend/src/main/resources/database/01-create-schema.sql:/docker-entrypoint-initdb.d/01-create-schema.sql:ro
       - ./src/backend/src/main/resources/database/02-seeds.sql:/docker-entrypoint-initdb.d/02-seeds.sql:ro
-      # Persistencia de datos entre reinicios
+      # Data persistence between restarts
       - mysql-data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
@@ -51,7 +51,7 @@ services:
       - "8081:8081"
     volumes:
       - ./src/backend:/app
-      # Caché de Maven para no descargar dependencias cada vez
+      # Maven cache to avoid downloading dependencies each time
       - maven-repo:/root/.m2
     depends_on:
       db:
@@ -74,7 +74,7 @@ services:
       - "4200:4200"
     volumes:
       - ./src/frontend:/app
-      # node_modules dentro del contenedor (evita conflictos con el host)
+      # node_modules inside the container (avoids conflicts with host)
       - frontend-node-modules:/app/node_modules
     depends_on:
       - backend
