@@ -1,0 +1,87 @@
+.landing-wrapper {
+  font-family: 'Playfair Display', serif;
+  color: #2C1810;
+}
+
+/* HERO SECTION */
+.hero {
+  height: 70vh;
+  background: url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+  position: relative;
+}
+
+.hero-overlay {
+  background: rgba(44, 24, 16, 0.6); /* Capa chocolate transparente */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-content {
+  color: #FDF7F0;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.logo-text { font-size: 4rem; margin-bottom: 10px; }
+.logo-text span { color: #C5A059; }
+.tagline { font-size: 1.5rem; font-style: italic; margin-bottom: 30px; opacity: 0.9; }
+
+/* ROLES CONTAINER */
+.roles-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: -60px; /* Solapamiento visual moderno */
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 10;
+}
+
+.role-card {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #EAE0D5;
+}
+
+.role-card:hover {
+  transform: translateY(-10px);
+  border-color: #C5A059;
+}
+
+.card-icon { font-size: 3rem; margin-bottom: 20px; }
+.cta-link { display: block; margin-top: 20px; color: #C5A059; font-weight: bold; }
+
+/* QUICK FEATURES */
+.quick-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  max-width: 1100px;
+  margin: 60px auto;
+  text-align: center;
+}
+
+.feature h4 { color: #C5A059; margin: 15px 0; text-transform: uppercase; letter-spacing: 1px; }
+
+.btn-primary {
+  background: #C5A059;
+  color: white;
+  border: none;
+  padding: 15px 35px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-primary:hover { background: #B48F48; }
