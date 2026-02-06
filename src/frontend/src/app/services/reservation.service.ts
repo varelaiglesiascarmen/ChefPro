@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs'; 
+import { Observable } from 'rxjs';
+import { ReservationCreateDto } from '../models/reservation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
@@ -13,7 +14,7 @@ export class ReservationService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  createReservation(data: any): Observable<any> {
+  createReservation(data: ReservationCreateDto): Observable<any> {
     return this.http.post(this.url, { ...data, status: 'PENDING' }, { headers: this.getHeaders() });
   }
 

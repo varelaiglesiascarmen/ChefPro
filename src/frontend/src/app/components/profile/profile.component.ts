@@ -1,12 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router'; // Importante para la navegación
+import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './sidebar/sidebar.component';
-// Nota: Ajusta estas rutas según tu nueva estructura de carpetas en image_8fb3ea.png
-import { UserInfoComponent } from './sidebar/user-info/user-info.component';
-import { ChefMenusComponent } from './sidebar/chef-menus/chef-menus.component';
-import { UserOrdersComponent } from './sidebar/user-orders/user-orders.component';
-import { UserCalendarComponent } from './sidebar/user-calendar/user-calendar.component';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -15,11 +10,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule,
     RouterOutlet,
-    SidebarComponent,
-    UserInfoComponent,
-    ChefMenusComponent,
-    UserOrdersComponent,
-    UserCalendarComponent
+    SidebarComponent
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
