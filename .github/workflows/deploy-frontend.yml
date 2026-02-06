@@ -30,10 +30,8 @@ on:
   push:
     branches:
       - main
-      - feat/vercel-deploy  # TODO: remove after testing
     paths:
       - 'src/frontend/**'
-      - '.github/workflows/deploy-frontend.yml'  # TODO: remove after testing
   pull_request:
     branches: [main]
     paths:
@@ -47,7 +45,7 @@ env:
 jobs:
   # ─── PRODUCTION deploy (push to main) ────────────────────
   deploy-production:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/vercel-deploy')  # TODO: restore to main only after testing
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
 

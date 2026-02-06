@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 310" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a-g" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L4,6 L8,0" fill="#14ffec"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="480" height="310" rx="12" fill="#f8f9fa"/>
+
+  <!-- Step 1 -->
+  <rect x="60" y="8" width="360" height="40" rx="8" fill="#2d2d2d" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="33" text-anchor="middle" fill="#90be6d" font-size="12" font-weight="600">1️⃣  docker compose up → descarga imágenes</text>
+
+  <line x1="240" y1="48" x2="240" y2="64" stroke="#14ffec" stroke-width="2" marker-end="url(#a-g)"/>
+
+  <!-- Step 2 -->
+  <rect x="60" y="67" width="360" height="40" rx="8" fill="#2d2d2d" stroke="#ffa500" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="92" text-anchor="middle" fill="#ffa500" font-size="12" font-weight="600">2️⃣  Arranca MySQL y ejecuta los scripts SQL</text>
+
+  <line x1="240" y1="107" x2="240" y2="123" stroke="#14ffec" stroke-width="2" marker-end="url(#a-g)"/>
+
+  <!-- Step 3 -->
+  <rect x="60" y="126" width="360" height="40" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="151" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">3️⃣  Healthcheck confirma: MySQL listo ✅</text>
+
+  <line x1="240" y1="166" x2="240" y2="182" stroke="#14ffec" stroke-width="2" marker-end="url(#a-g)"/>
+
+  <!-- Step 4 -->
+  <rect x="60" y="185" width="360" height="40" rx="8" fill="#2d2d2d" stroke="#e94560" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="210" text-anchor="middle" fill="#e94560" font-size="12" font-weight="600">4️⃣  Backend arranca (mvnw spring-boot:run)</text>
+
+  <line x1="240" y1="225" x2="240" y2="241" stroke="#14ffec" stroke-width="2" marker-end="url(#a-g)"/>
+
+  <!-- Step 5 -->
+  <rect x="60" y="244" width="360" height="50" rx="8" fill="#1a1a2e" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="266" text-anchor="middle" fill="#00b4d8" font-size="12" font-weight="600">5️⃣  Frontend arranca (ng serve)</text>
+  <text x="240" y="284" text-anchor="middle" fill="#ccc" font-size="10">🎉 Listo → abre localhost:14200</text>
+</svg>

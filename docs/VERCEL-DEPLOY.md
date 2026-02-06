@@ -1,105 +1,89 @@
-# Guía de Despliegue en Vercel - ChefPro Frontend
+# Despliegue del Frontend en Vercel
 
-Esta guía te explica **paso a paso** cómo desplegar la aplicación Angular en [Vercel](https://vercel.com), una plataforma cloud optimizada para frontends y aplicaciones estáticas.
+Vercel es donde se aloja el frontend en producción. Se encarga de servir los archivos estáticos de Angular (HTML, CSS, JS) a través de una CDN global, así que la web carga rápido desde cualquier sitio.
+
+Usamos dos plataformas distintas porque hacen cosas diferentes: Railway ejecuta el backend (Java + MySQL, que necesita un servidor corriendo), y Vercel sirve los archivos estáticos del frontend. Cada una en lo suyo.
+
+![Arquitectura del despliegue en Vercel](images/vercel-architecture.svg)
+
+## Resumen rápido
+
+Si ya controlas el proceso:
+
+1. Cuenta en [vercel.com](https://vercel.com) con GitHub
+2. Instalar CLI → `vercel login` → `vercel link`
+3. Guardar 3 secretos en GitHub (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`)
+4. Crear la variable `API_URL` con la URL de Railway
+5. Push a `main` y listo
 
 ---
 
 ## Índice
 
-1. [¿Qué es Vercel?](#1-qué-es-vercel)
-2. [Requisitos previos](#2-requisitos-previos)
-3. [Crear cuenta en Vercel](#3-crear-cuenta-en-vercel)
-4. [Vincular el proyecto con Vercel CLI](#4-vincular-el-proyecto-con-vercel-cli)
-5. [Configurar secretos en GitHub](#5-configurar-secretos-en-github)
-6. [Configurar la variable de API](#6-configurar-la-variable-de-api)
-7. [Cómo funciona el despliegue automático](#7-cómo-funciona-el-despliegue-automático)
-8. [Verificar el despliegue](#8-verificar-el-despliegue)
-9. [Archivos creados/modificados en esta rama](#9-archivos-creadosmodificados-en-esta-rama)
-10. [Conceptos clave aprendidos](#10-conceptos-clave-aprendidos)
-11. [Solución de problemas](#11-solución-de-problemas)
+| # | Sección | Descripción |
+|:-:|---------|-------------|
+| 1 | [Requisitos previos](#1-requisitos-previos) | Lo que necesitas |
+| 2 | [Crear cuenta](#2-crear-cuenta-en-vercel) | Registro en Vercel |
+| 3 | [Vincular el proyecto](#3-vincular-el-proyecto-con-vercel-cli) | Conectar repo con Vercel |
+| 4 | [Secretos en GitHub](#4-configurar-secretos-en-github) | Guardar credenciales |
+| 5 | [Variable de API](#5-configurar-la-url-de-la-api) | Apuntar al backend |
+| 6 | [Verificar](#6-verificar-que-funciona) | Comprobar que va bien |
+| — | [Cómo funciona por dentro](#cómo-funciona-el-despliegue-por-dentro) | Detalle técnico |
+| — | [Problemas frecuentes](#problemas-frecuentes) | Cuando algo falla |
+| — | [Glosario](#glosario) | Términos técnicos |
+| — | [Archivos relevantes](#archivos-de-esta-rama) | Referencia |
 
 ---
 
-## 1. ¿Qué es Vercel?
+## 1. Requisitos previos
 
-Vercel es una **plataforma de despliegue en la nube** especializada en aplicaciones frontend. Te permite:
-
-- Desplegar SPAs (Single Page Applications) como Angular con un comando
-- Obtener URLs de preview automáticas para cada Pull Request
-- CDN global: tu app se sirve desde el servidor más cercano al usuario
-- Certificado HTTPS automático
-- Despliegues atómicos: si algo falla, la versión anterior sigue activa
-
-**¿Por qué Vercel para el frontend de ChefPro?**
-- Plan gratuito (Hobby) con builds ilimitados
-- Optimizado para frameworks frontend (Angular, React, Vue...)
-- Deploy de preview en cada PR → el equipo puede probar cambios antes de mergear
-- Configuración mínima: detecta Angular automáticamente
-
-> **💡 Diferencia con Railway:** Railway hospeda el **backend** (Java + MySQL, servicios que necesitan un servidor ejecutándose constantemente). Vercel hospeda el **frontend** (archivos estáticos HTML/CSS/JS que se sirven al navegador del usuario).
-
----
-
-## 2. Requisitos previos
-
-- [x] Cuenta de GitHub con el repositorio ChefPro
-- [x] Node.js instalado localmente (v20 o superior)
-- [x] Los archivos de esta rama (`feat/vercel-deploy`):
+- [ ] Cuenta de GitHub con acceso al repo ChefPro
+- [ ] Node.js instalado (v20 o superior)
+- [ ] Estos archivos ya en la rama:
   - `src/frontend/vercel.json`
   - `src/frontend/src/environments/environment.prod.ts`
   - `.github/workflows/deploy-frontend.yml`
 
 ---
 
-## 3. Crear cuenta en Vercel
+## 2. Crear cuenta en Vercel
 
-1. Ve a [https://vercel.com](https://vercel.com)
-2. Haz clic en **"Sign Up"** → **"Continue with GitHub"**
-3. Autoriza la aplicación de Vercel en tu cuenta de GitHub
-4. Selecciona el plan **"Hobby"** (gratuito, perfecto para proyectos personales/TFG)
-
-> **💡 Concepto:** Vercel organiza tu trabajo en una **organización** (tu usuario personal) que contiene **proyectos**. Cada proyecto corresponde a una app desplegada.
+1. Entra en [vercel.com](https://vercel.com)
+2. **Sign Up** → **Continue with GitHub**
+3. Autoriza Vercel en tu cuenta
+4. Selecciona el plan **Hobby** (gratuito)
 
 ---
 
-## 4. Vincular el proyecto con Vercel CLI
+## 3. Vincular el proyecto con Vercel CLI
 
-La CLI de Vercel genera las credenciales que necesitamos para el despliegue automático.
+Esto genera las credenciales que GitHub Actions necesita para hacer el deploy.
 
-### Instalar la CLI
+### Instalar e iniciar sesión
 
 ```bash
 npm install -g vercel
+vercel login            # se abre el navegador para autenticarte
 ```
-
-### Iniciar sesión
-
-```bash
-vercel login
-```
-
-Se abrirá el navegador para autenticarte. Sigue las instrucciones.
 
 ### Vincular el repositorio
 
 ```bash
-# Desde la RAÍZ del repositorio ChefPro
-cd /ruta/a/ChefPro
-
+cd /ruta/a/ChefPro      # la raíz del repo
 vercel link
 ```
 
-Vercel te hará unas preguntas:
+Te hará unas preguntas:
 
 | Pregunta | Respuesta |
 |----------|-----------|
 | Set up project? | **Yes** |
-| Which scope? | *(tu usuario de Vercel)* |
+| Which scope? | Tu usuario de Vercel |
 | Link to existing project? | **No** (crear uno nuevo) |
 | Project name? | `chefpro-frontend` |
 | Directory with source code? | `src/frontend` |
 
-Esto crea un directorio `.vercel/` con un archivo `project.json` que contiene:
+Esto crea `.vercel/project.json` con dos valores que vas a necesitar:
 
 ```json
 {
@@ -108,265 +92,195 @@ Esto crea un directorio `.vercel/` con un archivo `project.json` que contiene:
 }
 ```
 
-> **⚠️ Importante:** Necesitas estos dos valores (`orgId` y `projectId`) para el paso siguiente. **No subas `.vercel/` a Git** (ya debería estar en `.gitignore`).
+No subas `.vercel/` a Git — ya está en `.gitignore`.
 
-### Obtener el Token de API
+### Obtener el token de API
 
-1. Ve a [https://vercel.com/account/tokens](https://vercel.com/account/tokens)
-2. Haz clic en **"Create"**
-3. Nómbralo: `github-actions-deploy`
-4. Scope: **Full Account**
-5. Expiration: elige la que prefieras (o "No Expiration" para el TFG)
-6. Copia el token generado — **solo se muestra una vez**
+1. Ve a [vercel.com/account/tokens](https://vercel.com/account/tokens)
+2. **Create** → ponle `github-actions-deploy`
+3. Scope: **Full Account**
+4. Copia el token — solo se muestra una vez
 
 ---
 
-## 5. Configurar secretos en GitHub
+## 4. Configurar secretos en GitHub
 
-Los secretos permiten que GitHub Actions se autentique con Vercel sin exponer credenciales.
+Los secretos permiten que GitHub Actions se autentique con Vercel sin exponer credenciales en el código.
 
-1. Ve a tu repositorio en GitHub: `github.com/varelaiglesiascarmen/ChefPro`
-2. **Settings** → **Secrets and variables** → **Actions**
-3. Pestaña **"Secrets"** → haz clic en **"New repository secret"** para cada uno:
+1. En GitHub → tu repo → **Settings** → **Secrets and variables** → **Actions**
+2. Pestaña **Secrets** → **New repository secret**
+3. Crea estos 3:
 
-| Nombre del secreto | Valor | De dónde lo sacas |
-|---------------------|-------|-------------------|
-| `VERCEL_TOKEN` | El token de API | Paso 4 (sección "Obtener el Token de API") |
-| `VERCEL_ORG_ID` | `team_xxxxxxxxxxxx` | Archivo `.vercel/project.json` → campo `orgId` |
-| `VERCEL_PROJECT_ID` | `prj_xxxxxxxxxxxx` | Archivo `.vercel/project.json` → campo `projectId` |
+| Nombre del secreto | Valor | De dónde sale |
+|---------------------|-------|---------------|
+| `VERCEL_TOKEN` | El token de API | Paso 3c |
+| `VERCEL_ORG_ID` | `team_xxxxxxxxxxxx` | `.vercel/project.json` → `orgId` |
+| `VERCEL_PROJECT_ID` | `prj_xxxxxxxxxxxx` | `.vercel/project.json` → `projectId` |
 
-> **💡 Concepto:** Los **secretos de GitHub** son variables cifradas que solo se descifran durante la ejecución de un workflow. Ni siquiera los administradores del repo pueden ver su valor una vez guardados — esto los hace ideales para tokens y contraseñas.
+Los secretos de GitHub van cifrados. Una vez guardados, ni los admins del repo pueden ver su valor.
 
 ---
 
-## 6. Configurar la variable de API
+## 5. Configurar la URL de la API
 
-Cuando el backend esté desplegado en Railway, necesitarás decirle al frontend dónde hacer las peticiones HTTP.
-
-### Opción A: Variable de GitHub (recomendada)
+El frontend necesita saber dónde está el backend para hacer las peticiones HTTP (login, buscar platos, etc.).
 
 1. En GitHub → **Settings** → **Secrets and variables** → **Actions**
-2. Pestaña **"Variables"** (no Secrets) → **"New repository variable"**
+2. Pestaña **Variables** (ojo, no Secrets) → **New repository variable**
 3. Nombre: `API_URL`
 4. Valor: `https://chefpro-production.up.railway.app`
 
-El workflow sustituirá automáticamente el placeholder `{API_URL}` en `environment.prod.ts` por este valor durante el build.
+Sobre esto hay que tener en cuenta una cosa: Angular es una app estática, así que una vez compilada, la URL de la API queda incrustada en el JavaScript. Para cambiarla hay que recompilar (o sea, hacer otro push).
 
-### Opción B: Dejarlo por defecto
-
-Si no defines `API_URL`, el workflow usará `/api` como fallback. Esto es útil para pruebas pero **no funcionará en producción** porque Vercel no tiene un proxy a tu backend.
-
-> **📝 ¿Cómo funciona?** Angular es una aplicación estática — una vez compilada, son archivos HTML/CSS/JS que el navegador descarga y ejecuta. Por eso la URL de la API debe estar "horneada" (baked-in) en el código durante la compilación. No se puede cambiar después sin recompilar.
->
-> El flujo es:
-> ```
-> environment.prod.ts tiene '{API_URL}' como placeholder
->     ↓ (durante el build en GitHub Actions)
-> sed reemplaza '{API_URL}' por el valor real
->     ↓ (Angular compila con --configuration production)
-> fileReplacements sustituye environment.ts → environment.prod.ts
->     ↓
-> El bundle final contiene la URL real de la API
-> ```
+Si no defines `API_URL`, el workflow usa `/api` como fallback, y eso **no funciona en producción** porque Vercel no tiene proxy al backend.
 
 ---
 
-## 7. Cómo funciona el despliegue automático
-
-El archivo `.github/workflows/deploy-frontend.yml` define dos flujos:
-
-### Deploy de producción
-
-```
-Push a main (con cambios en src/frontend/)
-    → GitHub Actions se activa
-        → Instala dependencias (npm ci)
-        → Inyecta API_URL en environment.prod.ts
-        → Compila con Vercel CLI (vercel build --prod)
-        → Despliega a producción (vercel deploy --prebuilt --prod)
-```
-
-La URL de producción es fija (ej: `chefpro-frontend.vercel.app`).
-
-### Deploy de preview
-
-```
-Pull Request contra main (con cambios en src/frontend/)
-    → GitHub Actions se activa
-        → Mismos pasos pero sin --prod
-        → Genera una URL de preview única para ese PR
-```
-
-Cada PR obtiene su propia URL temporal (ej: `chefpro-frontend-abc123.vercel.app`). Esto es muy útil para que el equipo revise cambios visualmente antes de aprobar el PR.
-
-> **💡 Concepto:** El workflow **solo se activa** cuando hay cambios dentro de `src/frontend/**`. Así, commits que solo tocan el backend no desperdician ejecuciones de CI/CD.
-
----
-
-## 8. Verificar el despliegue
+## 6. Verificar que funciona
 
 ### Desde GitHub
 
-1. Ve a la pestaña **"Actions"** de tu repositorio
-2. Busca la ejecución del workflow **"Deploy Frontend to Vercel"**
-3. Si tiene un ✅ verde, el despliegue fue exitoso
-4. En los logs del paso "Deploy to production", verás la URL desplegada
+1. Ve a **Actions** en tu repo
+2. Busca el workflow **Deploy Frontend to Vercel**
+3. Si aparece en verde, el deploy fue bien
+4. En los logs del paso "Deploy to production" verás la URL
 
 ### Desde Vercel
 
 1. Ve a [vercel.com/dashboard](https://vercel.com/dashboard)
-2. Haz clic en tu proyecto `chefpro-frontend`
-3. Verás todos los despliegues con su estado y URL
+2. Entra en tu proyecto `chefpro-frontend`
+3. Ahí tienes el historial de deploys con su estado y URL
 
 ### Pruebas manuales
 
-1. Abre la URL de producción en el navegador
-2. Verifica que la página principal se carga
-3. Navega a diferentes rutas (`/login`, `/about`, `/contact`)
-4. **Recarga la página** en una ruta que no sea `/` — debe seguir funcionando (gracias a la regla de rewrite en `vercel.json`)
-5. Abre DevTools → Network y verifica que las peticiones a la API apuntan a la URL correcta
+- [ ] Abre la URL de producción en el navegador
+- [ ] Comprueba que la página principal se carga
+- [ ] Navega a varias rutas (`/login`, `/about`, `/contact`)
+- [ ] **Recarga la página** en una ruta que no sea `/` — debería seguir funcionando (si no, revisa los rewrites)
+- [ ] DevTools → Network → las peticiones tienen que apuntar a la URL correcta de la API
 
 ---
 
-## 9. Archivos creados/modificados en esta rama
+## Cómo funciona el despliegue por dentro
+
+### Deploy de producción (push a `main`)
+
+![Flujo de deploy de producción en Vercel](images/vercel-deploy-production.svg)
+
+### Deploy de preview (Pull Request)
+
+![Flujo de deploy de preview en Vercel](images/vercel-deploy-preview.svg)
+
+El workflow solo se activa cuando hay cambios en `src/frontend/**`. Si un commit solo toca el backend, no gasta ejecución.
+
+### Cómo se inyecta la URL de la API
+
+![Flujo de inyección de la URL de la API](images/vercel-api-injection.svg)
+
+---
+
+## Problemas frecuentes
+
+### El workflow falla en "Install frontend dependencies"
+
+- Comprueba que `package-lock.json` existe en `src/frontend/` y está commiteado
+- `npm ci` es estricto: necesita que `package-lock.json` coincida con `package.json`
+
+### El workflow falla en "Pull Vercel configuration"
+
+Comprueba que los 3 secretos están bien en GitHub:
+
+| Secreto | Configurado? |
+|---------|:------------:|
+| `VERCEL_TOKEN` | |
+| `VERCEL_ORG_ID` | |
+| `VERCEL_PROJECT_ID` | |
+
+Si el token ha caducado, crea uno nuevo en [vercel.com/account/tokens](https://vercel.com/account/tokens).
+
+### Las rutas dan 404 al recargar
+
+Asegúrate de que `vercel.json` tiene la regla de rewrites:
+```json
+"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+```
+Y que el archivo está en `src/frontend/` (junto a `angular.json`).
+
+### Las peticiones a la API fallan
+
+| Síntoma | Causa | Solución |
+|---------|-------|----------|
+| Las peticiones van a `/api` | Falta `API_URL` | Configúrala en GitHub (paso 5) y haz un nuevo push |
+| Las peticiones van bien pero da error CORS | El backend no permite el dominio de Vercel | Configurar CORS en Spring Boot |
+
+### El build local funciona pero el de Vercel falla
+
+Vercel usa Node.js 20 — comprueba que tu proyecto es compatible. Revisa los logs en Vercel Dashboard → Deployments → clic en el fallido.
+
+<details>
+<summary>Probar el build de producción en local</summary>
+
+```bash
+cd src/frontend
+npx ng build --configuration production
+# Los archivos se generan en dist/frontend/browser/
+npx serve dist/frontend/browser
+```
+
+Ten en cuenta que en local `environment.prod.ts` tiene `{API_URL}` como placeholder. Para probarlo bien, sustituye ese valor a mano o usa `ng serve` (que tira de `environment.ts` con `/api` + proxy).
+</details>
+
+---
+
+## Glosario
+
+| Término | Qué es |
+|---------|--------|
+| **SPA** | Single Page Application — Angular genera una sola página HTML y la navegación ocurre en el navegador |
+| **Static Hosting** | Vercel sirve archivos estáticos (HTML/CSS/JS), no ejecuta código de servidor |
+| **CDN** | Content Delivery Network — los archivos se replican en servidores por todo el mundo |
+| **Preview Deployments** | Cada PR genera una URL temporal para probar los cambios antes de mergear |
+| **Environment Files** | Angular usa `environment.ts` (local) y `environment.prod.ts` (producción) |
+| **File Replacements** | Mecanismo de Angular para intercambiar archivos según el modo de build |
+| **SPA Rewrites** | Regla del servidor que redirige todas las rutas a `index.html` para que Angular Router funcione |
+| **Build-time injection** | Inyectar valores de configuración durante la compilación, no en runtime |
+| **CI/CD** | Integración y Despliegue Continuos |
+| **GitHub Secrets** | Variables cifradas accesibles solo durante la ejecución de workflows |
+
+---
+
+## Archivos de esta rama
 
 | Archivo | Qué hace |
 |---------|----------|
-| `src/frontend/vercel.json` | Configura Vercel: comando de build, directorio de salida, y regla de rewrite para SPA routing |
-| `src/frontend/src/environments/environment.prod.ts` | Entorno de producción con placeholder `{API_URL}` que se inyecta en CI/CD |
-| `src/frontend/angular.json` | Añadido `fileReplacements` para usar `environment.prod.ts` en builds de producción |
-| `src/frontend/src/app/services/search-results.service.ts` | Cambiado URL hardcodeada por `environment.apiUrl` |
-| `.github/workflows/deploy-frontend.yml` | Workflow de CI/CD para compilar y desplegar en Vercel |
-| `docs/VERCEL-DEPLOY.md` | Esta guía que estás leyendo |
+| `src/frontend/vercel.json` | Configura Vercel: build, directorio de salida y rewrites para SPA |
+| `src/frontend/src/environments/environment.prod.ts` | Entorno de producción con placeholder `{API_URL}` |
+| `src/frontend/angular.json` | Configuración de `fileReplacements` para producción |
+| `src/frontend/src/app/services/search-results.service.ts` | Sustituye URL hardcodeada por `environment.apiUrl` |
+| `.github/workflows/deploy-frontend.yml` | Workflow CI/CD para compilar y desplegar en Vercel |
+| `docs/VERCEL-DEPLOY.md` | Este documento |
 
-### ¿Qué hace cada archivo de configuración?
+<details>
+<summary>Detalle de los archivos de configuración</summary>
 
-**`vercel.json`** — Le dice a Vercel cómo tratar tu proyecto:
+**`vercel.json`** — Le dice a Vercel cómo tratar el proyecto:
 ```json
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/frontend/browser",
   "framework": "angular",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
+Sin los `rewrites`, acceder directamente a `/login` da 404 porque Vercel no sabe que es una SPA.
 
-- `buildCommand`: qué comando ejecutar para compilar
-- `outputDirectory`: dónde quedan los archivos compilados
-- `framework`: Vercel aplica optimizaciones específicas para Angular
-- `rewrites`: **crucial para SPAs** — redirige todas las rutas a `index.html` para que Angular Router las gestione en el navegador. Sin esto, acceder directamente a `/login` devolvería un 404.
-
-**`environment.prod.ts`** — Configuración específica de producción:
+**`environment.prod.ts`** — Configuración de producción:
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: '{API_URL}'  // Se reemplaza por el valor real durante el build
+  apiUrl: '{API_URL}'  // Se reemplaza durante el build
 };
 ```
 
-**`fileReplacements` en `angular.json`** — Cuando compilas con `--configuration production` (comportamiento por defecto de `ng build`), Angular reemplaza `environment.ts` por `environment.prod.ts`. En desarrollo (`ng serve`), se usa el `environment.ts` original con `apiUrl: '/api'`.
-
----
-
-## 10. Conceptos clave aprendidos
-
-| Concepto | Descripción |
-|----------|-------------|
-| **SPA (Single Page Application)** | Angular genera una sola página HTML. La navegación ocurre en el navegador sin recargar. |
-| **Static Hosting** | Vercel sirve archivos estáticos (HTML/CSS/JS) — no ejecuta código de servidor. |
-| **CDN** | Content Delivery Network. Tus archivos se replican en servidores por todo el mundo. |
-| **Preview Deployments** | Cada PR obtiene una URL temporal para probar cambios antes de mergear. |
-| **Environment Files** | Angular usa archivos de entorno (`environment.ts`, `environment.prod.ts`) para separar configuración por entorno. |
-| **File Replacements** | Mecanismo de Angular para intercambiar archivos según la configuración de build. |
-| **SPA Rewrites** | Regla del servidor que redirige todas las rutas a `index.html` para que el router del cliente funcione. |
-| **CI/CD** | Integración y Despliegue Continuos. Automatiza el build + deploy. |
-| **GitHub Secrets** | Variables cifradas accesibles solo durante la ejecución de workflows. |
-| **Build-time injection** | Inyectar valores de configuración durante la compilación (no en runtime). |
-
----
-
-## 11. Solución de problemas
-
-### El workflow falla en "Install frontend dependencies"
-
-- Verifica que `package-lock.json` existe en `src/frontend/` y está commiteado
-- `npm ci` es estricto: requiere que `package-lock.json` coincida con `package.json`
-
-### El workflow falla en "Pull Vercel configuration"
-
-- Verifica que los 3 secretos están configurados en GitHub:
-  - `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
-- El token puede haber expirado → crea uno nuevo en Vercel Dashboard
-
-### La app se despliega pero las rutas dan 404
-
-- Verifica que `vercel.json` contiene la regla de `rewrites`
-- Asegúrate de que `vercel.json` está en `src/frontend/` (junto a `angular.json`)
-
-### La app carga pero las peticiones a la API fallan
-
-- Abre DevTools → Network y revisa a qué URL se están enviando las peticiones
-- Si apuntan a `/api` en vez de a tu backend en Railway:
-  1. Define la variable `API_URL` en GitHub (Settings → Variables → Actions)
-  2. Haz un nuevo push para que el workflow reconstruya con la URL correcta
-- Si apuntan a la URL correcta pero dan error CORS:
-  - Necesitas configurar CORS en tu backend Spring Boot para permitir el dominio de Vercel
-
-### El build local funciona pero el de Vercel falla
-
-- Vercel usa Node.js 20 — asegúrate de que tu proyecto es compatible
-- Revisa los logs del despliegue en Vercel Dashboard → Deployments → haz clic en el fallido
-
-### Quiero probar el build de producción en local
-
-```bash
-cd src/frontend
-
-# Compilar en modo producción
-npx ng build --configuration production
-
-# Los archivos se generan en dist/frontend/browser/
-# Puedes servirlos con cualquier servidor estático:
-npx serve dist/frontend/browser
-```
-
-> **⚠️ Recuerda:** En local, `environment.prod.ts` tiene `{API_URL}` como placeholder. Para probarlo correctamente, sustituye ese valor manualmente o usa `ng serve` (que usa `environment.ts` con `/api` + proxy).
-
----
-
-## Arquitectura del despliegue
-
-```
-┌─────────────────────────────────────────────────┐
-│                   VERCEL (CDN)                   │
-│                                                  │
-│  ┌──────────────────────────────────────────┐   │
-│  │  Frontend Angular (archivos estáticos)    │   │
-│  │  HTML + CSS + JS compilados               │   │
-│  │  URL: chefpro-frontend.vercel.app         │   │
-│  └──────────────────────────────────────────┘   │
-│         │                                        │
-└─────────┼────────────────────────────────────────┘
-          │ HTTPS (peticiones API)
-          ▼
-┌─────────────────────────────────────────────────┐
-│                   RAILWAY                        │
-│                                                  │
-│  ┌──────────────────┐   ┌──────────────────┐    │
-│  │  Backend (Java)   │──▶│   MySQL 8.0      │    │
-│  │  Spring Boot 4.0  │   │   chef_pro DB    │    │
-│  │  Puerto: $PORT    │   │   Puerto: 3306   │    │
-│  └──────────────────┘   └──────────────────┘    │
-│                                                  │
-└──────────────────────────────────────────────────┘
-```
-
-```
-┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│  Developer    │  push   │   GitHub     │  deploy │   Vercel     │
-│  (VS Code)   │ ──────▶ │   Actions    │ ──────▶ │   (CDN)      │
-│              │         │  build+test  │         │  static host │
-└──────────────┘         └──────────────┘         └──────────────┘
-```
+**`fileReplacements` en `angular.json`** — Al compilar con `--configuration production`, Angular usa `environment.prod.ts` en vez de `environment.ts`.
+</details>

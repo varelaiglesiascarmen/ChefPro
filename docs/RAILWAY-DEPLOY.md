@@ -1,204 +1,186 @@
-# Guía de Despliegue en Railway - ChefPro Backend
+# Despliegue del Backend en Railway
 
-Esta guía te explica **paso a paso** cómo desplegar la API de Spring Boot y la base de datos MySQL en [Railway](https://railway.com), una plataforma cloud que facilita el despliegue de aplicaciones.
+Railway es la plataforma donde vive el backend (Spring Boot + MySQL) en producción. Básicamente, cada vez que haces push a `main`, GitHub Actions compila el proyecto, pasa los tests y lo despliega en Railway automáticamente.
+
+![Arquitectura del despliegue en Railway](images/railway-architecture.svg)
+
+## Resumen rápido
+
+Si ya sabes lo que haces y solo quieres los pasos:
+
+1. Crear cuenta en [railway.com](https://railway.com) con GitHub
+2. Proyecto vacío → añadir MySQL → importar los SQL
+3. Añadir servicio desde GitHub → meter las variables de entorno
+4. Crear token en Railway → guardarlo como secreto en GitHub
+5. Push a `main` y que se despliegue solo
+
+Para el paso a paso completo, sigue leyendo.
 
 ---
 
 ## Índice
 
-1. [¿Qué es Railway?](#1-qué-es-railway)
-2. [Requisitos previos](#2-requisitos-previos)
-3. [Crear cuenta en Railway](#3-crear-cuenta-en-railway)
-4. [Crear el proyecto en Railway](#4-crear-el-proyecto-en-railway)
-5. [Añadir la base de datos MySQL](#5-añadir-la-base-de-datos-mysql)
-6. [Desplegar el backend Java](#6-desplegar-el-backend-java)
-7. [Configurar variables de entorno](#7-configurar-variables-de-entorno)
-8. [Conectar GitHub Actions (CI/CD)](#8-conectar-github-actions-cicd)
-9. [Verificar el despliegue](#9-verificar-el-despliegue)
-10. [Conceptos clave aprendidos](#10-conceptos-clave-aprendidos)
-11. [Solución de problemas](#11-solución-de-problemas)
+| # | Sección | Descripción |
+|:-:|---------|-------------|
+| 1 | [Requisitos previos](#1-requisitos-previos) | Lo que necesitas tener listo |
+| 2 | [Crear cuenta](#2-crear-cuenta-en-railway) | Registro en Railway |
+| 3 | [Proyecto + MySQL](#3-crear-proyecto-y-base-de-datos) | Montar la infraestructura |
+| 4 | [Desplegar el backend](#4-desplegar-el-backend) | Primer deploy |
+| 5 | [Variables de entorno](#5-configurar-variables-de-entorno) | Conectar backend con la BD |
+| 6 | [CI/CD](#6-configurar-despliegue-automático-cicd) | Automatizar el deploy |
+| 7 | [Verificar](#7-verificar-que-funciona) | Comprobar que va todo bien |
+| — | [Problemas frecuentes](#problemas-frecuentes) | Cuando algo falla |
+| — | [Glosario](#glosario) | Términos técnicos |
+| — | [Archivos relevantes](#archivos-de-esta-rama) | Referencia |
 
 ---
 
-## 1. ¿Qué es Railway?
+## 1. Requisitos previos
 
-Railway es una **plataforma de despliegue en la nube (PaaS)** que te permite:
+Antes de tocar Railway, asegúrate de que tienes:
 
-- Desplegar aplicaciones directamente desde un repositorio de GitHub
-- Crear bases de datos (MySQL, PostgreSQL, Redis...) con un clic
-- Gestionar variables de entorno de forma segura
-- Escalar automáticamente según la demanda
-
-**¿Por qué Railway para ChefPro?**
-- Plan gratuito con $5 de crédito mensual (suficiente para desarrollo/TFG)
-- Soporte nativo para Docker, Java, y MySQL
-- Despliegue automático al hacer push a GitHub
-
----
-
-## 2. Requisitos previos
-
-- [x] Cuenta de GitHub con el repositorio ChefPro
-- [x] Backend compilando correctamente (`./mvnw clean verify`)
-- [x] Los archivos de esta rama (`feat/railway-deploy`):
+- [ ] Cuenta de GitHub con acceso al repo ChefPro
+- [ ] El backend compilando bien (prueba con `./mvnw clean verify`)
+- [ ] Estos archivos ya en la rama:
   - `src/backend/Dockerfile`
   - `railway.toml`
   - `.github/workflows/deploy-backend.yml`
 
 ---
 
-## 3. Crear cuenta en Railway
+## 2. Crear cuenta en Railway
 
-1. Ve a [https://railway.com](https://railway.com)
-2. Haz clic en **"Login"** → **"Login with GitHub"**
-3. Autoriza la aplicación de Railway en tu cuenta de GitHub
-4. Railway te pedirá verificar tu cuenta (puede requerir una tarjeta, pero **NO te cobran** en el plan Trial)
-
----
-
-## 4. Crear el proyecto en Railway
-
-1. Una vez dentro, haz clic en **"New Project"**
-2. Selecciona **"Empty Project"** (lo configuraremos manualmente)
-3. Dale un nombre descriptivo: `chefpro-production`
-
-> **💡 Concepto:** Un "Proyecto" en Railway es como un entorno que agrupa todos tus servicios (API, base de datos, etc.)
+1. Entra en [railway.com](https://railway.com)
+2. **Login** → **Login with GitHub**
+3. Autoriza Railway en tu cuenta
+4. Puede que te pida verificar con tarjeta — tranquila, **no cobran** en el plan Trial
 
 ---
 
-## 5. Añadir la base de datos MySQL
+## 3. Crear proyecto y base de datos
 
-1. Dentro del proyecto, haz clic en **"+ New"** → **"Database"** → **"MySQL"**
-2. Railway creará una instancia de MySQL automáticamente
-3. Haz clic en el servicio MySQL que acabas de crear
-4. Ve a la pestaña **"Variables"** y verás las credenciales generadas:
-   - `MYSQL_HOST`
-   - `MYSQL_PORT`
-   - `MYSQL_DATABASE`
-   - `MYSQL_USER`
-   - `MYSQL_PASSWORD`
-   - `MYSQL_URL` ← esta es la URL JDBC completa
+### Crear el proyecto
 
-### Importar el esquema y los datos iniciales
+1. En Railway → **New Project** → **Empty Project**
+2. Ponle de nombre `chefpro-production`
 
-1. En el servicio MySQL, ve a la pestaña **"Data"**
-2. Haz clic en **"Query"** (o usa la terminal de Railway)
-3. Copia y pega el contenido de `src/backend/src/main/resources/database/01-create-schema.sql`
-4. Ejecútalo
-5. Después copia y pega `src/backend/src/main/resources/database/02-seeds.sql`
-6. Ejecútalo
+Un "Proyecto" en Railway agrupa tus servicios (API, base de datos, etc.) en un mismo entorno.
 
-> **⚠️ Nota:** Esto solo hay que hacerlo la PRIMERA VEZ. Después, los datos persisten en Railway.
+### Añadir MySQL
 
-**Alternativa por terminal (si tienes `mysql` instalado localmente):**
+1. Dentro del proyecto → **+ New** → **Database** → **MySQL**
+2. Railway la crea automáticamente
+3. Haz clic en el servicio MySQL → pestaña **Variables**
+4. Ahí verás las credenciales generadas (`MYSQL_HOST`, `MYSQL_PORT`, etc.)
+
+### Importar los datos iniciales
+
+Esto solo se hace una vez. Después los datos persisten.
+
+1. En el servicio MySQL → pestaña **Data** → **Query**
+2. Pega el contenido de `src/backend/src/main/resources/database/01-create-schema.sql` → Ejecutar
+3. Pega el contenido de `src/backend/src/main/resources/database/02-seeds.sql` → Ejecutar
+
+<details>
+<summary>Alternativa por terminal</summary>
 
 ```bash
-# Los datos de conexión los sacas de las Variables del servicio MySQL en Railway
-mysql -h <MYSQL_HOST> -P <MYSQL_PORT> -u <MYSQL_USER> -p<MYSQL_PASSWORD> < src/backend/src/main/resources/database/01-create-schema.sql
-mysql -h <MYSQL_HOST> -P <MYSQL_PORT> -u <MYSQL_USER> -p<MYSQL_PASSWORD> chef_pro < src/backend/src/main/resources/database/02-seeds.sql
+# Usa los valores que aparecen en la pestaña Variables del servicio MySQL
+mysql -h <MYSQL_HOST> -P <MYSQL_PORT> -u <MYSQL_USER> -p<MYSQL_PASSWORD> \
+  < src/backend/src/main/resources/database/01-create-schema.sql
+
+mysql -h <MYSQL_HOST> -P <MYSQL_PORT> -u <MYSQL_USER> -p<MYSQL_PASSWORD> chef_pro \
+  < src/backend/src/main/resources/database/02-seeds.sql
 ```
+</details>
 
 ---
 
-## 6. Desplegar el backend Java
+## 4. Desplegar el backend
 
-### Opción A: Despliegue desde GitHub (Recomendado)
+1. En el proyecto → **+ New** → **GitHub Repo**
+2. Selecciona `varelaiglesiascarmen/ChefPro`
+3. Railway detecta el `railway.toml` y el `Dockerfile` sin que tengas que hacer nada
+4. El primer deploy arranca solo — espera a que termine
 
-1. En el proyecto de Railway, haz clic en **"+ New"** → **"GitHub Repo"**
-2. Selecciona el repositorio `varelaiglesiascarmen/ChefPro`
-3. Railway detectará automáticamente el `railway.toml` y usará el `Dockerfile`
-4. El primer despliegue empezará automáticamente
-
-### Opción B: Despliegue con Railway CLI (Manual)
+<details>
+<summary>Alternativa: deploy manual con Railway CLI</summary>
 
 ```bash
-# 1. Instalar el CLI de Railway
 npm install -g @railway/cli
-
-# 2. Iniciar sesión
 railway login
-
-# 3. Vincular al proyecto (desde la raíz del repo)
-railway link
-
-# 4. Desplegar
+railway link        # desde la raíz del repo
 railway up
 ```
+</details>
 
 ---
 
-## 7. Configurar variables de entorno
+## 5. Configurar variables de entorno
 
-Este es el paso **MÁS IMPORTANTE**. Las variables de entorno conectan tu backend con la base de datos.
+**Este paso es crítico.** Sin las variables, el backend no sabe cómo conectarse a la base de datos.
 
-1. En Railway, haz clic en tu servicio del **backend** (no el de MySQL)
-2. Ve a la pestaña **"Variables"**
-3. Haz clic en **"+ New Variable"** y añade las siguientes:
+1. En Railway → clic en el servicio del **backend** (no el de MySQL)
+2. Pestaña **Variables** → **+ New Variable**
+3. Añade estas:
 
-| Variable                    | Valor                                                                  | Descripción                               |
-|-----------------------------|------------------------------------------------------------------------|-------------------------------------------|
-| `SPRING_DATASOURCE_URL`    | `jdbc:mysql://${{MySQL.MYSQL_HOST}}:${{MySQL.MYSQL_PORT}}/chef_pro`   | URL de conexión a MySQL (usa referencias) |
-| `SPRING_DATASOURCE_USERNAME`| `${{MySQL.MYSQL_USER}}`                                               | Usuario de la BD                          |
-| `SPRING_DATASOURCE_PASSWORD`| `${{MySQL.MYSQL_PASSWORD}}`                                           | Contraseña de la BD                       |
-| `SPRING_JPA_SHOW_SQL`      | `false`                                                                | Desactivar logs SQL en producción         |
-| `LOG_LEVEL_SQL`            | `WARN`                                                                 | Menos logs en producción                  |
-| `LOG_LEVEL_BIND`           | `WARN`                                                                 | Menos logs en producción                  |
+| Variable | Valor | Para qué sirve |
+|----------|-------|-----------------|
+| `SPRING_DATASOURCE_URL` | `jdbc:mysql://${{MySQL.MYSQL_HOST}}:${{MySQL.MYSQL_PORT}}/chef_pro` | Conexión con MySQL |
+| `SPRING_DATASOURCE_USERNAME` | `${{MySQL.MYSQL_USER}}` | Usuario de la BD |
+| `SPRING_DATASOURCE_PASSWORD` | `${{MySQL.MYSQL_PASSWORD}}` | Contraseña de la BD |
+| `SPRING_JPA_SHOW_SQL` | `false` | No imprimir SQL en los logs |
+| `LOG_LEVEL_SQL` | `WARN` | Reducir verbosidad |
+| `LOG_LEVEL_BIND` | `WARN` | Reducir verbosidad |
 
-> **💡 Concepto:** La sintaxis `${{MySQL.VARIABLE}}` es una **referencia entre servicios** de Railway. Así, si la BD cambia de host, tu backend se actualiza automáticamente.
+La sintaxis `${{MySQL.VARIABLE}}` es una referencia entre servicios de Railway. Si la BD cambia de dirección internamente, el backend se actualiza solo.
 
-> **⚠️ IMPORTANTE:** Fíjate que en `application.yml` usamos `${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/chef_pro}`. La parte después de los `:` es el valor **por defecto** (para desarrollo local). En Railway, la variable de entorno sobreescribe ese valor.
+En local no afecta: `application.yml` tiene valores por defecto después de los `:` (ej: `${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/chef_pro}`), así que sin la variable de entorno usa el valor local.
 
 ---
 
-## 8. Conectar GitHub Actions (CI/CD)
+## 6. Configurar despliegue automático (CI/CD)
 
-Para que el workflow automático funcione, necesitas un **Token de Railway**:
+Para que cada push a `main` despliegue automáticamente, hay que darle a GitHub Actions acceso a Railway.
 
 ### Obtener el token
 
-1. Ve a [https://railway.com/account/tokens](https://railway.com/account/tokens)
-2. Haz clic en **"Create Token"**
-3. Nómbralo `github-actions-deploy`
-4. Copia el token generado
+1. Ve a [railway.com/account/tokens](https://railway.com/account/tokens)
+2. **Create Token** → ponle `github-actions-deploy`
+3. Copia el token (solo se muestra una vez, así que no lo pierdas)
 
-### Configurar el secreto en GitHub
+### Guardarlo en GitHub
 
-1. Ve a tu repositorio en GitHub: `github.com/varelaiglesiascarmen/ChefPro`
-2. **Settings** → **Secrets and variables** → **Actions**
-3. Haz clic en **"New repository secret"**
-4. Nombre: `RAILWAY_TOKEN`
-5. Valor: *(pega el token que copiaste)*
-6. Haz clic en **"Add secret"**
+1. En GitHub → tu repo → **Settings** → **Secrets and variables** → **Actions**
+2. **New repository secret**
+3. Nombre: `RAILWAY_TOKEN` / Valor: el token que acabas de copiar
+4. **Add secret**
 
-### Cómo funciona el workflow
+### El flujo
 
-```
-Push a main (con cambios en src/backend/) 
-    → GitHub Actions se activa
-        → Job 1: Compila y ejecuta tests con Maven
-        → Job 2: Si los tests pasan, despliega en Railway
-```
+Cada vez que haces push a `main` con cambios en `src/backend/`:
 
-El archivo `.github/workflows/deploy-backend.yml` define todo este proceso.
+![Flujo CI/CD del backend en Railway](images/railway-cicd-flow.svg)
+
+Todo esto lo define `.github/workflows/deploy-backend.yml`.
 
 ---
 
-## 9. Verificar el despliegue
+## 7. Verificar que funciona
 
-Una vez desplegado, Railway te asigna un dominio público automáticamente.
+### Generar dominio público
 
-1. En Railway, haz clic en tu servicio del backend
-2. Ve a **"Settings"** → **"Networking"** → **"Generate Domain"**
-3. Railway te dará una URL como: `chefpro-backend-production.up.railway.app`
+1. En Railway → servicio backend → **Settings**
+2. Sección **Networking** → **Generate Domain**
+3. Te dará algo tipo `chefpro-production.up.railway.app`
 
-### Probar que funciona
+### Probar la API
 
 ```bash
-# Health check
 curl https://TU-DOMINIO.up.railway.app/api/auth/health
-
-# Si devuelve respuesta, ¡tu API está desplegada! 🎉
 ```
+
+Si responde, la API está viva.
 
 ### Probar con Swagger
 
@@ -209,77 +191,52 @@ https://TU-DOMINIO.up.railway.app/swagger-ui/index.html
 
 ---
 
-## 10. Conceptos clave aprendidos
-
-| Concepto            | Descripción                                                                      |
-|---------------------|----------------------------------------------------------------------------------|
-| **PaaS**            | Platform as a Service. Railway gestiona servidores por ti.                        |
-| **Docker**          | Empaqueta tu app + dependencias en un contenedor reproducible.                   |
-| **Multi-stage build** | Dockerfile con dos fases: compilar (pesado) + ejecutar (ligero).              |
-| **Variables de entorno** | Configuración externa que cambia entre entornos (local vs producción).     |
-| **CI/CD**           | Integración y Despliegue Continuos. Automatiza build + deploy.                   |
-| **GitHub Actions**  | Plataforma de CI/CD integrada en GitHub.                                         |
-| **Health Check**    | Endpoint que Railway consulta para verificar que la app funciona.                |
-| **Secretos**        | Variables sensibles (tokens, passwords) almacenadas de forma segura en GitHub.   |
-
----
-
-## 11. Solución de problemas
+## Problemas frecuentes
 
 ### La app no arranca en Railway
 
-1. En Railway, ve al servicio → pestaña **"Deployments"** → haz clic en el despliegue fallido
-2. Revisa los **logs** (pestaña "Logs")
-3. Errores comunes:
-   - `Communications link failure` → Las variables de conexión a MySQL son incorrectas
-   - `Access denied` → Usuario/contraseña de BD incorrectos
-   - `Port already in use` → No debes hardcodear el puerto; usa `${PORT:8080}`
+Ve al servicio → **Deployments** → clic en el deploy fallido → **Logs**. Errores típicos:
+
+| Error en los logs | Qué pasa | Solución |
+|-------------------|----------|----------|
+| `Communications link failure` | Las variables de MySQL están mal | Revisa las 3 `SPRING_DATASOURCE_*` |
+| `Access denied` | Usuario o contraseña incorrectos | Compara con las Variables del servicio MySQL |
+| `Port already in use` | Hay un puerto fijo en el código | Usa `${PORT:8080}`, nunca un puerto hardcodeado |
 
 ### Los tests fallan en GitHub Actions
 
-1. Ve a la pestaña **Actions** en tu repo de GitHub
-2. Haz clic en el workflow fallido → revisa los logs del paso que falló
-3. Si el test necesita base de datos y falla, es normal (los tests de integración necesitan MySQL)
+Ve a **Actions** en GitHub → clic en el workflow fallido. Si el test necesita base de datos y falla, puede ser normal — los tests de integración requieren MySQL local.
 
-### No puedo conectar a la BD desde local
+### No puedo conectarme a la BD desde mi ordenador
 
-Si quieres conectarte a la BD de Railway desde tu máquina (ej. para depurar):
-1. En Railway, servicio MySQL → **"Variables"**
+1. En Railway → servicio MySQL → **Variables**
 2. Copia la `MYSQL_URL` pública
-3. Úsala en tu cliente MySQL favorito (DBeaver, DataGrip, MySQL Workbench...)
+3. Úsala en DBeaver, DataGrip, MySQL Workbench o lo que prefieras
 
 ---
 
-## Arquitectura del despliegue
+## Glosario
 
-```
-┌─────────────────────────────────────────────────┐
-│                   RAILWAY                        │
-│                                                  │
-│  ┌──────────────────┐   ┌──────────────────┐    │
-│  │  Backend (Java)   │──▶│   MySQL 8.0      │    │
-│  │  Spring Boot 4.0  │   │   chef_pro DB    │    │
-│  │  Puerto: $PORT    │   │   Puerto: 3306   │    │
-│  └──────────────────┘   └──────────────────┘    │
-│         ▲                                        │
-└─────────┼────────────────────────────────────────┘
-          │ HTTPS
-          │
-┌─────────┴──────────┐
-│   Frontend Angular  │  (tu navegador / futuro despliegue)
-│   localhost:4200    │
-└────────────────────┘
-```
+| Término | Qué es |
+|---------|--------|
+| **PaaS** | Platform as a Service — Railway gestiona los servidores, tú subes código |
+| **Docker** | Empaqueta tu app + dependencias en un contenedor reproducible |
+| **Multi-stage build** | Dockerfile con 2 fases: compilar (pesado) y ejecutar (ligero). La imagen final pesa menos |
+| **Variables de entorno** | Configuración que cambia entre entornos (local vs producción) sin tocar código |
+| **CI/CD** | Integración y Despliegue Continuos — automatiza build, tests y deploy |
+| **GitHub Actions** | Sistema de CI/CD integrado en GitHub |
+| **Health Check** | Endpoint que Railway consulta para saber si la app sigue viva |
+| **Secretos (GitHub)** | Variables cifradas que solo se descifran durante la ejecución de un workflow |
 
 ---
 
-## Archivos creados/modificados en esta rama
+## Archivos de esta rama
 
-| Archivo                                          | Qué hace                                                    |
-|--------------------------------------------------|-------------------------------------------------------------|
-| `src/backend/Dockerfile`                         | Define cómo construir la imagen Docker del backend          |
-| `src/backend/.dockerignore`                      | Excluye archivos innecesarios del build Docker              |
-| `railway.toml`                                   | Configuración de Railway (cómo construir y desplegar)       |
-| `.github/workflows/deploy-backend.yml`           | Workflow de CI/CD para compilar, testear y desplegar        |
-| `src/backend/src/main/resources/application.yml` | Variables de entorno dinámicas (compatible Railway + local)  |
-| `docs/RAILWAY-DEPLOY.md`                         | Esta guía que estás leyendo                                 |
+| Archivo | Qué hace |
+|---------|----------|
+| `src/backend/Dockerfile` | Imagen Docker del backend (multi-stage build) |
+| `src/backend/.dockerignore` | Excluye archivos del build Docker |
+| `railway.toml` | Configuración de Railway |
+| `.github/workflows/deploy-backend.yml` | Workflow CI/CD: compilar, testear y desplegar |
+| `src/backend/src/main/resources/application.yml` | Variables dinámicas (funciona en Railway y en local) |
+| `docs/RAILWAY-DEPLOY.md` | Este documento |
