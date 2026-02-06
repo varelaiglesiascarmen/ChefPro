@@ -6,10 +6,14 @@ import com.chefpro.backendjava.service.MenuService;
 import com.chefpro.backendjava.service.DishService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -105,26 +109,11 @@ public class ChefController {
 
   @GetMapping("/search")
   public ResponseEntity<Page<ChefSearchDto>> searchChefs(
-    @RequestParam(required = false, name = "q") String q,
-    @RequestParam(required = false, name = "date") String date,
-    @RequestParam(required = false, name = "min") Integer minPrice,
-    @RequestParam(required = false, name = "max") Integer maxPrice,
-    @RequestParam(required = false, name = "guests") Integer guests,
-    @RequestParam(required = false, name = "diets") String diets,
-    @RequestParam(required = false, name = "top", defaultValue = "false") boolean top,
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "10") int size
-  ) {
-    Page<ChefSearchDto> result = chefSearchService.search(
-      q,
-      date,
-      minPrice,
-      maxPrice,
-      guests,
-      diets,
-      top,
-      PageRequest.of(page, size)
-    );
+    @RequestParam(required = false) String name,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+    Page<ChefSearchDto> result = chefSearchService.search(name, date, pageable);
 
     return ResponseEntity.ok(result);
   }
