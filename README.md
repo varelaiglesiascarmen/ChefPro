@@ -20,6 +20,9 @@
 <path fill-rule="evenodd" clip-rule="evenodd" d="M901.642 73.7923C893.984 75.5244 883.867 80.1013 879.935 83.6117C877.237 86.0211 877.809 85.9496 885.723 82.8897C896.255 78.8164 909.575 76.8082 916.467 78.2539C930.153 81.1247 938.024 91.3131 949.652 121.208C954.772 134.372 957.908 140.391 961.555 144.056C966.874 149.401 972.512 151.482 967.488 146.246C963.417 142.002 959.528 133.979 954.407 119.252C945.512 93.6806 937.324 81.6723 924.882 75.9531C916.992 72.3267 910.706 71.7428 901.642 73.7923ZM855.616 93.0426C842.113 96.6133 835.162 103.869 834.674 114.904C834.229 124.938 836.388 131.16 842.683 137.99C850.378 146.339 854.651 148.31 849.35 141.064C844.215 134.049 840.096 122.413 840.39 115.764C840.805 106.395 849.668 97.4257 861.118 94.7889C864.567 93.9948 865.707 91.7163 862.676 91.6752C861.688 91.6616 858.51 92.2767 855.616 93.0426ZM904.081 132.436C901.769 136.137 898.956 141.813 897.828 145.049C896.05 150.155 895.395 150.805 892.884 149.957C891.292 149.42 887.743 148.549 884.997 148.02C880.556 147.166 879.963 146.572 879.627 142.657L879.251 138.252L877.317 143.197C875.754 147.193 874.576 148.239 871.174 148.649C867.88 149.045 868.913 149.447 875.928 150.497C894.955 153.342 911.357 162.52 928.234 179.763C939.759 191.54 945.999 196.601 941.638 190.634C939.495 187.703 939.577 187.588 945.237 185.657C953.077 182.982 952.619 182.07 944.461 184.112C940.817 185.025 937.671 185.558 937.469 185.298C937.268 185.039 934.26 181.236 930.786 176.847C927.311 172.459 924.947 168.444 925.531 167.925C926.117 167.407 925.903 167.288 925.055 167.663C924.209 168.036 920.835 166.308 917.559 163.821C914.283 161.333 908.772 157.686 905.311 155.716C899.452 152.378 899.102 151.869 900.184 148.242C900.824 146.103 902.278 142.392 903.415 139.996L905.482 135.641L905.547 139.417L905.61 143.192L907.182 139.049C908.045 136.771 908.646 132.836 908.517 130.306L908.283 125.705L904.081 132.436ZM986.768 156.354C994.281 160.731 997.889 164.335 1001.34 170.904C1005.89 179.579 1006.39 185.811 1003.15 193.328C999.569 201.613 994.573 206.193 986.641 208.458C978.528 210.772 972.997 209.692 960.941 203.439C955.916 200.832 951.794 198.956 951.78 199.267C951.767 199.58 953.467 201.406 955.557 203.325C960.828 208.165 972.457 213.407 978.477 213.654C989.077 214.092 1000.9 207.227 1006.02 197.664C1010.66 188.984 1008.8 174.641 1001.82 165.222C998.738 161.074 987.556 153.734 984.091 153.588C982.863 153.536 984.069 154.781 986.768 156.354ZM846.563 155.728C844.455 159.473 840.944 162.858 839.187 165.254L836.232 167.809L840.944 165.653C843.212 164.025 846.297 161.22 848.762 157.373C853.738 149.603 853.932 149.078 851.848 148.985C851.048 148.95 848.671 151.985 846.563 155.728ZM836.232 171.451C836.572 171.98 840.134 173.506 843.499 175.955C869.031 185.608 913.507 213.251 927.454 227.062C930.067 229.649 932.886 231.793 933.717 231.826C935.293 231.889 951.356 208.851 951.466 206.371C951.5 205.593 950.627 204.916 949.524 204.868C947.439 204.775 940.312 212.968 935.567 220.912C932.38 226.246 931.825 226.377 928.311 222.634C924.037 218.081 906.855 205.015 897.825 199.454C886.928 192.74 861.75 180.353 853.04 177.419C843.6 174.239 835.49 170.298 836.232 171.451Z" fill="black"/>
 </svg>
 
+[![Deploy Backend to Railway](https://github.com/varelaiglesiascarmen/ChefPro/actions/workflows/deploy-backend.yml/badge.svg)](https://github.com/varelaiglesiascarmen/ChefPro/actions/workflows/deploy-backend.yml)
+[![Deploy Frontend to Vercel](https://github.com/varelaiglesiascarmen/ChefPro/actions/workflows/deploy-frontend.yml/badge.svg)](https://github.com/varelaiglesiascarmen/ChefPro/actions/workflows/deploy-frontend.yml)
+
 Chef Pro es una plataforma web intermodular que democratiza el acceso a servicios de cocina privada. A diferencia de los modelos tradicionales de lujo, nuestra aplicación permite que cocineros autónomos ofrezcan menús personalizados para el día a día, haciendo la alimentación saludable accesible para todos los niveles adquisitivos.
 
 ## Documentación del Proyecto
@@ -50,7 +53,39 @@ El proyecto utiliza tecnologías modernas y de alta demanda profesional para gar
 - **Control de Versiones**: Estrategia de ramificación (Branching Strategy) en GitHub para asegurar la trazabilidad y calidad del código.
 - **Seguimiento**: Uso de Jira integrado con Clockify para la planificación temporal y registro de esfuerzos
 
-## Guía Técnica de Instalación
+## Instalación Rápida con Docker
+
+La forma más sencilla de levantar ChefPro en local es con Docker. No necesitas instalar MySQL, Java ni Node — Docker se encarga de todo.
+
+**Requisito:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo.
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/varelaiglesiascarmen/ChefPro.git
+cd ChefPro
+
+# 2. Crear el archivo de variables de entorno
+cp .env.example .env
+
+# 3. Levantar los 3 servicios (base de datos, backend y frontend)
+docker compose up
+```
+
+Una vez arrancado, accede a:
+
+| Servicio | URL |
+|----------|-----|
+| **Frontend** | [http://localhost:14200](http://localhost:14200) |
+| **Backend API** | [http://localhost:18080](http://localhost:18080) |
+| **Swagger (docs API)** | [http://localhost:18080/swagger-ui/index.html](http://localhost:18080/swagger-ui/index.html) |
+
+> Para la guía completa (resolución de problemas, comandos del día a día, configuración en Windows, etc.), consulta **[docs/LOCAL-SETUP.md](docs/LOCAL-SETUP.md)**.
+
+---
+
+## Guía Técnica de Instalación (sin Docker)
+Si prefieres instalar cada servicio manualmente:
+
 ### Requisitos Previos
 - Java JDK 17+
 - Node.js (v18+) y Angular CLI
