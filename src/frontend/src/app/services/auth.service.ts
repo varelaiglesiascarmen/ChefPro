@@ -142,4 +142,10 @@ export class AuthService {
     console.error('Error en el proceso de autenticación:', error);
     return throwError(() => error);
   }
+
+  // notify the component that the user is changing
+  updateUser(updatedUser: User): void {
+    localStorage.setItem('chefpro_user', JSON.stringify(updatedUser));
+    this.currentUserSubject.next(updatedUser);
+  }
 }

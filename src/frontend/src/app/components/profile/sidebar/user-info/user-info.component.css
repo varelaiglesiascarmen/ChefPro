@@ -1,0 +1,107 @@
+.user-info-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gourmet-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 850px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* ZONA AZUL: BIO FIJA */
+textarea {
+  width: 100% !important;
+  height: 120px;
+  resize: none;
+  /* Bloquea redimensionar */
+  border: 1.5px solid #EAE0D5;
+  border-radius: 12px;
+  padding: 15px;
+  background: #FAFAFA;
+}
+
+textarea[readonly], input[readonly] {
+  border-color: transparent;
+  background: transparent;
+  padding-left: 0;
+  cursor: default;
+}
+
+/* TAGS */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  border: 1.5px solid #EAE0D5;
+  border-radius: 12px;
+  min-height: 50px;
+}
+
+.readonly-tags {
+  border-color: transparent;
+  padding: 0;
+}
+
+.tag {
+  background: #2C1810;
+  color: #C5A059;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* OTROS */
+.btn-config {
+  background: white;
+  border: 2px solid #C5A059;
+  color: #C5A059;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-config:hover {
+  background: #C5A059;
+  color: white;
+}
+
+.error {
+  color: #C0392B;
+  font-size: 0.8rem;
+}
+
+.error-msg {
+  display: block;
+  color: #C0392B;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.char-counter {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.divider {
+  margin: 30px 0;
+  border: 0.5px solid #eee;
+}
