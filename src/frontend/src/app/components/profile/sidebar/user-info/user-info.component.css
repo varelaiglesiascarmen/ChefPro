@@ -1,0 +1,255 @@
+.user-info-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px);
+}
+
+.gourmet-card {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 50px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 20px 50px rgba(44, 24, 16, 0.08);
+  border: 1px solid #EAE0D5;
+  position: relative;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  border-bottom: 2px solid #FDF7F0;
+  padding-bottom: 20px;
+}
+
+.card-header h2 {
+  font-family: 'Playfair Display', serif;
+  color: #2C1810;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.btn-config {
+  background: #C5A059;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+}
+
+.btn-config:hover:not(:disabled) {
+  background: #B48F48;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.4);
+}
+
+.btn-config:disabled {
+  background: #D1BFA7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.chef-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #C5A059;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1.5px solid #EAE0D5;
+  border-radius: 15px;
+  background: #FAFAFA;
+  font-size: 1rem;
+  color: #2C1810;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+textarea {
+  height: 140px;
+  resize: none;
+  line-height: 1.6;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #C5A059;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
+}
+
+input[readonly], textarea[readonly] {
+  background: transparent;
+  border-color: transparent;
+  padding-left: 0;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #4A3728;
+}
+
+.char-counter {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #A69080;
+  margin-top: 5px;
+}
+
+/*tags  */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 15px;
+  border: 1.5px solid #EAE0D5;
+  border-radius: 15px;
+  min-height: 60px;
+  align-items: center;
+}
+
+.readonly-tags {
+  border-color: transparent;
+  padding-left: 0;
+}
+
+.tag {
+  background: #2C1810;
+  color: #C5A059;
+  padding: 8px 16px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: scaleIn 0.3s ease;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* security section  */
+.security-section {
+  margin-top: 20px;
+  background: #FDF7F0;
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px dashed #C5A059;
+}
+
+.section-title {
+  font-weight: 800;
+  color: #2C1810;
+  margin-bottom: 25px;
+  font-size: 1.1rem;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid #EAE0D5;
+  margin: 30px 0;
+}
+
+/* DANGER ZONE */
+.danger-zone {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(192, 57, 43, 0.1);
+  text-align: center;
+}
+
+.btn-delete {
+  background: transparent;
+  color: #C0392B;
+  border: 1px solid #C0392B;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-delete:hover {
+  background: #C0392B;
+  color: white;
+}
+
+/* error msgn */
+.error { color: #C0392B; font-size: 0.75rem; margin-top: 4px; font-weight: 600; }
+.error-msg {
+  display: block;
+  color: #C0392B;
+  background: #FADBD8;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* animations */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* responsive design */
+@media (max-width: 768px) {
+  .form-row { grid-template-columns: 1fr; }
+  .full-width { grid-column: span 1; }
+  .gourmet-card { padding: 30px; }
+}

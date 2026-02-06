@@ -11,6 +11,10 @@ import { UserMenuComponent } from './components/user-menu/user-menu.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
 import { NewMenuComponent } from './components/new-menu/new-menu.component';
+import { UserInfoComponent } from './components/profile/sidebar/user-info/user-info.component';
+import { ChefMenusComponent } from './components/profile/sidebar/chef-menus/chef-menus.component';
+import { UserCalendarComponent } from './components/profile/sidebar/user-calendar/user-calendar.component';
+import { UserOrdersComponent } from './components/profile/sidebar/user-orders/user-orders.component';
 
 export const routes: Routes = [
   // If the path is empty (‘’), redirect to 'homepage'
@@ -37,9 +41,6 @@ export const routes: Routes = [
   // not found root
   { path: 'not-found', component: NotFoundComponent },
 
-  // profile root
-  { path: 'profile', component: ProfileComponent },
-
   // user-menu root
   { path: 'user-menu', component: UserMenuComponent },
 
@@ -51,6 +52,19 @@ export const routes: Routes = [
 
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
+
+  //profile root
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    children: [
+      { path: '', redirectTo: 'info', pathMatch: 'full' },
+      { path: 'info', component: UserInfoComponent },
+      { path: 'menus', component: ChefMenusComponent },
+      { path: 'calendar', component: UserCalendarComponent },
+      { path: 'orders', component: UserOrdersComponent }
+    ]
+  },
 
   // If you write something strange, send it to the home page
   { path: '**', redirectTo: 'homepage' }
