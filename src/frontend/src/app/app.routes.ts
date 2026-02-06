@@ -9,8 +9,8 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { UserMenuComponent } from './components/user-menu/user-menu.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
-import { CreateMenuComponent } from './components/create-menu/create-menu.component';
 import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
+import { NewMenuComponent } from './components/new-menu/new-menu.component';
 
 export const routes: Routes = [
   // If the path is empty (‘’), redirect to 'homepage'
@@ -46,11 +46,8 @@ export const routes: Routes = [
   // search-results root
   { path: 'search-results', component: SearchResultsComponent },
 
-  //create menu root
-  { path: 'create-menu', component: CreateMenuComponent },
-
-  // edit-menu root
-  { path: 'edit-menu/:id', component: CreateMenuComponent },
+  // new-menu root
+  { path: 'new-menu', component: NewMenuComponent },
 
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
