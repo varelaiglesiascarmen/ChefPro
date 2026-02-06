@@ -28,8 +28,11 @@ export class UserInfoComponent implements OnInit {
     this.initForm();
 
     this.authService.user$.subscribe(user => {
+      console.log('User data received in user-info component:', user);
+
       if (user) {
         this.role = user.role;
+        console.log('User role:', this.role);
 
         const patchData: any = {
           name: user.name,
@@ -37,6 +40,8 @@ export class UserInfoComponent implements OnInit {
           username: user.userName,
           photo: user.photoUrl
         };
+
+        console.log('Patch data prepared:', patchData);
 
         if (user.role === 'CHEF') {
           const chef = user as Chef;
@@ -52,6 +57,8 @@ export class UserInfoComponent implements OnInit {
         this.profileForm.patchValue(patchData);
         this.profileForm.get('emailGroup.email')?.setValue(user.email);
         this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email);
+
+        console.log('Form patched with values:', this.profileForm.value);
       }
     });
   }
