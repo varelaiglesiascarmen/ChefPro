@@ -1,10 +1,12 @@
 package com.chefpro.backendjava.service.impl;
 
-import com.chefpro.backendjava.common.object.dto.SignUpReqDto; // ✅ CAMBIO
+import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
+import com.chefpro.backendjava.common.object.entity.Chef;
 import com.chefpro.backendjava.common.object.entity.Diner;
 import com.chefpro.backendjava.common.object.entity.UserLogin;
 import com.chefpro.backendjava.common.object.entity.UserRoleEnum;
+import com.chefpro.backendjava.repository.ChefRepository;
 import com.chefpro.backendjava.repository.CustomUserRepository;
 import com.chefpro.backendjava.repository.DinerRepository;
 import com.chefpro.backendjava.service.UserService;
@@ -19,13 +21,16 @@ public class UserServiceImpl implements UserService {
 
   private final CustomUserRepository customUserRepository;
   private final DinerRepository dinerRepository;
+  private final ChefRepository chefRepository;
   private final PasswordEncoder passwordEncoder;
 
   public UserServiceImpl(CustomUserRepository customUserRepository,
                          DinerRepository dinerRepository,
+                         ChefRepository chefRepository,
                          PasswordEncoder passwordEncoder) {
     this.customUserRepository = customUserRepository;
     this.dinerRepository = dinerRepository;
+    this.chefRepository= chefRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -62,7 +67,7 @@ public class UserServiceImpl implements UserService {
       return false;
     }
 
-    if (findByEmail(signUpRequest.getUsername()) != null) {
+    if (findByEmail(signUpRequest.getEmail()) != null) {
       return false;
     }
 
@@ -74,8 +79,8 @@ public class UserServiceImpl implements UserService {
     userLogin.setPhoneNumber(signUpRequest.getPhoneNumber());
     userLogin.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
+    UserRoleEnum role = UserRoleEnum.DINER; // default
 
-    UserRoleEnum role = UserRoleEnum.DINER;
     if (signUpRequest.getRole() != null && !signUpRequest.getRole().isBlank()) {
       try {
         role = UserRoleEnum.valueOf(signUpRequest.getRole().toUpperCase());
@@ -83,6 +88,7 @@ public class UserServiceImpl implements UserService {
         role = UserRoleEnum.DINER;
       }
     }
+
     userLogin.setRole(role);
 
     userLogin.setName(signUpRequest.getName() != null ? signUpRequest.getName() : "Usuario");
@@ -90,10 +96,17 @@ public class UserServiceImpl implements UserService {
 
     UserLogin savedUser = customUserRepository.saveAndFlush(userLogin);
 
-    Diner diner = new Diner();
-    diner.setUser(savedUser);
-    dinerRepository.save(diner);
+    if (role == UserRoleEnum.CHEF) {
+      Chef chef = new Chef();
+      chef.setUser(savedUser);
+      chefRepository.save(chef);
+    } else {
+      Diner diner = new Diner();
+      diner.setUser(savedUser);
+      dinerRepository.save(diner);
+    }
 
     return true;
   }
+
 }
