@@ -35,6 +35,16 @@ public class Chef {
   @Column(name = "prizes")
   private String prizes;
 
+  @Column(name = "location", length = 255)
+  private String location;
+
+  @Column(name = "languages", length = 255)
+  private String languages;
+
+  @Lob
+  @Column(name = "cover_photo")
+  private String coverPhoto;
+
   // Relación con menus
   @OneToMany(mappedBy = "chef", cascade = CascadeType.ALL)
   @Builder.Default

@@ -1,6 +1,7 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.common.object.dto.*;
+import com.chefpro.backendjava.service.ChefProfileService;
 import com.chefpro.backendjava.service.ChefSearchService;
 import com.chefpro.backendjava.service.DishService;
 import com.chefpro.backendjava.service.MenuService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/chef")
@@ -23,15 +25,18 @@ public class ChefController {
   private final MenuService menuService;
   private final DishService dishService;
   private final ChefSearchService chefSearchService;
+  private final ChefProfileService chefProfileService;
 
   public ChefController(
     MenuService menuService,
     DishService dishService,
-    ChefSearchService chefSearchService
+    ChefSearchService chefSearchService,
+    ChefProfileService chefProfileService
   ) {
     this.menuService = menuService;
     this.dishService = dishService;
     this.chefSearchService = chefSearchService;
+    this.chefProfileService = chefProfileService;
   }
 
   @GetMapping("/menus")
@@ -116,5 +121,29 @@ public class ChefController {
     Page<ChefSearchDto> result = chefSearchService.search(name, date, pageable);
 
     return ResponseEntity.ok(result);
+  }
+
+  // ========================================
+  // ENDPOINTS PÚBLICOS - Perfil de Chef y Menú
+  // ========================================
+
+  @GetMapping("/{chefId}/profile")
+  public ResponseEntity<ChefPublicDetailDto> getChefPublicProfile(@PathVariable Long chefId) {
+    try {
+      ChefPublicDetailDto dto = chefProfileService.getChefPublicProfile(chefId);
+      return ResponseEntity.ok(dto);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/menus/{menuId}/public")
+  public ResponseEntity<MenuPublicDetailDto> getMenuPublicDetail(@PathVariable Long menuId) {
+    try {
+      MenuPublicDetailDto dto = chefProfileService.getMenuPublicDetail(menuId);
+      return ResponseEntity.ok(dto);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 }

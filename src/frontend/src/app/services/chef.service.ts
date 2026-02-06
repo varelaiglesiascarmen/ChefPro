@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { ChefPublicDetail, MenuPublicDetail } from '../models/chef-detail.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,19 +13,19 @@ export class ChefService {
   private router = inject(Router);
   private apiUrl = `${environment.apiUrl}`;
 
-  // get details about the chef
-  getChefDetails(chefId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/chefs/${chefId}`);
+  // Perfil público del chef (sin autenticación)
+  getChefPublicProfile(chefId: number): Observable<ChefPublicDetail> {
+    return this.http.get<ChefPublicDetail>(`${this.apiUrl}/chef/${chefId}/profile`);
+  }
+
+  // Detalle público de un menú (sin autenticación)
+  getMenuPublicDetail(menuId: number): Observable<MenuPublicDetail> {
+    return this.http.get<MenuPublicDetail>(`${this.apiUrl}/chef/menus/${menuId}/public`);
   }
 
   // update chef's menu
   updateChef(chefId: number, chefData: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/chefs/${chefId}`, chefData);
-  }
-
-  // obtain the chef's menus
-  getChefMenus(chefId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/menu/chef/${chefId}`);
   }
 
   // delete some menu

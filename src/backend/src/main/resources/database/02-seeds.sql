@@ -38,7 +38,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `chefs` WRITE;
 /*!40000 ALTER TABLE `chefs` DISABLE KEYS */;
-INSERT INTO `chefs` VALUES (2,'https://images.unsplash.com/photo-1577219491135-ce391730fb2c','Pasión por la cocina internacional y la perfección.','3 Estrellas Michelin'),(3,'https://images.unsplash.com/photo-1583394293214-28ded15ee548','Cocina de vanguardia con raíces tradicionales.','2 Soles Repsol');
+INSERT INTO `chefs` VALUES (2,'https://images.unsplash.com/photo-1577219491135-ce391730fb2c','Pasión por la cocina internacional y la perfección.','3 Estrellas Michelin','Madrid','Español, Inglés, Francés','https://images.unsplash.com/photo-1414235077428-338989a2e8c0'),(3,'https://images.unsplash.com/photo-1583394293214-28ded15ee548','Cocina de vanguardia con raíces tradicionales.','2 Soles Repsol','Sevilla','Español, Inglés','https://images.unsplash.com/photo-1504674900247-0877df9cc836');
 /*!40000 ALTER TABLE `chefs` ENABLE KEYS */;
 UNLOCK TABLES;
 

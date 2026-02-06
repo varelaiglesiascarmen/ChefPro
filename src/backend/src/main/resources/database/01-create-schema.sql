@@ -47,6 +47,9 @@ CREATE TABLE `chefs` (
   `photo` varchar(255) DEFAULT NULL,
   `bio` text DEFAULT NULL,
   `prizes` text DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `languages` varchar(255) DEFAULT NULL,
+  `cover_photo` text DEFAULT NULL,
   PRIMARY KEY (`user_ID`),
   CONSTRAINT `chefs_ibfk_1` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

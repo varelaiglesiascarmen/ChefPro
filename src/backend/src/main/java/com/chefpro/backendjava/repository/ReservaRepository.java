@@ -68,4 +68,12 @@ public interface ReservaRepository extends JpaRepository<Reservation, Reservatio
     @Param("chefId") Long chefId,
     @Param("date") LocalDate date
   );
+
+  // Obtener fechas ocupadas de un chef (con reservas PENDING o CONFIRMED)
+  @Query("SELECT r.date FROM Reservation r WHERE r.chefId = :chefId AND r.status IN (com.chefpro.backendjava.common.object.entity.Reservation.ReservationStatus.PENDING, com.chefpro.backendjava.common.object.entity.Reservation.ReservationStatus.CONFIRMED)")
+  List<LocalDate> findBusyDatesByChefId(@Param("chefId") Long chefId);
+
+  // Obtener fechas ocupadas de un chef filtrando por menú
+  @Query("SELECT r.date FROM Reservation r WHERE r.menu.id = :menuId AND r.status IN (com.chefpro.backendjava.common.object.entity.Reservation.ReservationStatus.PENDING, com.chefpro.backendjava.common.object.entity.Reservation.ReservationStatus.CONFIRMED)")
+  List<LocalDate> findBusyDatesByMenuId(@Param("menuId") Long menuId);
 }

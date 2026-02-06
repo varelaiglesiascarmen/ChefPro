@@ -3,7 +3,12 @@
   <p>Cargando información...</p>
 </div>
 
-<div *ngIf="!isLoading && data" class="detail-page fadeIn">
+<div *ngIf="!isLoading && errorMessage" class="loading-container">
+  <p style="font-size: 1.2rem; color: #a00;">{{ errorMessage }}</p>
+  <button class="btn-back" (click)="goBack()" style="margin-top: 1rem;">← Volver</button>
+</div>
+
+<div *ngIf="!isLoading && data && !errorMessage" class="detail-page fadeIn">
 
   <button class="btn-back" (click)="goBack()">← Volver</button>
 
@@ -16,8 +21,8 @@
         <div class="chef-text">
           <h1>{{ data.fullName }}</h1>
 
-          <div *ngIf="data.prizes && data.prizes.length > 0" class="prizes-container">
-            <span *ngFor="let prize of data.prizes" class="prizes-badge">{{ prize }}</span>
+          <div *ngIf="data.prizes" class="prizes-container">
+            <span class="prizes-badge">{{ data.prizes }}</span>
           </div>
 
           <div class="meta-info">
