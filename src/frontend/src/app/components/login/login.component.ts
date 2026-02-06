@@ -45,7 +45,7 @@ export class LoginComponent {
         this.cdr.detectChanges();
         // AuthService already saves the token and session (setSession).
         // Here we only navigate after successful login.
-        this.router.navigate(['/user-menu']);
+        this.router.navigate(['/index']);
       },
       error: (err) => {
         this.isLoading = false;
