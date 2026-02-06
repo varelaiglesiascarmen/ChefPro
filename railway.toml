@@ -10,8 +10,8 @@
 [build]
 # Tell Railway to use the Dockerfile we created
 dockerfilePath = "src/backend/Dockerfile"
-# Build context is the backend folder (where pom.xml lives)
-dockerContext = "src/backend"
+# Build context is the repo root (railway up uploads from here)
+dockerContext = "."
 
 [deploy]
 # Railway injects $PORT; Spring Boot reads it via ${PORT:8081}

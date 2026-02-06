@@ -15,13 +15,13 @@ WORKDIR /app
 
 # Copy pom.xml first (to leverage Docker layer caching)
 # If pom.xml hasn't changed, Docker reuses this layer and skips downloading dependencies.
-COPY pom.xml .
+COPY src/backend/pom.xml .
 
 # Download dependencies without compiling the code (this gets cached)
 RUN mvn dependency:go-offline -B
 
 # Now copy all the source code
-COPY src src
+COPY src/backend/src src
 
 # Build the project and generate the .jar (skip tests to speed up the build)
 RUN mvn package -DskipTests -B
