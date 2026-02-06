@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="480" rx="12" fill="#f8f9fa"/>
+
+  <!-- Railway cloud box -->
+  <rect x="40" y="30" width="400" height="200" rx="12" fill="#1a1a2e" stroke="#e94560" stroke-width="2" filter="url(#shadow)"/>
+  <text x="240" y="58" text-anchor="middle" fill="#e94560" font-size="13" font-weight="600">☁️ RAILWAY (nube)</text>
+
+  <!-- Backend box -->
+  <rect x="70" y="80" width="160" height="70" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5"/>
+  <text x="150" y="108" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">🖥️ Backend</text>
+  <text x="150" y="128" text-anchor="middle" fill="#b0f0f0" font-size="11">Spring Boot</text>
+
+  <!-- MySQL box -->
+  <rect x="270" y="80" width="150" height="70" rx="8" fill="#323232" stroke="#ffa500" stroke-width="1.5"/>
+  <text x="345" y="108" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">🗄️ MySQL 8</text>
+  <text x="345" y="128" text-anchor="middle" fill="#ffcc80" font-size="11">chef_pro DB</text>
+
+  <!-- Arrow Backend → MySQL -->
+  <line x1="230" y1="115" x2="270" y2="115" stroke="#14ffec" stroke-width="2" marker-end="url(#arrowTeal)"/>
+  <defs>
+    <marker id="arrowTeal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#14ffec"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#90be6d"/>
+    </marker>
+    <marker id="arrowYellow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#f9c74f"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#00b4d8"/>
+    </marker>
+  </defs>
+
+  <!-- Frontend box (Vercel) -->
+  <rect x="40" y="290" width="170" height="70" rx="8" fill="#1a1a2e" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="125" y="318" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">🌐 Frontend</text>
+  <text x="125" y="338" text-anchor="middle" fill="#80d8ff" font-size="11">(Vercel)</text>
+
+  <!-- Arrow Frontend → Backend (HTTPS) -->
+  <path d="M125,290 L125,230 L150,230" fill="none" stroke="#00b4d8" stroke-width="2" marker-end="url(#arrowBlue)" stroke-dasharray="6,3"/>
+  <text x="82" y="262" fill="#00b4d8" font-size="10" font-weight="500">HTTPS</text>
+
+  <!-- Dev box -->
+  <rect x="500" y="160" width="170" height="70" rx="8" fill="#2d2d2d" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="585" y="188" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">👩‍💻 Tú</text>
+  <text x="585" y="208" text-anchor="middle" fill="#c5e1a5" font-size="11">(VS Code)</text>
+
+  <!-- GitHub Actions box -->
+  <rect x="500" y="310" width="170" height="70" rx="8" fill="#2d2d2d" stroke="#f9c74f" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="585" y="338" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">⚙️ GitHub Actions</text>
+  <text x="585" y="358" text-anchor="middle" fill="#fff3b0" font-size="11">CI/CD</text>
+
+  <!-- Arrow Dev → GitHub Actions (git push) -->
+  <line x1="585" y1="230" x2="585" y2="310" stroke="#90be6d" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="596" y="275" fill="#90be6d" font-size="10" font-weight="500">git push</text>
+
+  <!-- Arrow GitHub Actions → Railway (auto-deploy) -->
+  <path d="M500,345 L440,345 L440,200" fill="none" stroke="#f9c74f" stroke-width="2" marker-end="url(#arrowYellow)"/>
+  <text x="445" y="275" fill="#f9c74f" font-size="10" font-weight="500">auto-deploy</text>
+
+  <!-- Legend -->
+  <rect x="40" y="420" width="640" height="45" rx="8" fill="#f0f0f0" stroke="#ddd" stroke-width="1"/>
+  <text x="60" y="448" fill="#555" font-size="11">🔑 Railway hospeda el <tspan font-weight="600">backend</tspan> (API Java + MySQL). El frontend en Vercel le envía peticiones HTTPS.</text>
+</svg>

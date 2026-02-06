@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 120" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arr1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#90be6d"/>
+    </marker>
+    <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#14ffec"/>
+    </marker>
+    <marker id="arr3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#e94560"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="700" height="120" rx="10" fill="#f8f9fa"/>
+
+  <!-- git push -->
+  <rect x="10" y="30" width="110" height="56" rx="8" fill="#2d2d2d" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="65" y="56" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">git push</text>
+  <text x="65" y="72" text-anchor="middle" fill="#c5e1a5" font-size="10">a main</text>
+
+  <!-- Arrow -->
+  <line x1="120" y1="58" x2="150" y2="58" stroke="#90be6d" stroke-width="2" marker-end="url(#arr1)"/>
+
+  <!-- GitHub Actions -->
+  <rect x="155" y="30" width="130" height="56" rx="8" fill="#2d2d2d" stroke="#f9c74f" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="220" y="56" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">⚙️ GitHub Actions</text>
+  <text x="220" y="72" text-anchor="middle" fill="#fff3b0" font-size="10">se activa</text>
+
+  <!-- Arrow -->
+  <line x1="285" y1="58" x2="315" y2="58" stroke="#14ffec" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <!-- Job 1 -->
+  <rect x="320" y="30" width="140" height="56" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="390" y="52" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Job 1</text>
+  <text x="390" y="68" text-anchor="middle" fill="#b0f0f0" font-size="10">Compila + tests</text>
+  <text x="390" y="80" text-anchor="middle" fill="#b0f0f0" font-size="10">(Maven)</text>
+
+  <!-- Arrow -->
+  <line x1="460" y1="58" x2="490" y2="58" stroke="#e94560" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="475" y="48" fill="#90be6d" font-size="9" font-weight="600">tests OK ✅</text>
+
+  <!-- Job 2 -->
+  <rect x="495" y="30" width="175" height="56" rx="8" fill="#1a1a2e" stroke="#e94560" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="582" y="52" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Job 2</text>
+  <text x="582" y="68" text-anchor="middle" fill="#ff8a80" font-size="10">Despliega en Railway 🚀</text>
+
+  <!-- Subtitle -->
+  <text x="350" y="110" text-anchor="middle" fill="#888" font-size="10">Definido en .github/workflows/deploy-backend.yml</text>
+</svg>

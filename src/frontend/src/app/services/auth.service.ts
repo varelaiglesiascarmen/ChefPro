@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, User } from '../models/auth.model';
 import { environment } from '../../environments/environment';
@@ -18,9 +18,9 @@ export class AuthService {
   public user$ = this.currentUserSubject.asObservable();
 
   // ==========================================
-  // BLOQUE MODO DESARROLLADOR (isDevMode)
+  // DEVELOPER MODE BLOCK (isDevMode)
   // ==========================================
-  private isDevMode = true; // CAMBIA A 'false' PARA CONECTAR CON EL BACKEND REAL
+  private isDevMode = false; // CHANGE TO 'false' TO CONNECT TO REAL BACKEND
 
   private getMockUser(role: 'CHEF' | 'DINER' = 'CHEF'): User {
     return {
@@ -46,10 +46,10 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  // LOGIN CON BYPASS
+  // LOGIN WITH BYPASS
   login(credentials: LoginRequest): Observable<User> {
     if (this.isDevMode) {
-      console.warn('MODO DEV: Saltando login real');
+      console.warn('⚠️ DEV MODE: Skipping real login');
       const mock = this.getMockUser();
       localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
@@ -66,10 +66,10 @@ export class AuthService {
     );
   }
 
-  // SIGNUP CON BYPASS
+  // SIGNUP WITH BYPASS
   signup(data: any): Observable<User> {
     if (this.isDevMode) {
-      console.warn('MODO DEV: Saltando registro real');
+      console.warn('DEV MODE: Skipping real registration');
       const mock = this.getMockUser(data.role || 'CHEF');
       localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
@@ -86,7 +86,7 @@ export class AuthService {
     );
   }
 
-  // GET USER DATA (Con protección para modo Dev)
+  // GET USER DATA (With protection for Dev mode)
   getUserData(): Observable<User> {
     if (this.isDevMode) return of(this.getMockUser());
 

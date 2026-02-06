@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 260" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a-e" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L4,6 L8,0" fill="#14ffec"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="500" height="260" rx="12" fill="#f8f9fa"/>
+
+  <!-- Step 1 -->
+  <rect x="30" y="10" width="440" height="46" rx="8" fill="#2d2d2d" stroke="#f9c74f" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="250" y="29" text-anchor="middle" fill="#f9c74f" font-size="11" font-weight="700">1. Código fuente</text>
+  <text x="250" y="45" text-anchor="middle" fill="#ccc" font-size="10">environment.prod.ts → apiUrl: '%%API_URL%%'</text>
+
+  <line x1="250" y1="56" x2="250" y2="72" stroke="#14ffec" stroke-width="2" marker-end="url(#a-e)"/>
+
+  <!-- Step 2 -->
+  <rect x="30" y="75" width="440" height="46" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="250" y="94" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">2. GitHub Actions (sed)</text>
+  <text x="250" y="110" text-anchor="middle" fill="#e0f7fa" font-size="10">Reemplaza %%API_URL%% → https://api.chefpro.up.railway.app</text>
+
+  <line x1="250" y1="121" x2="250" y2="137" stroke="#14ffec" stroke-width="2" marker-end="url(#a-e)"/>
+
+  <!-- Step 3 -->
+  <rect x="30" y="140" width="440" height="46" rx="8" fill="#1a1a2e" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="250" y="159" text-anchor="middle" fill="#00b4d8" font-size="11" font-weight="700">3. ng build --configuration production</text>
+  <text x="250" y="175" text-anchor="middle" fill="#ccc" font-size="10">Angular compila con la URL real en el bundle JS</text>
+
+  <line x1="250" y1="186" x2="250" y2="202" stroke="#14ffec" stroke-width="2" marker-end="url(#a-e)"/>
+
+  <!-- Step 4 -->
+  <rect x="30" y="205" width="440" height="42" rx="8" fill="#2d2d2d" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="250" y="225" text-anchor="middle" fill="#90be6d" font-size="11" font-weight="700">4. dist/ contiene archivos estáticos con URL de Railway</text>
+  <text x="250" y="240" text-anchor="middle" fill="#ccc" font-size="10">✅ El frontend ya sabe llamar al backend correcto</text>
+</svg>

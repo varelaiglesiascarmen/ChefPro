@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a-down" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L4,6 L8,0" fill="#14ffec"/>
+    </marker>
+    <marker id="a-down-ok" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L4,6 L8,0" fill="#90be6d"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="520" height="420" rx="12" fill="#f8f9fa"/>
+
+  <!-- Step boxes -->
+  <!-- git push -->
+  <rect x="160" y="10" width="200" height="45" rx="8" fill="#2d2d2d" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="38" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">git push (src/frontend/)</text>
+
+  <line x1="260" y1="55" x2="260" y2="70" stroke="#14ffec" stroke-width="2" marker-end="url(#a-down)"/>
+
+  <!-- GH Actions -->
+  <rect x="160" y="73" width="200" height="40" rx="8" fill="#2d2d2d" stroke="#f9c74f" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="98" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">⚙️ GitHub Actions</text>
+
+  <line x1="260" y1="113" x2="260" y2="128" stroke="#14ffec" stroke-width="2" marker-end="url(#a-down)"/>
+
+  <!-- npm ci -->
+  <rect x="160" y="131" width="200" height="40" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="156" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">npm ci (instala dependencias)</text>
+
+  <line x1="260" y1="171" x2="260" y2="186" stroke="#14ffec" stroke-width="2" marker-end="url(#a-down)"/>
+
+  <!-- Inject API_URL -->
+  <rect x="130" y="189" width="260" height="40" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="214" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Sustituye {API_URL} → URL real</text>
+
+  <line x1="260" y1="229" x2="260" y2="244" stroke="#14ffec" stroke-width="2" marker-end="url(#a-down)"/>
+
+  <!-- Build -->
+  <rect x="140" y="247" width="240" height="40" rx="8" fill="#0d7377" stroke="#14ffec" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="272" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">vercel build --prod</text>
+
+  <line x1="260" y1="287" x2="260" y2="302" stroke="#14ffec" stroke-width="2" marker-end="url(#a-down)"/>
+
+  <!-- Deploy -->
+  <rect x="120" y="305" width="280" height="40" rx="8" fill="#1a1a2e" stroke="#00b4d8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="330" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">vercel deploy --prebuilt --prod</text>
+
+  <line x1="260" y1="345" x2="260" y2="360" stroke="#90be6d" stroke-width="2" marker-end="url(#a-down-ok)"/>
+
+  <!-- Done -->
+  <rect x="120" y="363" width="280" height="42" rx="8" fill="#1a5c1a" stroke="#90be6d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="260" y="389" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">✅ chefpro-frontend.vercel.app</text>
+</svg>

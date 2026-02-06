@@ -10,6 +10,8 @@ export interface User {
   reviews_count: number;
   languages?: string[];
   photoUrl?: string;
+  rating_avg?: number;
+  address?: string;
 }
 
 /* EXTENSIÓN: Exclusive data from CHEF */

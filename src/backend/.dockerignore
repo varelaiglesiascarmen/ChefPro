@@ -1,0 +1,14 @@
+# Ignore target folder (generated inside the container)
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
