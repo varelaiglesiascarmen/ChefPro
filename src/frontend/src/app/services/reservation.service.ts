@@ -1,23 +1,26 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { ReservationCreateDto } from '../models/reservation.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ReservationService {
   private http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl;
+  private url = `${environment.apiUrl}/reservations`;
 
-  /**
-   * Sends a new reservation request to the backend.
-   * POST /api/reservations — the backend identifies the diner via JWT.
-   * @param dto Object matching ReservationsCReqDto (chefId, menuId, date, numberOfDiners, address).
-   * @returns Observable that completes on 201 Created.
-   */
-  createReservation(dto: ReservationCreateDto): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/reservations`, dto);
+  private getHeaders() {
+    const token = localStorage.getItem('chefpro_token');
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
+
+  requestBooking(data: any) {
+    return this.http.post(this.url, { ...data, status: 'PENDING' }, { headers: this.getHeaders() });
+  }
+
+  getReservations() {
+    return this.http.get<any[]>(this.url, { headers: this.getHeaders() });
+  }
+
+  updateStatus(id: number, status: 'ACCEPTED' | 'REJECTED') {
+    return this.http.patch(`${this.url}/${id}`, { status }, { headers: this.getHeaders() });
   }
 }
