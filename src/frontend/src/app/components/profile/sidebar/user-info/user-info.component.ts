@@ -24,6 +24,11 @@ export class UserInfoComponent implements OnInit {
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
 
+  get profilePhotoUrl(): string {
+    const photoValue = this.profileForm?.get('photo')?.value;
+    return photoValue && photoValue.trim() !== '' ? photoValue : '/logos/users.svg';
+  }
+
   ngOnInit() {
     this.initForm();
 
