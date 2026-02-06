@@ -1,6 +1,7 @@
 package com.chefpro.backendjava.repository;
 
 import com.chefpro.backendjava.common.object.entity.Chef;
+import com.chefpro.backendjava.common.object.entity.UserLogin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,8 @@ import java.util.Optional;
 public interface ChefRepository extends JpaRepository<Chef, Long> {
 
   Optional<Chef> findByUser_Username(String username);
+
+  Optional<Chef> findByUser(UserLogin user);
 
   /**
    * Busca chefs por nombre (en nombre o apellido del usuario)

@@ -4,6 +4,7 @@ import com.chefpro.backendjava.common.security.JwtUtil;
 import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginResponseDto;
+import com.chefpro.backendjava.common.object.dto.login.UpdateProfileDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import com.chefpro.backendjava.service.UserService;
 import jakarta.validation.Valid;
@@ -58,6 +59,7 @@ public class LoginController {
     userLoginDto.setUsername(userFound.getUsername());
     userLoginDto.setEmail(userFound.getEmail());
     userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
+    userLoginDto.setPhoto(userFound.getPhoto());
     userLoginDto.setRole(role);
 
     LoginResponseDto response = new LoginResponseDto();
@@ -92,6 +94,7 @@ public class LoginController {
     userLoginDto.setUsername(userFound.getUsername());
     userLoginDto.setEmail(userFound.getEmail());
     userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
+    userLoginDto.setPhoto(userFound.getPhoto());
     userLoginDto.setRole(role);
 
     return ResponseEntity.ok(userLoginDto);
@@ -127,6 +130,7 @@ public class LoginController {
       userLoginDto.setUsername(userFound.getUsername());
       userLoginDto.setEmail(userFound.getEmail());
       userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
+      userLoginDto.setPhoto(userFound.getPhoto());
       userLoginDto.setRole(role);
 
       LoginResponseDto response = new LoginResponseDto();
@@ -142,5 +146,22 @@ public class LoginController {
   @PostMapping("/logout")
   public ResponseEntity<Void> logout() {
     return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/profile")
+  public ResponseEntity<UserLoginDto> updateProfile(
+      @AuthenticationPrincipal UserDetails user,
+      @Valid @RequestBody UpdateProfileDto updateProfileDto) {
+    
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    try {
+      UserLoginDto updatedUser = userService.updateProfile(user.getUsername(), updateProfileDto);
+      return ResponseEntity.ok(updatedUser);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
   }
 }

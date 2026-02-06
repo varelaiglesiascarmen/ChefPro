@@ -33,6 +33,78 @@ export class UserInfoComponent implements OnInit {
     event.target.src = '/logos/users.svg';
   }
 
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      // Verificar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecciona un archivo de imagen válido.');
+        return;
+      }
+
+      // Verificar tamaño máximo (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('La imagen es demasiado grande. El tamaño máximo es 2MB.');
+        return;
+      }
+
+      this.resizeAndConvertImage(file);
+    }
+  }
+
+  resizeAndConvertImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.onload = () => {
+        // Crear canvas para redimensionar
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Dimensiones del avatar (200x200px)
+        const MAX_WIDTH = 200;
+        const MAX_HEIGHT = 200;
+
+        let width = img.width;
+        let height = img.height;
+
+        // Calcular proporciones manteniendo aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = (height * MAX_WIDTH) / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = (width * MAX_HEIGHT) / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Dibujar imagen redimensionada
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Convertir a Base64 JPEG con compresión
+        const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+
+        // Actualizar el formulario con la imagen en Base64
+        this.profileForm.patchValue({ photo: base64Image });
+
+        console.log('Imagen redimensionada y convertida. Tamaño aproximado:',
+          Math.round(base64Image.length * 0.75 / 1024), 'KB');
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removePhoto(): void {
+    this.profileForm.patchValue({ photo: '' });
+  }
+
   urlValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
     if (!value || value.trim() === '') {
@@ -86,7 +158,7 @@ export class UserInfoComponent implements OnInit {
       name: [''],
       lastname: [''],
       username: ['', [Validators.required], [this.usernameValidator.bind(this)]],
-      photo: ['', [this.urlValidator]],
+      photo: [''],
       bio: ['', [Validators.maxLength(200)]],
       address: [''],
       prizes: [''],
@@ -181,27 +253,26 @@ export class UserInfoComponent implements OnInit {
         photoUrl: formVal.photo || currentUser.photoUrl
       };
 
-      // Solo actualizar email si se modificó
-      if (formVal.emailGroup.email && formVal.emailGroup.email.trim() !== '') {
-        updatedUser.email = formVal.emailGroup.email;
-      }
-
-      // Solo actualizar contraseña si se modificó
-      if (formVal.passGroup.password && formVal.passGroup.password.trim() !== '') {
-        updatedUser.password = formVal.passGroup.password;
-      }
-
       if (this.role === 'CHEF') {
         updatedUser.bio = formVal.bio;
         updatedUser.prizes = this.prizesTags.join(', ');
+        updatedUser.address = formVal.address;
       } else if (this.role === 'DINER') {
         updatedUser.address = formVal.address;
       }
 
       console.log('Updating user:', updatedUser);
-      this.authService.updateUser(updatedUser);
-      this.editMode = false;
-      alert('Perfil actualizado con éxito');
+
+      this.authService.updateUser(updatedUser).subscribe({
+        next: (user) => {
+          this.editMode = false;
+          alert('Perfil actualizado con éxito');
+        },
+        error: (error) => {
+          console.error('Error updating profile:', error);
+          alert('Error al actualizar el perfil. Por favor, intenta de nuevo.');
+        }
+      });
     } else {
       console.log('Form is invalid');
       Object.keys(this.profileForm.controls).forEach(key => {
