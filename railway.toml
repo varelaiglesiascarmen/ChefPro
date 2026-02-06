@@ -14,6 +14,8 @@ dockerfilePath = "src/backend/Dockerfile"
 dockerContext = "."
 
 [deploy]
+# Explicit start command to avoid entrypoint issues
+startCommand = "java -jar /app/app.jar"
 # Railway injects $PORT; Spring Boot reads it via ${PORT:8081}
 # Healthcheck: Railway verifies the app responds before routing traffic
 healthcheckPath = "/api/auth/health"
