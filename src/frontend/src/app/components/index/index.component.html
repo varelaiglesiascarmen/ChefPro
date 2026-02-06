@@ -1,1 +1,44 @@
-<p>index.component works!</p>
+<div class="landing-wrapper fadeIn">
+
+  <header class="hero">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 class="logo-text">Chef<span>Pro</span></h1>
+        <p class="tagline">La alta cocina, servida en la intimidad de tu hogar.</p>
+
+        <div class="search-bar" *ngIf="!(authService.user$ | async)">
+          <button class="btn-primary" routerLink="/signup">Únete a la élite culinaria</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="roles-container">
+    <div class="role-card chef-path" (click)="navigateTo('CHEF')">
+      <h3>¿Eres Chef?</h3>
+      <p>Gestiona tus menús, tu agenda y ofrece experiencias gastronómicas únicas.</p>
+      <span class="cta-link">Empezar a cocinar →</span>
+    </div>
+
+    <div class="role-card diner-path" (click)="navigateTo('DINER')">
+      <h3>¿Buscas un Chef?</h3>
+      <p>Encuentra al profesional ideal para tu evento y disfruta de un servicio gourmet.</p>
+      <span class="cta-link">Explorar cartas →</span>
+    </div>
+  </section>
+
+  <section class="quick-features">
+    <div class="feature">
+      <h4>Calidad Michelin</h4>
+      <p>Chefs verificados con trayectoria profesional.</p>
+    </div>
+    <div class="feature">
+      <h4>Reserva Fácil</h4>
+      <p>Sincronización de calendario en tiempo real.</p>
+    </div>
+    <div class="feature">
+      <h4>Pago Seguro</h4>
+      <p>Transacciones protegidas para tu tranquilidad.</p>
+    </div>
+  </section>
+</div>
