@@ -41,6 +41,10 @@ public class UserLogin {
   @Column(name = "lastname", length = 100, nullable = false)
   private String lastname;
 
+  @Lob
+  @Column(name = "photo", columnDefinition = "LONGTEXT")
+  private String photo;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 

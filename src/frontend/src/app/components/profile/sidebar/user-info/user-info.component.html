@@ -12,15 +12,21 @@
 
       <div class="form-row">
         <div class="form-group photo-preview-group">
-          <label>URL Foto de Perfil</label>
+          <label>Foto de Perfil</label>
           <div class="photo-input-wrapper">
             <img [src]="profilePhotoUrl" (error)="handleImageError($event)" alt="Foto de perfil"
               class="profile-photo-preview">
-            <input formControlName="photo" [readonly]="!editMode" placeholder="URL de la imagen">
+            <div class="photo-controls" *ngIf="editMode">
+              <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+              <button type="button" class="btn-upload" (click)="fileInput.click()">
+                📁 Seleccionar imagen
+              </button>
+              <button type="button" class="btn-remove" (click)="removePhoto()" *ngIf="profileForm.get('photo')?.value">
+                🗑️ Eliminar
+              </button>
+            </div>
           </div>
-          <small class="error"
-            *ngIf="profileForm.get('photo')?.invalid && profileForm.get('photo')?.touched && editMode">La URL no es
-            válida.</small>
+          <small class="info-text">Tamaño recomendado: 200x200px. Máximo 2MB.</small>
         </div>
         <div class="form-group">
           <label>Nombre de Usuario *</label>
