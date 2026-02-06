@@ -12,6 +12,8 @@ export interface User {
   photoUrl?: string;
   rating_avg?: number;
   address?: string;
+  bio?: string;
+  prizes?: string;
 }
 
 /* EXTENSIÓN: Exclusive data from CHEF */

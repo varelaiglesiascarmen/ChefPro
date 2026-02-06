@@ -115,6 +115,7 @@ public class SecurityConfig {
         // ENDPOINT DE USUARIO AUTENTICADO
         // ========================================
         .requestMatchers("/api/auth/me").authenticated()
+        .requestMatchers("/api/auth/profile").authenticated()
 
         // ========================================
         // CUALQUIER OTRA RUTA REQUIERE AUTENTICACIÓN

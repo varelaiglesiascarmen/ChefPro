@@ -38,7 +38,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `chefs` WRITE;
 /*!40000 ALTER TABLE `chefs` DISABLE KEYS */;
-INSERT INTO `chefs` VALUES (2,'https://images.unsplash.com/photo-1577219491135-ce391730fb2c','Pasión por la cocina internacional y la perfección.','3 Estrellas Michelin','Madrid','Español, Inglés, Francés','https://images.unsplash.com/photo-1414235077428-338989a2e8c0'),(3,'https://images.unsplash.com/photo-1583394293214-28ded15ee548','Cocina de vanguardia con raíces tradicionales.','2 Soles Repsol','Sevilla','Español, Inglés','https://images.unsplash.com/photo-1504674900247-0877df9cc836');
+INSERT INTO `chefs` VALUES (2,'https://images.unsplash.com/photo-1577219491135-ce391730fb2c','Pasión por la cocina internacional y la perfección.','3 Estrellas Michelin','Madrid',NULL,'Español, Inglés, Francés','https://images.unsplash.com/photo-1414235077428-338989a2e8c0'),(3,'https://images.unsplash.com/photo-1583394293214-28ded15ee548','Cocina de vanguardia con raíces tradicionales.','2 Soles Repsol','Sevilla',NULL,'Español, Inglés','https://images.unsplash.com/photo-1504674900247-0877df9cc836');
 /*!40000 ALTER TABLE `chefs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -108,7 +108,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'ADMIN','admin','$2a$10$6maG.SKdrCRX16NKsJZ5TewH/z.GqeLKHgjSsSB.9RoFi2psh8NeW','admin@app.com','600000000','Super','Admin','2026-02-04 12:14:54'),(2,'CHEF','gordon','$2a$10$.jvy7lGrZg/153is3Xmm.uX4rs89y4/YKNx7CfBUj/KXLqwqbH.le','gordon@kitchen.com','611111111','Gordon','Ramz','2026-02-04 12:14:54'),(3,'CHEF','dani','$2a$10$.jvy7lGrZg/153is3Xmm.uX4rs89y4/YKNx7CfBUj/KXLqwqbH.le','dani@garcia.com','622222222','Dani','Garcia','2026-02-04 12:14:54'),(4,'DINER','juan','$2a$10$D18OcHT11Des2Bnk6fngjupe4mSvBLMtrV1RQk.yil7craNt2aN6q','juan@gmail.com','633333333','Juan','Pérez','2026-02-04 12:14:54'),(5,'DINER','ana','$2a$10$D18OcHT11Des2Bnk6fngjupe4mSvBLMtrV1RQk.yil7craNt2aN6q','ana@hotmail.com','644444444','Ana','López','2026-02-04 12:14:54');
+INSERT INTO `users` VALUES (1,'ADMIN','admin','$2a$10$6maG.SKdrCRX16NKsJZ5TewH/z.GqeLKHgjSsSB.9RoFi2psh8NeW','admin@app.com','600000000','Super','Admin',NULL,'2026-02-04 12:14:54'),(2,'CHEF','gordon','$2a$10$.jvy7lGrZg/153is3Xmm.uX4rs89y4/YKNx7CfBUj/KXLqwqbH.le','gordon@kitchen.com','611111111','Gordon','Ramz',NULL,'2026-02-04 12:14:54'),(3,'CHEF','dani','$2a$10$.jvy7lGrZg/153is3Xmm.uX4rs89y4/YKNx7CfBUj/KXLqwqbH.le','dani@garcia.com','622222222','Dani','Garcia',NULL,'2026-02-04 12:14:54'),(4,'DINER','juan','$2a$10$D18OcHT11Des2Bnk6fngjupe4mSvBLMtrV1RQk.yil7craNt2aN6q','juan@gmail.com','633333333','Juan','Pérez',NULL,'2026-02-04 12:14:54'),(5,'DINER','ana','$2a$10$D18OcHT11Des2Bnk6fngjupe4mSvBLMtrV1RQk.yil7craNt2aN6q','ana@hotmail.com','644444444','Ana','López',NULL,'2026-02-04 12:14:54');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

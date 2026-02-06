@@ -191,14 +191,28 @@ export class AuthService {
     return mappedUser;
   }
 
-  // notify the component that the user is changing
+  // Update user profile
   updateUser(updatedUser: User): Observable<User> {
     const token = localStorage.getItem('chefpro_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    return this.http.put<any>(`${this.authUrl}/update/${updatedUser.user_ID}`, updatedUser, { headers }).pipe(
-      tap(() => {
-        this.setSession(updatedUser);
+    // Map frontend User to backend UpdateProfileDto
+    const updateDto = {
+      name: updatedUser.name,
+      surname: updatedUser.lastname,
+      username: updatedUser.userName,
+      photo: updatedUser.photoUrl,
+      bio: updatedUser.bio,
+      prizes: updatedUser.prizes,
+      address: updatedUser.address
+    };
+
+    return this.http.put<any>(`${this.authUrl}/profile`, updateDto, { headers }).pipe(
+      switchMap(backendUser => {
+        // Map response back to frontend User model
+        const user: User = this.mapBackendUserToFrontend(backendUser);
+        this.setSession(user);
+        return of(user);
       }),
       catchError(this.handleError)
     );

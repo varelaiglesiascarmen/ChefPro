@@ -21,6 +21,8 @@ public class UserLoginDto {
 
   private String phoneNumber;
 
+  private String photo;
+
   private String role;
 
 }

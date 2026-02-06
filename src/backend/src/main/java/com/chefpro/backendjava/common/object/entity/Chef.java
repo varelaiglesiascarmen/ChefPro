@@ -38,6 +38,9 @@ public class Chef {
   @Column(name = "location", length = 255)
   private String location;
 
+  @Column(name = "address", length = 500)
+  private String address;
+
   @Column(name = "languages", length = 255)
   private String languages;
 

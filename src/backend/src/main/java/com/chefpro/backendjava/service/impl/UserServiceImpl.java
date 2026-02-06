@@ -1,6 +1,7 @@
 package com.chefpro.backendjava.service.impl;
 
 import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
+import com.chefpro.backendjava.common.object.dto.login.UpdateProfileDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import com.chefpro.backendjava.common.object.entity.Chef;
 import com.chefpro.backendjava.common.object.entity.Diner;
@@ -50,6 +51,7 @@ public class UserServiceImpl implements UserService {
       userLoginDto.setUsername(userLogin.getUsername());
       userLoginDto.setEmail(userLogin.getEmail());
       userLoginDto.setPhoneNumber(userLogin.getPhoneNumber());
+      userLoginDto.setPhoto(userLogin.getPhoto());
       userLoginDto.setRole(userLogin.getRole().name());
 
       return userLoginDto;
@@ -109,6 +111,62 @@ public class UserServiceImpl implements UserService {
     }
 
     return true;
+  }
+
+  @Override
+  @Transactional
+  public UserLoginDto updateProfile(String userEmail, UpdateProfileDto updateProfileDto) {
+    Optional<UserLogin> foundUser = customUserRepository.findByUsername(userEmail);
+
+    if (foundUser.isEmpty()) {
+      throw new RuntimeException("Usuario no encontrado");
+    }
+
+    UserLogin userLogin = foundUser.get();
+
+    // Actualizar campos básicos del usuario
+    userLogin.setName(updateProfileDto.getName());
+    userLogin.setLastname(updateProfileDto.getSurname());
+    userLogin.setUsername(updateProfileDto.getUsername());
+    
+    // Actualizar foto si se proporciona
+    if (updateProfileDto.getPhoto() != null && !updateProfileDto.getPhoto().isBlank()) {
+      userLogin.setPhoto(updateProfileDto.getPhoto());
+    }
+
+    // Si es un chef, actualizar información adicional
+    if (userLogin.getRole() == UserRoleEnum.CHEF) {
+      Optional<Chef> chefOpt = chefRepository.findByUser(userLogin);
+      if (chefOpt.isPresent()) {
+        Chef chef = chefOpt.get();
+        if (updateProfileDto.getBio() != null) {
+          chef.setBio(updateProfileDto.getBio());
+        }
+        if (updateProfileDto.getPrizes() != null) {
+          chef.setPrizes(updateProfileDto.getPrizes());
+        }
+        if (updateProfileDto.getAddress() != null) {
+          chef.setAddress(updateProfileDto.getAddress());
+        }
+        chefRepository.save(chef);
+      }
+    }
+
+    // Guardar usuario actualizado
+    UserLogin savedUser = customUserRepository.save(userLogin);
+
+    // Construir y devolver DTO
+    UserLoginDto userLoginDto = new UserLoginDto();
+    userLoginDto.setId(savedUser.getId());
+    userLoginDto.setName(savedUser.getName());
+    userLoginDto.setSurname(savedUser.getLastname());
+    userLoginDto.setUsername(savedUser.getUsername());
+    userLoginDto.setEmail(savedUser.getEmail());
+    userLoginDto.setPhoneNumber(savedUser.getPhoneNumber());
+    userLoginDto.setPhoto(savedUser.getPhoto());
+    userLoginDto.setRole(savedUser.getRole().name());
+
+    return userLoginDto;
   }
 
 }
