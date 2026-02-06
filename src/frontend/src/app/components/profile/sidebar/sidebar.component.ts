@@ -30,6 +30,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.userSub?.unsubscribe();
   }
 
+  handleImageError(event: any): void {
+    event.target.src = '/logos/users.svg';
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/index']);
