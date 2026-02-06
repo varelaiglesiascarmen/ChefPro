@@ -1,0 +1,100 @@
+<div class="user-info-container fadeIn">
+  <div class="gourmet-card">
+    <div class="card-header">
+      <h2>Mi Perfil {{ role === 'CHEF' ? 'Profesional' : 'Gourmet' }}</h2>
+      <button class="btn-config" (click)="editMode ? saveChanges() : toggleEdit()"
+              [disabled]="editMode && profileForm.invalid">
+        {{ editMode ? 'Guardar Cambios' : 'Configuración' }}
+      </button>
+    </div>
+
+    <form [formGroup]="profileForm" class="chef-form">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>URL Foto de Perfil</label>
+          <input formControlName="photo" [readonly]="!editMode">
+        </div>
+        <div class="form-group">
+          <label>Nombre de Usuario *</label>
+          <input formControlName="username" [readonly]="!editMode">
+          <small class="error" *ngIf="profileForm.get('username')?.hasError('alreadyExists')">Este usuario ya existe.</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input formControlName="name" [readonly]="!editMode">
+        </div>
+        <div class="form-group">
+          <label>Apellidos</label>
+          <input formControlName="lastname" [readonly]="!editMode">
+        </div>
+      </div>
+
+      <ng-container *ngIf="role === 'CHEF'">
+        <div class="form-group full-width">
+          <label>Biografía Culinaria (Máx. 200 caracteres)</label>
+          <textarea formControlName="bio" [readonly]="!editMode" maxlength="200"></textarea>
+          <div class="char-counter">{{ profileForm.get('bio')?.value?.length || 0 }} / 200</div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Premios y Reconocimientos</label>
+          <div class="tags-container" [class.readonly-tags]="!editMode">
+            <span *ngFor="let prize of prizesTags; let i = index" class="tag">
+              {{ prize }}
+              <button type="button" *ngIf="editMode" (click)="removePrizeTag(i)">×</button>
+            </span>
+            <input *ngIf="editMode" [(ngModel)]="currentPrizeInput" [ngModelOptions]="{standalone: true}"
+                   (keydown.enter)="addPrizeTag($event)" placeholder="Pulsa Enter para añadir">
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="form-group full-width" *ngIf="role === 'DINER'">
+        <label>Dirección de Entrega Predeterminada</label>
+        <input formControlName="address" [readonly]="!editMode" placeholder="Calle, Número, Ciudad...">
+      </div>
+
+      <div class="security-section" *ngIf="editMode">
+        <hr class="divider">
+        <p class="section-title">Ajustes de Seguridad</p>
+
+        <div formGroupName="emailGroup">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nuevo Email *</label>
+              <input formControlName="email">
+            </div>
+            <div class="form-group">
+              <label>Confirmar Email *</label>
+              <input formControlName="confirmEmail">
+            </div>
+          </div>
+          <small class="error-msg" *ngIf="profileForm.get('emailGroup')?.hasError('mismatch')">Los emails no coinciden.</small>
+        </div>
+
+        <div formGroupName="passGroup">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nueva Contraseña *</label>
+              <input type="password" formControlName="password">
+            </div>
+            <div class="form-group">
+              <label>Repetir Contraseña *</label>
+              <input type="password" formControlName="confirmPassword">
+            </div>
+          </div>
+          <small class="error-msg" *ngIf="profileForm.get('passGroup')?.hasError('mismatch')">Las contraseñas no coinciden.</small>
+        </div>
+
+        <div class="danger-zone">
+          <button type="button" class="btn-delete" (click)="deleteAccount()">Eliminar mi cuenta definitivamente</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

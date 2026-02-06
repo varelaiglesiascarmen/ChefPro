@@ -7,11 +7,26 @@ export interface User {
   lastname: string;
   email: string;
   phone_number?: string;
-  address?: string;
-  rating_avg: number;
   reviews_count: number;
   languages?: string[];
   photoUrl?: string;
+}
+
+/* EXTENSIÓN: Exclusive data from CHEF */
+export interface Chef extends User {
+  role: 'CHEF';
+  bio: string;
+  prizes: string;
+  // average score of reviews
+  rating_avg: number;
+  // number of reviews received
+  reviews_count: number;
+}
+
+/* EXTENSIÓN: Exclusive data from DINER */
+export interface Diner extends User {
+  role: 'DINER';
+  address: string;
 }
 
 /* SERVICE MODULE (MENUS & DISHES) */
@@ -25,7 +40,7 @@ export interface Dish {
 
 export interface Menu {
   id: number;
-  chefId: string;
+  chefId: number;
   chefName: string;
   title: string;
   description: string;
@@ -41,9 +56,9 @@ export interface Menu {
 
 /* RESERVATION MODULE (ORDERS) */
 export interface Order {
-  id: string;
-  chefId: string;
-  dinerId: string;
+  order_id: number;
+  chefId: number;
+  dinerId: number;
   menuId: number;
   eventDate: string;
   guestsCount: number;
@@ -59,8 +74,8 @@ export interface Order {
 export interface Review {
   id: string;
   orderId: string;
-  fromUserId: string;
-  toUserId: string;
+  fromUserId: number;
+  toUserId: number;
   rating: number;
   comment: string;
   date: string;
