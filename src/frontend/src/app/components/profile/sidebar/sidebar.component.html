@@ -1,7 +1,8 @@
 <aside class="sidebar-container">
   <div class="profile-summary">
     <div class="avatar-wrapper">
-      <img [src]="user?.photo || 'assets/default-chef.png'" alt="Chef Photo" class="chef-avatar">
+      <img [src]="user?.photoUrl || '/logos/users.svg'" (error)="handleImageError($event)" alt="Chef Photo"
+        class="chef-avatar">
     </div>
     <div class="chef-meta">
       <h3>{{ user?.name || 'Chef' }} {{ user?.lastname || '' }}</h3>
@@ -16,13 +17,18 @@
     </a>
 
     <ng-container *ngIf="role === 'CHEF'">
+      <a routerLink="calendar" routerLinkActive="active" class="nav-item">Mi Calendario
+      </a>
+      <a routerLink="user-calendar" routerLinkActive="active" class="nav-item">Agenda y Disponibilidad
+      </a>
       <a routerLink="menus" routerLinkActive="active" class="nav-item">Mis Menús
       </a>
-      <a routerLink="calendar" routerLinkActive="active" class="nav-item">Calendario
+      <a routerLink="new-menu" routerLinkActive="active" class="nav-item create-highlight">Crear Nuevo Menú
       </a>
     </ng-container>
 
-    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes' : 'Mis Reservas' }}
+    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes de reservas' : 'Mis
+      Reservas' }}
     </a>
   </nav>
 

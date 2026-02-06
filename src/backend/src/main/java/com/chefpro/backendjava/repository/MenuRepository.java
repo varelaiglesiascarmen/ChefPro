@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
@@ -41,4 +42,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     "LEFT JOIN FETCH m.chef c " +
     "LEFT JOIN FETCH c.user u")
   List<Menu> findAllWithDishes();
+
+  @Query("SELECT m FROM Menu m " +
+    "LEFT JOIN FETCH m.dishes " +
+    "LEFT JOIN FETCH m.chef c " +
+    "LEFT JOIN FETCH c.user " +
+    "WHERE m.id = :menuId")
+  Optional<Menu> findByIdWithDetails(@Param("menuId") Long menuId);
 }

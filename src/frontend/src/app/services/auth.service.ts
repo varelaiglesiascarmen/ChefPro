@@ -20,7 +20,7 @@ export class AuthService {
   // ==========================================
   // DEVELOPER MODE BLOCK (isDevMode)
   // ==========================================
-  private isDevMode = false; // CHANGE TO 'false' TO CONNECT TO REAL BACKEND
+  private isDevMode = false; // Using real backend API
 
   private getMockUser(role: 'CHEF' | 'DINER' = 'CHEF'): User {
     return {
@@ -60,8 +60,12 @@ export class AuthService {
       tap(response => {
         if (response.token) localStorage.setItem('chefpro_token', response.token);
       }),
-      switchMap(() => this.getUserData()),
-      tap(fullUser => this.setSession(fullUser)),
+      switchMap(response => {
+        // Map backend response to frontend User model
+        const user: User = this.mapBackendUserToFrontend(response.user);
+        this.setSession(user);
+        return of(user);
+      }),
       catchError(this.handleError)
     );
   }
@@ -80,8 +84,13 @@ export class AuthService {
       tap(response => {
         if (response.token) localStorage.setItem('chefpro_token', response.token);
       }),
-      switchMap(() => this.getUserData()),
-      tap(fullUser => this.setSession(fullUser)),
+      switchMap(response => {
+        // Map backend response to frontend User model
+        // Pass the original signup data to fill in missing fields
+        const user: User = this.mapBackendUserToFrontend(response.user, data);
+        this.setSession(user);
+        return of(user);
+      }),
       catchError(this.handleError)
     );
   }
@@ -90,10 +99,12 @@ export class AuthService {
   getUserData(): Observable<User> {
     if (this.isDevMode) return of(this.getMockUser());
 
-    return this.http.get<User>(`${this.authUrl}/me`).pipe(
-      tap(user => {
+    return this.http.get<any>(`${this.authUrl}/me`).pipe(
+      switchMap(backendUser => {
+        const user: User = this.mapBackendUserToFrontend(backendUser);
         this.currentUserSubject.next(user);
         localStorage.setItem('chefpro_user', JSON.stringify(user));
+        return of(user);
       }),
       catchError(this.handleError)
     );
@@ -128,11 +139,23 @@ export class AuthService {
     const userJson = localStorage.getItem('chefpro_user');
 
     if (token) {
-      if (this.isDevMode && userJson) {
-        this.currentUserSubject.next(JSON.parse(userJson));
-      } else {
+      // Restore user from localStorage immediately (optimistic)
+      if (userJson) {
+        try {
+          const user = JSON.parse(userJson);
+          this.currentUserSubject.next(user);
+        } catch (e) {
+          console.error('Error parsing stored user data:', e);
+        }
+      }
+
+      // Then validate token with backend (only if not in dev mode)
+      if (!this.isDevMode) {
         this.getUserData().subscribe({
-          error: () => this.logout()
+          error: () => {
+            console.warn('Token validation failed, logging out');
+            this.logout();
+          }
         });
       }
     }
@@ -141,6 +164,30 @@ export class AuthService {
   private handleError(error: HttpErrorResponse) {
     console.error('Error en el proceso de autenticación:', error);
     return throwError(() => error);
+  }
+
+  // Map backend user response to frontend User model
+  private mapBackendUserToFrontend(backendUser: any, additionalData?: any): User {
+    console.log('🔍 Backend user data:', backendUser);
+    console.log('🔍 Additional signup data:', additionalData);
+
+    const mappedUser: User = {
+      user_ID: backendUser.id,
+      userName: additionalData?.username || backendUser.username || backendUser.email?.split('@')[0] || 'user',
+      name: backendUser.name || '',
+      lastname: additionalData?.surname || backendUser.surname || backendUser.lastname || '',
+      email: backendUser.email,
+      phone_number: additionalData?.phoneNumber || backendUser.phoneNumber || backendUser.phone_number,
+      role: backendUser.role,
+      reviews_count: backendUser.reviews_count || 0,
+      rating_avg: backendUser.rating_avg || 0,
+      languages: backendUser.languages || [],
+      photoUrl: backendUser.photoUrl || backendUser.photo,
+      address: backendUser.address
+    };
+
+    console.log('✅ Mapped user:', mappedUser);
+    return mappedUser;
   }
 
   // notify the component that the user is changing

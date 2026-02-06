@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { ChefProfileUpdate, ChefPublicDetail, MenuPublicDetail } from '../models/chef-detail.model';
+import { ReservationStatusUpdate } from '../models/reservation.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,50 +14,75 @@ export class ChefService {
   private router = inject(Router);
   private apiUrl = `${environment.apiUrl}`;
 
-  // get details about the chef
-  getChefDetails(chefId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/chefs/${chefId}`);
+  // ========================================
+  // PUBLIC ENDPOINTS (no authentication)
+  // ========================================
+
+  /** Chef public profile */
+  getChefPublicProfile(chefId: number): Observable<ChefPublicDetail> {
+    return this.http.get<ChefPublicDetail>(`${this.apiUrl}/chef/${chefId}/profile`);
   }
 
-  // update chef's menu
-  updateChef(chefId: number, chefData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/chefs/${chefId}`, chefData);
+  /** Public menu detail */
+  getMenuPublicDetail(menuId: number): Observable<MenuPublicDetail> {
+    return this.http.get<MenuPublicDetail>(`${this.apiUrl}/chef/menus/${menuId}/public`);
   }
 
-  // obtain the chef's menus
-  getChefMenus(chefId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/menu/chef/${chefId}`);
+  // ========================================
+  // AUTHENTICATED ENDPOINTS — CHEF PROFILE
+  // ========================================
+
+  /**
+   * Partially updates the authenticated chef's profile.
+   * PATCH /api/chef/profile — the backend identifies the chef via JWT.
+   */
+  updateChefProfile(chefData: ChefProfileUpdate): Observable<ChefPublicDetail> {
+    return this.http.patch<ChefPublicDetail>(`${this.apiUrl}/chef/profile`, chefData);
   }
 
-  // delete some menu
-  deleteMenu(menuId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/menu/${menuId}`);
-  }
+  // ========================================
+  // AUTHENTICATED ENDPOINTS — MENUS
+  // ========================================
 
-  // obtain reservations orders
-  getChefReservations(chefId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/reservations/chef/${chefId}`);
-  }
-
-  // change reservation status
-  updateReservationStatus(chefId: number, date: string, status: string): Observable<any> {
-    const payload = { chef_ID: chefId, date: date, status: status };
-    return this.http.put<any>(`${this.apiUrl}/reservations/status`, payload);
-  }
-
-  // Create menu
+  /** Creates a new menu for the authenticated chef */
   createMenu(menuData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/chef/menus`, menuData);
   }
 
-  // create dish
+  /**
+   * Deletes a menu owned by the authenticated chef.
+   * DELETE /api/chef/menus/{menuId}
+   */
+  deleteMenu(menuId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/chef/menus/${menuId}`);
+  }
+
+  // ========================================
+  // AUTHENTICATED ENDPOINTS — DISHES
+  // ========================================
+
+  /** Creates a new dish */
   createDish(dishData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/chef/plato`, dishData);
   }
 
-  // save allergen
-  saveAllergen(allergenData: any) {
-    return this.http.post(`${this.apiUrl}/alergenos`, allergenData);
+  // ========================================
+  // AUTHENTICATED ENDPOINTS — RESERVATIONS
+  // ========================================
+
+  /**
+   * Retrieves the authenticated chef's reservations.
+   * GET /api/reservations/chef — the backend identifies the chef via JWT.
+   */
+  getChefReservations(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reservations/chef`);
   }
 
+  /**
+   * Updates the status of a reservation.
+   * PATCH /api/reservations/status — the backend expects PATCH, not PUT.
+   */
+  updateReservationStatus(payload: ReservationStatusUpdate): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/reservations/status`, payload);
+  }
 }

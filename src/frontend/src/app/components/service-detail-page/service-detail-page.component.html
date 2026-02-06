@@ -3,7 +3,12 @@
   <p>Cargando información...</p>
 </div>
 
-<div *ngIf="!isLoading && data" class="detail-page fadeIn">
+<div *ngIf="!isLoading && errorMessage" class="loading-container">
+  <p style="font-size: 1.2rem; color: #a00;">{{ errorMessage }}</p>
+  <button class="btn-back" (click)="goBack()" style="margin-top: 1rem;">← Volver</button>
+</div>
+
+<div *ngIf="!isLoading && data && !errorMessage" class="detail-page fadeIn">
 
   <button class="btn-back" (click)="goBack()">← Volver</button>
 
@@ -12,12 +17,12 @@
     <header class="chef-hero" [style.backgroundImage]="'url(' + data.coverUrl + ')'">
       <div class="overlay"></div>
       <div class="chef-identity">
-        <img [src]="data.photoUrl" class="chef-avatar" alt="Foto de perfil">
+        <img [src]="data.photoUrl || '/logos/users.svg'" class="chef-avatar" alt="Foto de perfil">
         <div class="chef-text">
           <h1>{{ data.fullName }}</h1>
 
-          <div *ngIf="data.prizes && data.prizes.length > 0" class="prizes-container">
-            <span *ngFor="let prize of data.prizes" class="prizes-badge">{{ prize }}</span>
+          <div *ngIf="data.prizes" class="prizes-container">
+            <span class="prizes-badge">{{ data.prizes }}</span>
           </div>
 
           <div class="meta-info">
@@ -140,11 +145,20 @@
           </div>
 
           <button class="btn-primary-action full-width" (click)="requestReservation()"
-            [disabled]="!selectedMenuId || !reservationDate">
-            Mandar la comanda al Chef
+            [disabled]="!selectedMenuId || !reservationDate || reservationLoading || reservationConfirmed">
+            <span *ngIf="reservationLoading" class="spinner-border-sm"></span>
+            {{ reservationConfirmed ? 'Reserva enviada ✓' : (reservationLoading ? 'Enviando...' : 'Mandar la comanda al Chef') }}
           </button>
 
-          <p class="secure-note">La comanda debe ser acepatada en 24 hr por el Chef. ¡Te avisaremos cuando sepamos su repuesta!</p>
+          <div *ngIf="reservationSuccess" class="reservation-message-success">
+            {{ reservationSuccess }}
+          </div>
+          <div *ngIf="reservationError" class="reservation-message-error">
+            {{ reservationError }}
+          </div>
+
+          <p class="secure-note">La comanda debe ser acepatada en 24 hr por el Chef. ¡Te avisaremos cuando sepamos su
+            repuesta!</p>
         </div>
       </aside>
 
@@ -201,7 +215,8 @@
             <div class="req-title-row">
               <h4>Requisitos de tu cocina</h4>
               <div class="info-tooltip-wrapper">
-                <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="16" x2="12" y2="12"></line>
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -233,7 +248,8 @@
         </div>
       </div>
 
-      <div class="reservation-wide-container"> <div class="reservation-grid">
+      <div class="reservation-wide-container">
+        <div class="reservation-grid">
 
           <div class="res-col-left">
             <h3>Configura tu evento</h3>
@@ -252,9 +268,11 @@
                 <span style="font-weight:normal; color:#999;">({{data.minDiners}}-{{data.maxDiners}})</span>
               </label>
               <div class="guest-counter">
-                <button (click)="updateGuests(-1)" class="counter-btn" [disabled]="reservationGuests <= data.minDiners">-</button>
+                <button (click)="updateGuests(-1)" class="counter-btn"
+                  [disabled]="reservationGuests <= data.minDiners">-</button>
                 <span class="counter-value">{{ reservationGuests }}</span>
-                <button (click)="updateGuests(1)" class="counter-btn" [disabled]="reservationGuests >= data.maxDiners">+</button>
+                <button (click)="updateGuests(1)" class="counter-btn"
+                  [disabled]="reservationGuests >= data.maxDiners">+</button>
               </div>
             </div>
           </div>
@@ -298,9 +316,17 @@
               </div>
 
               <button class="btn-primary-action full-width" (click)="requestReservation()"
-                 [disabled]="!reservationDate">
-                Enviar Comanda al Chef
+                [disabled]="!reservationDate || reservationLoading || reservationConfirmed">
+                <span *ngIf="reservationLoading" class="spinner-border-sm"></span>
+                {{ reservationConfirmed ? 'Reserva enviada ✓' : (reservationLoading ? 'Enviando...' : 'Enviar Comanda al Chef') }}
               </button>
+
+              <div *ngIf="reservationSuccess" class="reservation-message-success">
+                {{ reservationSuccess }}
+              </div>
+              <div *ngIf="reservationError" class="reservation-message-error">
+                {{ reservationError }}
+              </div>
 
               <p class="secure-note">
                 El chef confirmará si tiene disponibilidad para desplazarse a tu dirección en la fecha indicada.

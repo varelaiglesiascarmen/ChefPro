@@ -14,9 +14,9 @@ public class UserLoginDto {
 
   private String name;
 
-  private String username;
-
   private String surname;
+
+  private String username;
 
   private String email;
 

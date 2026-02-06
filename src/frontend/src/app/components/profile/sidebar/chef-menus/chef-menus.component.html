@@ -1,1 +1,41 @@
-<p>chef-menus.component works!</p>
+<div class="chef-menus-container fadeIn">
+  <div class="header-dashboard">
+    <div class="text-group">
+      <h1>Gestión de Carta Gourmet</h1>
+      <p>Crea, edita y organiza tus propuestas gastronómicas.</p>
+    </div>
+    <button class="btn-create-main" routerLink="/profile/new-menu">
+      <i class="icon-plus">+</i> Nuevo Menú
+    </button>
+  </div>
+
+  <div class="menus-grid">
+    <div class="menu-card create-new-card" routerLink="/profile/new-menu">
+      <div class="create-content">
+        <div class="plus-circle">+</div>
+        <p>Añadir Nueva Creación</p>
+        <small>Diseña un nuevo servicio para tus comensales</small>
+      </div>
+    </div>
+
+    <div class="menu-card" *ngFor="let menu of menus">
+      <div class="menu-thumb" [style.backgroundImage]="'url(' + menu.photoUrl + ')'">
+        <div class="badge-price">{{ menu.price }}€</div>
+      </div>
+
+      <div class="menu-body">
+        <h3>{{ menu.title }}</h3>
+        <p class="description">{{ menu.description | slice:0:60 }}...</p>
+
+        <div class="menu-footer">
+          <button class="btn-action edit" (click)="goToEdit(menu.id)">
+            <i class="icon-edit"></i> Editar
+          </button>
+          <button class="btn-action delete" (click)="confirmDelete(menu.id)">
+            <i class="icon-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

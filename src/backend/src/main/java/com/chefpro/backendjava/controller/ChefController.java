@@ -1,6 +1,7 @@
 package com.chefpro.backendjava.controller;
 
 import com.chefpro.backendjava.common.object.dto.*;
+import com.chefpro.backendjava.service.ChefProfileService;
 import com.chefpro.backendjava.service.ChefSearchService;
 import com.chefpro.backendjava.service.DishService;
 import com.chefpro.backendjava.service.MenuService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/chef")
@@ -22,15 +24,18 @@ public class ChefController {
   private final MenuService menuService;
   private final DishService dishService;
   private final ChefSearchService chefSearchService;
+  private final ChefProfileService chefProfileService;
 
   public ChefController(
     MenuService menuService,
     DishService dishService,
-    ChefSearchService chefSearchService
+    ChefSearchService chefSearchService,
+    ChefProfileService chefProfileService
   ) {
     this.menuService = menuService;
     this.dishService = dishService;
     this.chefSearchService = chefSearchService;
+    this.chefProfileService = chefProfileService;
   }
 
   @GetMapping("/chef/search")
@@ -121,5 +126,53 @@ public class ChefController {
                                                          @PageableDefault(size = 10, sort = "id") Pageable pageable) {
     List<MenuDTO> menus = menuService.listAllMenus(title, description, pickUpAvailable, chefUsername, deliveryAvailable, cookAtClientHome);
     return ResponseEntity.ok(menus);
+  }
+
+  @GetMapping("/search")
+  public ResponseEntity<Page<ChefSearchDto>> searchChefs(
+    @RequestParam(required = false) String name,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+    Page<ChefSearchDto> result = chefSearchService.search(name, date, pageable);
+
+    return ResponseEntity.ok(result);
+  }
+
+  // ========================================
+  // ENDPOINTS PÚBLICOS - Perfil de Chef y Menú
+  // ========================================
+
+  @GetMapping("/{chefId}/profile")
+  public ResponseEntity<ChefPublicDetailDto> getChefPublicProfile(@PathVariable Long chefId) {
+    try {
+      ChefPublicDetailDto dto = chefProfileService.getChefPublicProfile(chefId);
+      return ResponseEntity.ok(dto);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/menus/{menuId}/public")
+  public ResponseEntity<MenuPublicDetailDto> getMenuPublicDetail(@PathVariable Long menuId) {
+    try {
+      MenuPublicDetailDto dto = chefProfileService.getMenuPublicDetail(menuId);
+      return ResponseEntity.ok(dto);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  // ========================================
+  // AUTHENTICATED ENDPOINT - Update Chef Profile
+  // ========================================
+
+  @PatchMapping("/profile")
+  public ResponseEntity<ChefPublicDetailDto> updateChefProfile(
+    Authentication authentication,
+    @RequestBody ChefUReqDto chefUpdateDto
+  ) {
+    ChefPublicDetailDto updated = chefProfileService.updateChefProfile(authentication, chefUpdateDto);
+    return ResponseEntity.ok(updated);
   }
 }
