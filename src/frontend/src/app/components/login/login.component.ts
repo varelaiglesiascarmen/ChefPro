@@ -27,7 +27,7 @@ export class LoginComponent {
   onLogin() {
   this.errorMessage = '';
   if (!this.loginData.username || !this.loginData.password) {
-    this.errorMessage = 'Usuario o contraseña obligatorios.';
+    this.errorMessage = 'Username or password required.';
     return;
   }
 
@@ -36,8 +36,8 @@ export class LoginComponent {
   this.authService.login(this.loginData).subscribe({
     next: (user: any) => { 
       this.isLoading = false;
-      // AuthService ya guarda el token y la sesión (setSession).
-      // Aquí solo navegamos tras el login correcto.
+      // AuthService already saves the token and session (setSession).
+      // Here we only navigate after successful login.
       this.router.navigate(['/user-menu']);
     },
     error: (err) => {
