@@ -2,9 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { ChefService } from '../../services/chef.service';
+import { ReservationService } from '../../services/reservation.service';
 import { User } from '../../models/auth.model';
+import { ReservationCreateDto } from '../../models/reservation.model';
 import { ChefPublicDetail, MenuPublicDetail } from '../../models/chef-detail.model';
 import { CalendarComponent } from '../calendar/calendar.component';
 
@@ -39,6 +42,7 @@ export class ServiceDetailPageComponent implements OnInit {
   private location = inject(Location);
   private authService = inject(AuthService);
   private chefService = inject(ChefService);
+  private reservationService = inject(ReservationService);
 
   user: User | null = null;
   currentUser: User | null = null;
@@ -52,6 +56,11 @@ export class ServiceDetailPageComponent implements OnInit {
   selectedMenuId: number | null = null;
   isDropdownOpen: boolean = false;
   officialAllergens = OFFICIAL_ALLERGENS;
+
+  reservationLoading = false;
+  reservationConfirmed = false;
+  reservationSuccess: string | null = null;
+  reservationError: string | null = null;
 
   ngOnInit() {
     this.authService.user$.subscribe(user => {
@@ -129,7 +138,6 @@ export class ServiceDetailPageComponent implements OnInit {
   }
 
   updateDate(fechaRecibida: string) {
-    console.log('El usuario eligió:', fechaRecibida);
     this.reservationDate = fechaRecibida;
   }
 
@@ -139,22 +147,45 @@ export class ServiceDetailPageComponent implements OnInit {
       return;
     }
 
-    const unitPrice = this.viewType === 'chef' ? this.selectedMenu?.price : this.data.price;
-    const totalPrice = (unitPrice * this.reservationGuests).toFixed(2);
-    const reservationData = {
-      chef_ID: this.viewType === 'chef' ? this.data.id : this.data.chefId,
-      diner_ID: this.currentUser.user_ID,
-      menu_ID: this.viewType === 'chef' ? this.selectedMenuId : this.data.id,
+    if (this.currentUser.role !== 'DINER') {
+      this.reservationError = 'Solo los comensales pueden hacer reservas.';
+      return;
+    }
+
+    const dto: ReservationCreateDto = {
+      chefId: this.viewType === 'chef' ? this.data.id : this.data.chefId,
+      menuId: this.viewType === 'chef' ? this.selectedMenuId! : this.data.id,
       date: this.reservationDate,
-      n_diners: this.reservationGuests,
-      total_price: totalPrice,
-      address: this.currentUser.address,
-      status: 'PENDING'
+      numberOfDiners: this.reservationGuests,
+      address: this.currentUser.address || ''
     };
 
-    console.log('Enviando a Backend:', reservationData);
+    this.reservationLoading = true;
+    this.reservationSuccess = null;
+    this.reservationError = null;
 
-    alert(`Solicitud enviada por ${totalPrice}€ a la dirección: ${reservationData.address}`);
+    this.reservationService.createReservation(dto).subscribe({
+      next: () => {
+        this.reservationLoading = false;
+        this.reservationConfirmed = true;
+        this.reservationSuccess = '¡Reserva enviada con éxito! El chef confirmará en las próximas 24 h.';
+      },
+      error: (err: HttpErrorResponse) => {
+        this.reservationLoading = false;
+        if (err.status === 400 || err.status === 409) {
+          const serverMsg = typeof err.error === 'string' ? err.error : err.error?.message;
+          this.reservationError = serverMsg || 'Este chef ya tiene una reserva para esa fecha.';
+        } else if (err.status === 401) {
+          this.reservationError = 'Tu sesión ha expirado. Vuelve a iniciar sesión.';
+        } else if (err.status === 403 || err.status === 500) {
+          // El backend no tiene @ExceptionHandler → las validaciones de negocio
+          // (fecha duplicada, menú inválido, etc.) llegan como 403 o 500.
+          this.reservationError = 'No se pudo completar la reserva. Es posible que esta fecha ya esté ocupada.';
+        } else {
+          this.reservationError = 'Error al crear la reserva. Inténtalo de nuevo.';
+        }
+      }
+    });
   }
 
   closeLoginModal() { this.showLoginModal = false; }

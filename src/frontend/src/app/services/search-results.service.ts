@@ -102,8 +102,9 @@ export class ChefService {
    * Persists a new reservation record to the database.
    * @param bookingData Object containing chef_ID, menu_ID, n_diners, and date.
    */
+  /** @deprecated Use ReservationService.createReservation() instead. */
   createReservation(bookingData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reservations/reservas`, bookingData);
+    return this.http.post(`${this.apiUrl}/reservations`, bookingData);
   }
 
   /**
