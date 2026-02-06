@@ -71,6 +71,10 @@ public class UserServiceImpl implements UserService {
       return false;
     }
 
+    if (customUserRepository.findByUsername(signUpRequest.getUsername()).isPresent() || customUserRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
+      return false;
+    }
+
     UserLogin userLogin = new UserLogin();
     userLogin.setName(signUpRequest.getName());
     userLogin.setLastname(signUpRequest.getSurname());

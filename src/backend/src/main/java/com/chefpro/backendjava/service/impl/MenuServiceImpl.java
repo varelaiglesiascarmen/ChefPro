@@ -10,6 +10,8 @@ import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.repository.ChefRepository;
 import com.chefpro.backendjava.repository.MenuRepository;
 import com.chefpro.backendjava.service.MenuService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -193,10 +195,23 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<MenuDTO> listAllMenus() {
+  public List<MenuDTO> listAllMenus(
+    String title,
+    String description,
+    Boolean pickUpAvailable,
+    String chefUsername,
+    Boolean deliveryAvailable,
+    Boolean cookAtClientHome) {
 
-    // Obtener todos los menús con sus platos
-    List<Menu> menus = menuRepository.findAllWithDishes();
+    // Obtener menús con filtros aplicados
+    List<Menu> menus = menuRepository.findAllWithDishesAndFilters(
+      title,
+      description,
+      chefUsername,
+      pickUpAvailable,
+      deliveryAvailable,
+      cookAtClientHome
+    );
 
     // Cargar alérgenos (forzar carga lazy)
     menus.forEach(menu ->

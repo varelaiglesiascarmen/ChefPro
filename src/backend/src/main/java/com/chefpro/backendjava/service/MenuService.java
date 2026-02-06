@@ -1,6 +1,8 @@
 package com.chefpro.backendjava.service;
 
 import com.chefpro.backendjava.common.object.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
@@ -15,5 +17,5 @@ public interface MenuService {
 
   MenuDTO updateMenu (Authentication authentication, MenuUReqDto uReq);
 
-  List<MenuDTO> listAllMenus();
+  List<MenuDTO> listAllMenus(String title, String description, Boolean pickUpAvailable, String chefUsername, Boolean deliveryAvailable, Boolean cookAtClientHome);
 }

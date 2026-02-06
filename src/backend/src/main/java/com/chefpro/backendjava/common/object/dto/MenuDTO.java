@@ -1,36 +1,45 @@
 package com.chefpro.backendjava.common.object.dto;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class MenuDTO {
 
-    private Long id;
-    private String title;
-    private String description;
+  private Long id;
+  private String title;
+  private String description;
 
-    private List<DishDto> dishes;
-    private Set<String> allergens;
+  private List<DishDto> dishes;
+  private Set<String> allergens;
 
-    private BigDecimal pricePerPerson;
+  @JsonProperty("price_per_person")
+  private BigDecimal pricePerPerson;
 
-    private boolean deliveryAvailable;
-    private boolean cookAtClientHome;
-    private boolean pickupAvailable;
+  @JsonProperty("min_number_diners")
+  private Integer minNumberDiners;
 
-    private String chefUsername;
+  @JsonProperty("max_number_diners")
+  private Integer maxNumberDiners;
 
-    private Instant createdAt;
+  @JsonProperty("kitchen_requirements")
+  private String kitchenRequirements;
+
+  private boolean deliveryAvailable;
+  private boolean cookAtClientHome;
+  private boolean pickupAvailable;
+
+  private String chefUsername;
+  private Instant createdAt;
 }

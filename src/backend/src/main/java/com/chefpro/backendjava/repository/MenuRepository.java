@@ -19,6 +19,19 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
   @Query("SELECT DISTINCT m FROM Menu m " +
     "LEFT JOIN FETCH m.dishes " +
     "LEFT JOIN FETCH m.chef c " +
-    "LEFT JOIN FETCH c.user")
-  List<Menu> findAllWithDishes();
+    "LEFT JOIN FETCH c.user u " +
+    "WHERE (:title IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
+    "AND (:description IS NULL OR LOWER(m.description) LIKE LOWER(CONCAT('%', :description, '%'))) " +
+    "AND (:chefUsername IS NULL OR LOWER(u.username) = LOWER(:chefUsername)) " +
+    "AND (:pickUpAvailable IS NULL OR c.pickUpAvailable = :pickUpAvailable) " +
+    "AND (:deliveryAvailable IS NULL OR c.deliveryAvailable = :deliveryAvailable) " +
+    "AND (:cookAtClientHome IS NULL OR c.cookAtClientHome = :cookAtClientHome)")
+  List<Menu> findAllWithDishesAndFilters(
+    @Param("title") String title,
+    @Param("description") String description,
+    @Param("chefUsername") String chefUsername,
+    @Param("pickUpAvailable") Boolean pickUpAvailable,
+    @Param("deliveryAvailable") Boolean deliveryAvailable,
+    @Param("cookAtClientHome") Boolean cookAtClientHome
+  );
 }

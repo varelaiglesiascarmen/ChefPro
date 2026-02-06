@@ -1,5 +1,6 @@
 package com.chefpro.backendjava.common.object.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,21 +16,29 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuUReqDto {
 
+  private Long id;
+  private String title;
+  private String description;
 
-    private Long id;
-    private String title;
-    private String description;
+  private List<Long> dishes;
+  private String allergens;
 
-    private List<Long> dishes;
-    private String allergens;
+  @JsonProperty("price_per_person")
+  private BigDecimal pricePerPerson;
 
-    private BigDecimal pricePerPerson;
+  @JsonProperty("min_number_diners")
+  private Integer minNumberDiners;
 
-    private boolean deliveryAvailable;
-    private boolean cookAtClientHome;
-    private boolean pickupAvailable;
+  @JsonProperty("max_number_diners")
+  private Integer maxNumberDiners;
 
-    private String chefUsername;
+  @JsonProperty("kitchen_requirements")
+  private String kitchenRequirements;
 
-    private Instant createdAt;
+  private boolean deliveryAvailable;
+  private boolean cookAtClientHome;
+  private boolean pickupAvailable;
+
+  private String chefUsername;
+  private Instant createdAt;
 }
