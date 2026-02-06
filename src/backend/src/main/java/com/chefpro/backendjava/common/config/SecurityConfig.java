@@ -72,6 +72,7 @@ public class SecurityConfig {
         // ENDPOINTS PÚBLICOS DE MENÚS
         // ========================================
         .requestMatchers(HttpMethod.GET, "/api/chef/menus/public").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/chef/search").permitAll()
 
         // ========================================
         // RUTAS PROTEGIDAS POR ROL - CHEF
