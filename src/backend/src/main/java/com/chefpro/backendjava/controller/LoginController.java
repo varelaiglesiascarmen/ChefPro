@@ -54,6 +54,8 @@ public class LoginController {
     UserLoginDto userLoginDto = new UserLoginDto();
     userLoginDto.setId(userFound.getId());
     userLoginDto.setName(userFound.getName());
+    userLoginDto.setSurname(userFound.getSurname());
+    userLoginDto.setUsername(userFound.getUsername());
     userLoginDto.setEmail(userFound.getEmail());
     userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
     userLoginDto.setRole(role);
@@ -86,7 +88,10 @@ public class LoginController {
     UserLoginDto userLoginDto = new UserLoginDto();
     userLoginDto.setId(userFound.getId());
     userLoginDto.setName(userFound.getName());
+    userLoginDto.setSurname(userFound.getSurname());
+    userLoginDto.setUsername(userFound.getUsername());
     userLoginDto.setEmail(userFound.getEmail());
+    userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
     userLoginDto.setRole(role);
 
     return ResponseEntity.ok(userLoginDto);
@@ -118,6 +123,8 @@ public class LoginController {
       UserLoginDto userLoginDto = new UserLoginDto();
       userLoginDto.setId(userFound.getId());
       userLoginDto.setName(userFound.getName());
+      userLoginDto.setSurname(userFound.getSurname());
+      userLoginDto.setUsername(userFound.getUsername());
       userLoginDto.setEmail(userFound.getEmail());
       userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
       userLoginDto.setRole(role);
