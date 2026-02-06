@@ -1,0 +1,111 @@
+<div class="chef-creator fadeIn">
+  <header class="header">
+    <h1>Crear Propuesta Gastronómica</h1>
+    <p>Diseña una experiencia única para tus futuros comensales</p>
+  </header>
+
+  <section class="card">
+    <h3>Detalles del Menú</h3>
+
+    <div class="input-group mb-small">
+      <label class="label-bold">Titulo del Menu</label>
+      <input [(ngModel)]="menuForm.title" placeholder="Ej: Banquete de Caza y Setas">
+    </div>
+
+    <div class="input-group mb-small">
+      <label class="label-bold">Descripcion del Menu</label>
+      <textarea [(ngModel)]="menuForm.description" rows="4"
+        placeholder="Describe la historia y el concepto de este menú..."></textarea>
+    </div>
+
+    <div class="row-3 grid-labels">
+      <div class="input-group">
+        <label class="label-subtitle">Precio por persona</label>
+        <input type="number" [(ngModel)]="menuForm.price_per_person" min="1" placeholder="0.00" (keydown)="blockSomeKeys($event)">
+      </div>
+
+      <div class="input-group">
+        <label class="label-subtitle">Mínimo de comensales</label>
+        <input type="number" [(ngModel)]="menuForm.min_number_diners" min="1" (keydown)="blockSomeKeys($event)"
+          (blur)="sanitizeInteger('min_number_diners')" placeholder="2">
+      </div>
+
+      <div class="input-group">
+        <label class="label-subtitle">Máximo de comensales</label>
+        <input type="number" [(ngModel)]="menuForm.max_number_diners" min="1" (keydown)="blockSomeKeys($event)"
+          (blur)="sanitizeInteger('max_number_diners')" placeholder="10">
+      </div>
+    </div>
+
+    <div class="kitchen-section">
+      <label class="label-bold">Requisitos de tu cocina</label>
+      <p class="helper-text">Escribe un requisito (ej: Horno) y pulsa Enter.</p>
+      <div class="tags-container">
+        <span *ngFor="let tag of kitchenTags; let i = index" class="skill-tag">
+          {{ tag }}
+          <button class="remove-tag" (click)="removeKitchenTag(i)">&times;</button>
+        </span>
+        <input [(ngModel)]="currentTagInput" (keydown.enter)="addKitchenTag($event)" placeholder="Añadir requisito...">
+      </div>
+    </div>
+  </section>
+
+  <div class="dishes-section">
+    <div class="dishes-header">
+      <h2>Platos del Menú</h2>
+      <button class="btn-add" (click)="addDish()" [disabled]="dishes.length >= 6">+ Añadir Plato</button>
+    </div>
+
+    <div *ngFor="let dish of dishes; let i = index" class="dish-card fadeIn">
+      <div class="dish-header-row">
+        <h3>Plato {{ i + 1 }}</h3>
+        <button *ngIf="dishes.length > 1" class="btn-remove-dish" (click)="removeDish(i)">Eliminar Plato</button>
+      </div>
+
+      <div class="dish-main-info">
+        <div class="input-row">
+          <div class="field">
+            <label class="label-subtitle">Nombre del Plato</label>
+            <input [(ngModel)]="dish.title" placeholder="Ej: Solomillo al Pedro Ximénez">
+          </div>
+          <div class="field">
+            <label class="label-subtitle">Categoria</label>
+            <select [(ngModel)]="dish.category">
+              <option value="Entrante">Entrante</option>
+              <option value="Plato Principal">Plato Principal</option>
+              <option value="Postre">Postre</option>
+              <option value="Bebida">Bebida</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="label-subtitle">Descripcion del Plato</label>
+        <textarea [(ngModel)]="dish.description" rows="2" placeholder="Detalla los ingredientes clave..."></textarea>
+
+        <div class="allergen-box">
+          <label class="label-subtitle">Alergenos presentes</label>
+          <div class="allergen-grid">
+            <label *ngFor="let alg of officialAllergens" [class.selected]="dish.allergenIds.includes(alg.id)"
+              (click)="toggleAllergen(i, alg.id)">
+              <span class="alg-num">{{ alg.id }}</span>
+              <span class="allergen-name">{{ alg.name }}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="photo-upload">
+          <label class="label-subtitle">Foto del plato (Máx 2MB)</label>
+          <input type="file" (change)="onFileSelected($event, i)" accept="image/*">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-save" (click)="saveMenu()" [disabled]="!isFormValid()">
+      Publicar Menú en Chef Pro
+    </button>
+    <p class="warning" *ngIf="!isFormValid()">* Debes completar todos los títulos, descripciones y al menos un alérgeno
+      por plato.</p>
+  </div>
+</div>

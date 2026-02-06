@@ -2,6 +2,7 @@
 export interface User {
   user_ID: number;
   role: 'ADMIN' | 'CHEF' | 'DINER';
+  userName: string;
   name: string;
   lastname: string;
   email: string;
