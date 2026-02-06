@@ -34,10 +34,9 @@ WORKDIR /app
 # Copy the .jar generated in the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Railway injects the PORT variable automatically.
-# Spring Boot reads it via ${PORT:8081} in application.yml
-EXPOSE ${PORT:-8081}
+# Expose port 8080 (Spring Boot 4.0 default)
+EXPOSE 8080
 
-# Command to start the application
-# - Uses Railway's PORT variable as the server port
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Start the application
+# Railway injects PORT; we pass it as server.port so Spring listens on the right port
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]

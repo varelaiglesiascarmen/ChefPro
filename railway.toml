@@ -14,9 +14,7 @@ dockerfilePath = "src/backend/Dockerfile"
 dockerContext = "."
 
 [deploy]
-# Use sh -c so $PORT gets expanded by the shell
-startCommand = "sh -c 'java -Dserver.port=${PORT:-8080} -jar /app/app.jar'"
-# Railway injects $PORT; Spring Boot reads it via ${PORT:8081}
+# Railway injects $PORT; Spring Boot reads it via ${PORT:8080}
 # Healthcheck: Railway verifies the app responds before routing traffic
 healthcheckPath = "/api/auth/health"
 healthcheckTimeout = 300
