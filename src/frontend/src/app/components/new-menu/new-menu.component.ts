@@ -1,23 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // Importación vital
+import { Router } from '@angular/router'; 
 import { AuthService } from '../../services/auth.service';
 import { ChefService } from '../../services/chef.service';
 
 @Component({
-  selector: 'app-create-menu',
+  selector: 'app-new-menu',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './create-menu.component.html',
-  styleUrls: ['./create-menu.component.css']
+  templateUrl: './new-menu.component.html',
+  styleUrls: ['./new-menu.component.css']
 })
-export class CreateMenuComponent implements OnInit {
+export class NewMenuComponent implements OnInit {
   private authService = inject(AuthService);
   private chefService = inject(ChefService);
-  private router = inject(Router); // Inyectamos el router para ir a /profile
+  private router = inject(Router);
 
-  // Lista oficial con IDs (para que coincida con la vista de detalle que me has pasado)
   officialAllergens = [
     { id: 1, name: 'Cereales con gluten' }, { id: 2, name: 'Crustáceos' },
     { id: 3, name: 'Huevos' }, { id: 4, name: 'Pescado' },
@@ -34,19 +33,39 @@ export class CreateMenuComponent implements OnInit {
     price_per_person: 0,
     min_number_diners: 2,
     max_number_diners: 10,
-    kitchen_requirements: '' // Tu Task List para el Chef
+    kitchen_requirements: ''
   };
 
   dishes: any[] = [];
+  kitchenTags: string[] = [];
+  currentTagInput: string = '';
 
   ngOnInit() {
-    // Verificamos rol: solo CHEF puede estar aquí
+    // We verify that only users of the chef type can see this interface. If not, we redirect to login.
     const user = this.authService.currentUserValue;
     if (!user || user.role !== 'CHEF') {
       this.router.navigate(['/login']);
       return;
     }
-    this.addDish(); // Empezamos con un plato
+    this.addDish();
+  }
+
+  // save skills form kitchen_requirements as an array of tags, but keep the database field as a comma-separated string for compatibility with the existing schema
+  addKitchenTag(event: any): void {
+    event.preventDefault();
+
+    const value = this.currentTagInput.trim();
+    if (value && !this.kitchenTags.includes(value)) {
+      this.kitchenTags.push(value);
+      // Synchronize the database field (separating skills with commas)
+      this.menuForm.kitchen_requirements = this.kitchenTags.join(', ');
+    }
+    this.currentTagInput = '';
+  }
+
+  removeKitchenTag(index: number): void {
+    this.kitchenTags.splice(index, 1);
+    this.menuForm.kitchen_requirements = this.kitchenTags.join(', ');
   }
 
   addDish() {
@@ -55,7 +74,7 @@ export class CreateMenuComponent implements OnInit {
         title: '',
         description: '',
         category: 'Plato Principal',
-        allergenIds: [], // Guardaremos los números [1, 7, etc.]
+        allergenIds: [],
         photo: null
       });
     }
@@ -72,12 +91,12 @@ export class CreateMenuComponent implements OnInit {
     else ids.push(allergenId);
   }
 
-  // Lógica UX: Solo 1 foto por plato y máx 2MB
+  // UX logic: Only 1 photo per dish and max. 2MB
   onFileSelected(event: any, index: number) {
     const file = event.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen es demasiado pesada. Máximo 2MB para no colapsar la BBDD.');
+        alert('La imagen es demasiado pesada. Máximo 2MB.');
         event.target.value = '';
         return;
       }
@@ -85,15 +104,40 @@ export class CreateMenuComponent implements OnInit {
     }
   }
 
-  // Lógica de Negocio: Validar campos obligatorios
+  // validate obligatory fields and that the number of diners is correct
   isFormValid(): boolean {
-    const isMenuOk = this.menuForm.title && this.menuForm.price_per_person > 0;
+    // Validate basic menu data
+    const isMenuOk =
+      this.menuForm.title.trim() !== '' &&
+      this.menuForm.price_per_person >= 1 &&
+      this.menuForm.min_number_diners >= 1 &&
+      this.menuForm.max_number_diners >= 1 &&
+      Number.isInteger(this.menuForm.min_number_diners) &&
+      this.menuForm.max_number_diners >= this.menuForm.min_number_diners;
+
+    // check that the dishes are complete
     const areDishesOk = this.dishes.length > 0 && this.dishes.every(d =>
       d.title.trim() !== '' &&
       d.description.trim() !== '' &&
-      d.allergenIds.length > 0 // Alérgenos obligatorios
+      d.allergenIds.length > 0
     );
+
     return !!(isMenuOk && areDishesOk);
+  }
+
+  // block letters and symbols in the form
+  blockSomeKeys(event: KeyboardEvent): void {
+    if (event.key === '.' || event.key === ',' || event.key === '-' || event.key === '+' || event.key === '0' || event.key === 'e' || event.key === 'E') {
+      event.preventDefault();
+    }
+  }
+
+  // round up if the user manages to enter a decimal point.
+  sanitizeInteger(field: 'min_number_diners' | 'max_number_diners'): void {
+    const value = this.menuForm[field];
+    if (value) {
+      this.menuForm[field] = Math.round(value);
+    }
   }
 
   saveMenu() {
@@ -101,14 +145,13 @@ export class CreateMenuComponent implements OnInit {
 
     const chefId = this.authService.currentUserValue?.user_ID;
 
-    // 1. Enviamos el Menú (Endpoint 5)
+    // send new menu to back and get the new menu ID back, then send each dish with that menu ID
     const menuPayload = { ...this.menuForm, chef_ID: chefId };
 
     this.chefService.createMenu(menuPayload).subscribe({
       next: (resMenu: any) => {
         const newMenuId = resMenu.menu_ID;
 
-        // 2. Enviamos los platos a la API /plato (Endpoint 6)
         this.dishes.forEach((dish, index) => {
           const dishPayload = {
             menu_ID: newMenuId,
@@ -116,14 +159,14 @@ export class CreateMenuComponent implements OnInit {
             title: dish.title,
             description: dish.description,
             category: dish.category,
-            allergenIds: dish.allergenIds // Enviamos los números [1, 7...]
+            allergenIds: dish.allergenIds
           };
 
           this.chefService.createDish(dishPayload).subscribe();
         });
 
-        alert('✅ ¡Menú creado con éxito!');
-        this.router.navigate(['/profile']); // Redirigimos al perfil privado del chef
+        alert('¡Menú creado con éxito!');
+        this.router.navigate(['/profile']);
       },
       error: (err) => alert('Error al crear el menú base. Revisa la conexión.')
     });
