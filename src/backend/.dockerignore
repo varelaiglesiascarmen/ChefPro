@@ -1,4 +1,4 @@
-# Ignorar carpeta target (se genera dentro del contenedor)
+# Ignore target folder (generated inside the container)
 target/
 
 # IDE

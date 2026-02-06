@@ -1,48 +1,48 @@
 # ============================================
-# Dockerfile multi-stage para ChefPro Backend
+# Multi-stage Dockerfile for ChefPro Backend
 # ============================================
-# Etapa 1: Compilación (build)
-# Usamos una imagen con Maven y JDK 17 para compilar el proyecto.
-# Etapa 2: Ejecución (runtime)
-# Usamos una imagen ligera solo con JRE para ejecutar el .jar resultante.
+# Stage 1: Build
+# Uses an image with Maven and JDK 17 to compile the project.
+# Stage 2: Runtime
+# Uses a lightweight JRE-only image to run the resulting .jar.
 # ============================================
 
-# ---------- ETAPA 1: BUILD ----------
+# ---------- STAGE 1: BUILD ----------
 FROM eclipse-temurin:17-jdk AS build
 
-# Directorio de trabajo dentro del contenedor
+# Working directory inside the container
 WORKDIR /app
 
-# Copiamos el wrapper de Maven y el pom.xml primero (para aprovechar la caché de Docker)
-# Si el pom.xml no cambia, Docker reutiliza esta capa y no vuelve a descargar dependencias.
+# Copy the Maven wrapper and pom.xml first (to leverage Docker layer caching)
+# If pom.xml hasn't changed, Docker reuses this layer and skips downloading dependencies.
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Damos permiso de ejecución al wrapper de Maven
+# Grant execute permission to the Maven wrapper
 RUN chmod +x mvnw
 
-# Descargamos las dependencias sin compilar el código (esto se cachea)
+# Download dependencies without compiling the code (this gets cached)
 RUN ./mvnw dependency:go-offline -B
 
-# Ahora sí copiamos todo el código fuente
+# Now copy all the source code
 COPY src src
 
-# Compilamos el proyecto y generamos el .jar (sin ejecutar tests para acelerar el build)
+# Build the project and generate the .jar (skip tests to speed up the build)
 RUN ./mvnw package -DskipTests -B
 
-# ---------- ETAPA 2: RUNTIME ----------
+# ---------- STAGE 2: RUNTIME ----------
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-# Copiamos el .jar generado en la etapa de build
+# Copy the .jar generated in the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Railway inyecta la variable PORT automáticamente.
-# Spring Boot la lee gracias a ${PORT:8081} en application.yml
+# Railway injects the PORT variable automatically.
+# Spring Boot reads it via ${PORT:8081} in application.yml
 EXPOSE ${PORT:-8081}
 
-# Comando para arrancar la aplicación
-# - Usamos la variable PORT de Railway como puerto del servidor
+# Command to start the application
+# - Uses Railway's PORT variable as the server port
 ENTRYPOINT ["java", "-jar", "app.jar"]
