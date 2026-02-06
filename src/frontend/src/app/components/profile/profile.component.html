@@ -1,1 +1,89 @@
-<p>profile.component works!</p>
+<div class="profile-wrapper fadeIn">
+
+  <div *ngIf="role === 'CHEF'" class="chef-dashboard">
+
+    <aside class="sidebar">
+      <div class="chef-info-min">
+        <img [src]="chefProfile.photo || 'assets/default-chef.png'" class="avatar">
+        <h3>Chef {{ user.name }}</h3>
+        <span class="badge-role">Professional Chef</span>
+      </div>
+
+      <nav class="side-nav">
+        <button [class.active]="activeTab === 'info'" (click)="activeTab = 'info'">Mi Perfil</button>
+        <button [class.active]="activeTab === 'menus'" (click)="activeTab = 'menus'">Mis Menús</button>
+        <button [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+          Pedidos
+          <span class="counter" *ngIf="pendingOrders.length > 0">{{ pendingOrders.length }}</span>
+        </button>
+        <button [class.active]="activeTab === 'calendar'" (click)="activeTab = 'calendar'">Calendario</button>
+      </nav>
+
+      <button class="btn-logout" (click)="authService.logout()">Cerrar Sesión</button>
+    </aside>
+
+    <main class="content-area">
+
+      <section *ngIf="activeTab === 'info'" class="tab-card card">
+        <div class="header-row">
+          <h2>Información Profesional</h2>
+          <button class="btn-edit" (click)="editMode = !editMode">
+            {{ editMode ? 'Guardar' : 'Editar' }}
+          </button>
+        </div>
+        <div class="profile-form">
+          <label>Biografía</label>
+          <textarea [(ngModel)]="chefProfile.bio" [disabled]="!editMode"></textarea>
+
+          <label>Premios y Reconocimientos</label>
+          <input [(ngModel)]="chefProfile.prizes" [disabled]="!editMode">
+
+          <div class="user-static-info">
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Teléfono:</strong> {{ user.phone_number }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="activeTab === 'menus'" class="tab-card">
+        <div class="header-row">
+          <h2>Mis Menús</h2>
+          <button class="btn-gold" (click)="router.navigate(['/create-menu'])">+ Nuevo Menú</button>
+        </div>
+        <div class="menu-grid">
+          <div *ngFor="let menu of myMenus" class="mini-menu-card card">
+            <h4>{{ menu.title }}</h4>
+            <p class="price">{{ menu.price_per_person }}€/pers</p>
+            <div class="actions">
+              <button class="btn-small">Editar</button>
+              <button class="btn-small btn-danger" (click)="deleteMenu(menu.menu_ID)">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="activeTab === 'orders'" class="tab-card">
+        <h2>Buzón de Comandas</h2>
+        <div class="orders-list">
+          <div *ngFor="let order of pendingOrders" class="order-item card">
+            <div class="order-info">
+              <span class="date">{{ order.date | date:'dd/MM/yyyy' }}</span>
+              <p><strong>Comensal:</strong> {{ order.diner_ID }} ({{ order.n_diners }} personas)</p>
+              <p><strong>Dirección:</strong> {{ order.address }}</p>
+            </div>
+            <div class="order-btns">
+              <button class="btn-accept" (click)="updateStatus(order, 'CONFIRMED')">Aceptar</button>
+              <button class="btn-reject" (click)="updateStatus(order, 'REJECTED')">Rechazar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div *ngIf="role === 'DINER'" class="diner-view">
+    <h1>Mi Perfil de Comensal</h1>
+    </div>
+
+</div>
