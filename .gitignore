@@ -68,6 +68,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Docker / DevContainer
+.env
+
 # System files
 .DS_Store
 Thumbs.db

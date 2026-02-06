@@ -1,0 +1,43 @@
+// ==========================================================================
+// ChefPro – Dev Container (VS Code)
+// ==========================================================================
+// Abre el proyecto en VS Code → Ctrl+Shift+P → "Dev Containers: Reopen in Container"
+// Esto levanta los 3 servicios (MySQL, Backend, Frontend) y conecta VS Code
+// al contenedor del frontend para desarrollo con hot-reload.
+// ==========================================================================
+{
+  "name": "ChefPro Dev",
+
+  // Usa el docker-compose.yml de la raíz del proyecto
+  "dockerComposeFile": "../docker-compose.yml",
+
+  // VS Code se conecta al contenedor del frontend
+  "service": "frontend",
+  "workspaceFolder": "/app",
+
+  // Puertos accesibles desde el navegador del host
+  "forwardPorts": [4200, 8081, 3306],
+  "portsAttributes": {
+    "4200": { "label": "Frontend (Angular)", "onAutoForward": "openBrowser" },
+    "8081": { "label": "Backend (Spring Boot)", "onAutoForward": "silent" },
+    "3306": { "label": "MySQL", "onAutoForward": "silent" }
+  },
+
+  // Instalar dependencias al crear el contenedor
+  "postCreateCommand": "npm install",
+
+  // Extensiones recomendadas dentro del contenedor
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "angular.ng-template",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "sh"
+      }
+    }
+  }
+}
