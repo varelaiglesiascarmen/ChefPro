@@ -118,9 +118,6 @@ public class MenuServiceImpl implements MenuService {
       .pricePerPerson(menu.getPricePerPerson())
       .dishes(dishes)
       .allergens(allergens)
-      .deliveryAvailable(false)
-      .cookAtClientHome(false)
-      .pickupAvailable(false)
       .chefUsername(menu.getChef().getUser().getUsername())
       .createdAt(null)
       .build();
@@ -184,9 +181,6 @@ public class MenuServiceImpl implements MenuService {
 
       .dishes(List.of())
       .allergens(Set.of())
-      .deliveryAvailable(false)
-      .cookAtClientHome(false)
-      .pickupAvailable(false)
 
       .chefUsername(authentication.getName())
       .createdAt(null)
@@ -198,20 +192,10 @@ public class MenuServiceImpl implements MenuService {
   public List<MenuDTO> listAllMenus(
     String title,
     String description,
-    Boolean pickUpAvailable,
-    String chefUsername,
-    Boolean deliveryAvailable,
-    Boolean cookAtClientHome) {
+    String chefUsername) {
 
     // Obtener menús con filtros aplicados
-    List<Menu> menus = menuRepository.findAllWithDishesAndFilters(
-      title,
-      description,
-      chefUsername,
-      pickUpAvailable,
-      deliveryAvailable,
-      cookAtClientHome
-    );
+    List<Menu> menus = menuRepository.findAllWithDishesAndFilters(title, description, chefUsername);
 
     // Si no hay resultados con los filtros, obtener todos los menús
     if (menus.isEmpty()) {

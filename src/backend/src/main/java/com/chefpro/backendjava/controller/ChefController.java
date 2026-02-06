@@ -38,7 +38,7 @@ public class ChefController {
     this.chefProfileService = chefProfileService;
   }
 
-  @GetMapping("/chef/search")
+  @GetMapping("/search")
   public ResponseEntity<Page<ChefSearchDto>> searchChefs(
     @RequestParam(required = false) String name,
     @RequestParam(required = false)
@@ -119,24 +119,10 @@ public class ChefController {
   @GetMapping("/menus/public")
   public ResponseEntity<List<MenuDTO>> getAllMenusPublic(@RequestParam(required = false) String title,
                                                          @RequestParam (required = false) String description,
-                                                         @RequestParam(required = false) Boolean pickUpAvailable,
                                                          @RequestParam(required = false) String chefUsername,
-                                                         @RequestParam(required = false) Boolean deliveryAvailable,
-                                                         @RequestParam(required = false) Boolean cookAtClientHome,
                                                          @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-    List<MenuDTO> menus = menuService.listAllMenus(title, description, pickUpAvailable, chefUsername, deliveryAvailable, cookAtClientHome);
+    List<MenuDTO> menus = menuService.listAllMenus(title, description, chefUsername);
     return ResponseEntity.ok(menus);
-  }
-
-  @GetMapping("/search")
-  public ResponseEntity<Page<ChefSearchDto>> searchChefs(
-    @RequestParam(required = false) String name,
-    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-
-    Page<ChefSearchDto> result = chefSearchService.search(name, date, pageable);
-
-    return ResponseEntity.ok(result);
   }
 
   // ========================================

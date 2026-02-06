@@ -23,17 +23,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     "LEFT JOIN FETCH c.user u " +
     "WHERE (:title IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
     "AND (:description IS NULL OR LOWER(m.description) LIKE LOWER(CONCAT('%', :description, '%'))) " +
-    "AND (:chefUsername IS NULL OR LOWER(u.username) = LOWER(:chefUsername)) " +
-    "AND (:pickUpAvailable IS NULL OR c.pickUpAvailable = :pickUpAvailable) " +
-    "AND (:deliveryAvailable IS NULL OR c.deliveryAvailable = :deliveryAvailable) " +
-    "AND (:cookAtClientHome IS NULL OR c.cookAtClientHome = :cookAtClientHome)")
+    "AND (:chefUsername IS NULL OR LOWER(u.username) = LOWER(:chefUsername)) ")
   List<Menu> findAllWithDishesAndFilters(
     @Param("title") String title,
     @Param("description") String description,
-    @Param("chefUsername") String chefUsername,
-    @Param("pickUpAvailable") Boolean pickUpAvailable,
-    @Param("deliveryAvailable") Boolean deliveryAvailable,
-    @Param("cookAtClientHome") Boolean cookAtClientHome
+    @Param("chefUsername") String chefUsername
   );
 
   // Nuevo método para obtener todos los menús sin filtros

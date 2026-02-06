@@ -36,10 +36,6 @@ public class MenuDTO {
   @JsonProperty("kitchen_requirements")
   private String kitchenRequirements;
 
-  private boolean deliveryAvailable;
-  private boolean cookAtClientHome;
-  private boolean pickupAvailable;
-
   private String chefUsername;
   private Instant createdAt;
 }

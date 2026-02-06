@@ -17,5 +17,5 @@ public interface MenuService {
 
   MenuDTO updateMenu (Authentication authentication, MenuUReqDto uReq);
 
-  List<MenuDTO> listAllMenus(String title, String description, Boolean pickUpAvailable, String chefUsername, Boolean deliveryAvailable, Boolean cookAtClientHome);
+  List<MenuDTO> listAllMenus(String title, String description, String chefUsername);
 }
