@@ -1,6 +1,6 @@
 /**
- * DTOs para las respuestas públicas de perfil de chef y detalle de menú.
- * Corresponden 1:1 con los DTOs del backend (ChefPublicDetailDto, MenuPublicDetailDto).
+ * DTOs for the public chef profile and menu detail responses.
+ * Map 1:1 to the backend DTOs (ChefPublicDetailDto, MenuPublicDetailDto).
  */
 
 export interface ReviewSummary {
@@ -61,4 +61,17 @@ export interface MenuPublicDetail {
   chefPhoto: string;
   dishes: DishPublic[];
   busyDates: string[];
+}
+
+/**
+ * Interface for partial chef profile updates.
+ * All fields are optional (semantic PATCH).
+ */
+export interface ChefProfileUpdate {
+  photo?: string;
+  bio?: string;
+  prizes?: string;
+  location?: string;
+  languages?: string;
+  coverPhoto?: string;
 }

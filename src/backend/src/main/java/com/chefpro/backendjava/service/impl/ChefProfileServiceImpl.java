@@ -4,6 +4,7 @@ import com.chefpro.backendjava.common.object.dto.*;
 import com.chefpro.backendjava.common.object.entity.*;
 import com.chefpro.backendjava.repository.*;
 import com.chefpro.backendjava.service.ChefProfileService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,5 +168,25 @@ public class ChefProfileServiceImpl implements ChefProfileService {
       .dishes(dishes)
       .busyDates(busyDates)
       .build();
+  }
+
+  @Override
+  @Transactional
+  public ChefPublicDetailDto updateChefProfile(Authentication authentication, ChefUReqDto dto) {
+    Chef chef = chefRepository.findByUser_Username(authentication.getName())
+      .orElseThrow(() -> new NoSuchElementException("Chef not found for user: " + authentication.getName()));
+
+    // Partial update: only non-null DTO fields are applied
+    if (dto.getPhoto() != null)     chef.setPhoto(dto.getPhoto());
+    if (dto.getBio() != null)       chef.setBio(dto.getBio());
+    if (dto.getPrizes() != null)    chef.setPrizes(dto.getPrizes());
+    if (dto.getLocation() != null)  chef.setLocation(dto.getLocation());
+    if (dto.getLanguages() != null) chef.setLanguages(dto.getLanguages());
+    if (dto.getCoverPhoto() != null) chef.setCoverPhoto(dto.getCoverPhoto());
+
+    chefRepository.save(chef);
+
+    // Reuse the existing method to return the full updated profile
+    return getChefPublicProfile(chef.getId());
   }
 }
