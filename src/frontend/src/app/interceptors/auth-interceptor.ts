@@ -18,8 +18,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/api/chef/search'
   ];
 
+  // Dynamic public URL patterns (e.g. /api/chef/42/profile, /api/chef/menus/7/public)
+  const publicPatterns: RegExp[] = [
+    /\/api\/chef\/\d+\/profile$/,
+    /\/api\/chef\/menus\/\d+\/public$/
+  ];
+
   // Check if the request is to a public endpoint
-  const isPublicEndpoint = publicEndpoints.some(endpoint => req.url.includes(endpoint));
+  const isPublicEndpoint =
+    publicEndpoints.some(endpoint => req.url.includes(endpoint)) ||
+    publicPatterns.some(pattern => pattern.test(req.url));
 
   if (isPublicEndpoint) {
     return next(req);
