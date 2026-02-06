@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ChefService } from '../../services/chef.service';
 import { Router } from '@angular/router';
+import { CalendarComponent } from '../calendar/calendar.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CalendarComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -33,6 +34,9 @@ export class ProfileComponent implements OnInit {
   currentDate = new Date();
   calendarDays: any[] = [];
 
+  selectedDate: string | null = null;
+  selectedDayOrders: any[] = [];
+
   ngOnInit() {
     this.user = this.authService.currentUserValue;
     if (!this.user) {
@@ -53,8 +57,22 @@ export class ProfileComponent implements OnInit {
     this.chefService.getChefReservations(id).subscribe(data => {
       this.reservations = data;
       this.pendingOrders = data.filter((r: any) => r.status === 'PENDING');
-      this.generateCalendar(); // Generamos los días una vez tenemos las fechas
     });
+  }
+
+  onDateSelected(date: string) {
+    this.selectedDate = date;
+
+    // Filtramos las reservas del Chef para ese día específico
+    this.selectedDayOrders = this.reservations.filter(res => res.date === date);
+
+    console.log(`Día seleccionado: ${date}`, this.selectedDayOrders);
+  }
+
+  getBusyDates(): string[] {
+    return this.reservations
+      .filter(res => res.status === 'CONFIRMED')
+      .map(res => res.date);
   }
 
   // --- MÉTODO OLVIDADO: GUARDAR PERFIL ---
