@@ -8,28 +8,23 @@
 # ============================================
 
 # ---------- STAGE 1: BUILD ----------
-FROM eclipse-temurin:17-jdk AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 
 # Working directory inside the container
 WORKDIR /app
 
-# Copy the Maven wrapper and pom.xml first (to leverage Docker layer caching)
+# Copy pom.xml first (to leverage Docker layer caching)
 # If pom.xml hasn't changed, Docker reuses this layer and skips downloading dependencies.
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
 
-# Grant execute permission to the Maven wrapper
-RUN chmod +x mvnw
-
 # Download dependencies without compiling the code (this gets cached)
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Now copy all the source code
 COPY src src
 
 # Build the project and generate the .jar (skip tests to speed up the build)
-RUN ./mvnw package -DskipTests -B
+RUN mvn package -DskipTests -B
 
 # ---------- STAGE 2: RUNTIME ----------
 FROM eclipse-temurin:17-jre
