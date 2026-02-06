@@ -48,7 +48,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
-      - "18081:8081"
+      - "18080:8080"
     volumes:
       - ./src/backend:/app
       # Maven cache to avoid downloading dependencies each time

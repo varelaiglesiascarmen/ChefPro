@@ -233,7 +233,7 @@ https://TU-DOMINIO.up.railway.app/swagger-ui/index.html
 3. Errores comunes:
    - `Communications link failure` → Las variables de conexión a MySQL son incorrectas
    - `Access denied` → Usuario/contraseña de BD incorrectos
-   - `Port already in use` → No debes hardcodear el puerto; usa `${PORT:8081}`
+   - `Port already in use` → No debes hardcodear el puerto; usa `${PORT:8080}`
 
 ### Los tests fallan en GitHub Actions
 

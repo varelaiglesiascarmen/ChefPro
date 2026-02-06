@@ -48,7 +48,7 @@ const MOCK_CHEFS: Chef[] = [
 })
 export class ChefService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8081/api';
+  private readonly apiUrl = 'http://localhost:8080/api';
 
   /**
    * Filters the chef list based on search criteria.
