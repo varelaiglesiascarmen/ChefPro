@@ -1,0 +1,148 @@
+.chef-menus-container {
+  padding: 40px;
+}
+
+.header-dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 50px;
+  border-bottom: 1px solid #EAE0D5;
+  padding-bottom: 20px;
+}
+
+.header-dashboard h1 {
+  font-family: 'Playfair Display', serif;
+  color: #2C1810;
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.header-dashboard p {
+  color: #A69080;
+  margin: 5px 0 0;
+}
+
+.menus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 35px;
+}
+
+.create-new-card {
+  border: 2px dashed #C5A059 !important;
+  background: #FDF7F0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  min-height: 350px;
+  transition: all 0.3s ease !important;
+}
+
+.create-new-card:hover {
+  background: #C5A059 !important;
+  border-style: solid !important;
+}
+
+.create-new-card:hover p,
+.create-new-card:hover small,
+.create-new-card:hover .plus-circle {
+  color: white !important;
+}
+
+.plus-circle {
+  font-size: 3rem;
+  color: #C5A059;
+  margin-bottom: 15px;
+  font-weight: 200;
+}
+
+.create-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.create-content p {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #2C1810;
+  margin: 0;
+}
+
+.create-content small {
+  color: #A69080;
+}
+
+.menu-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(44, 24, 16, 0.05);
+  border: 1px solid #EAE0D5;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-thumb {
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.badge-price {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: #C5A059;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.menu-body {
+  padding: 25px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-body h3 {
+  font-family: 'Playfair Display', serif;
+  margin: 0 0 10px;
+  color: #2C1810;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: #666;
+  flex-grow: 1;
+}
+
+.menu-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #FDF7F0;
+}
+
+.btn-action.edit {
+  background: #2C1810;
+  color: #C5A059;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-action.delete {
+  background: transparent;
+  border: none;
+  color: #C0392B;
+  cursor: pointer;
+}

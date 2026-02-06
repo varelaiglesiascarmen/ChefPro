@@ -47,9 +47,6 @@ export const routes: Routes = [
   // search-results root
   { path: 'search-results', component: SearchResultsComponent },
 
-  // new-menu root
-  { path: 'new-menu', component: NewMenuComponent },
-
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
 
@@ -61,6 +58,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'info', pathMatch: 'full' },
       { path: 'info', component: UserInfoComponent },
       { path: 'menus', component: ChefMenusComponent },
+      { path: 'new-menu', component: NewMenuComponent },
       { path: 'calendar', component: UserCalendarComponent },
       { path: 'orders', component: UserOrdersComponent }
     ]
