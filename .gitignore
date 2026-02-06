@@ -68,9 +68,8 @@ testem.log
 /typings
 __screenshots__/
 
-# Environment variables
+# Docker
 .env
-.env.*
 
 # System files
 .DS_Store

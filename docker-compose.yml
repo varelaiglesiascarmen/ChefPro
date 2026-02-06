@@ -1,0 +1,95 @@
+# ============================================================================
+# ChefPro – Docker Compose (Development)
+# ============================================================================
+# Start the entire environment:  docker compose up
+# Database only:                 docker compose up db
+# Stop everything:               docker compose down
+# Delete MySQL data:             docker compose down -v
+# ============================================================================
+
+services:
+  # --------------------------------------------------------------------------
+  # MySQL 8.0 Database
+  # --------------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: chefpro-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "13306:3306"
+    volumes:
+      # Initialization scripts (executed only on first run)
+      - ./src/backend/src/main/resources/database/01-create-schema.sql:/docker-entrypoint-initdb.d/01-create-schema.sql:ro
+      - ./src/backend/src/main/resources/database/02-seeds.sql:/docker-entrypoint-initdb.d/02-seeds.sql:ro
+      # Data persistence between restarts
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # --------------------------------------------------------------------------
+  # Backend – Spring Boot (Java 17)
+  # --------------------------------------------------------------------------
+  backend:
+    image: eclipse-temurin:17-jdk
+    container_name: chefpro-backend
+    restart: unless-stopped
+    working_dir: /app
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "18081:8081"
+    volumes:
+      - ./src/backend:/app
+      # Maven cache to avoid downloading dependencies each time
+      - maven-repo:/root/.m2
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "chmod +x mvnw && ./mvnw spring-boot:run
+      -Dspring-boot.run.jvmArguments='-Dspring.datasource.url=$${SPRING_DATASOURCE_URL}
+      -Dspring.datasource.username=$${SPRING_DATASOURCE_USERNAME}
+      -Dspring.datasource.password=$${SPRING_DATASOURCE_PASSWORD}'"
+
+  # --------------------------------------------------------------------------
+  # Frontend – Angular 21 (Node 22)
+  # --------------------------------------------------------------------------
+  frontend:
+    image: node:22-slim
+    container_name: chefpro-frontend
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "14200:4200"
+    volumes:
+      - ./src/frontend:/app
+      # node_modules inside the container (avoids conflicts with host)
+      - frontend-node-modules:/app/node_modules
+    depends_on:
+      - backend
+    command: >
+      sh -c "npm install && npx ng serve
+      --host 0.0.0.0
+      --port 4200
+      --proxy-config proxy.conf.docker.json
+      --poll 2000
+      --configuration development"
+
+volumes:
+  mysql-data:
+    name: chefpro-mysql-data
+  maven-repo:
+    name: chefpro-maven-repo
+  frontend-node-modules:
+    name: chefpro-frontend-node-modules
