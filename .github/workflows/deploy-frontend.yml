@@ -1,0 +1,142 @@
+# ============================================================
+# Workflow: Deploy Frontend to Vercel
+# ============================================================
+# This workflow deploys the Angular application to Vercel.
+#
+# - Push to main (with changes in src/frontend/) → PRODUCTION deploy
+# - Pull Request against main                    → PREVIEW deploy
+#
+# ============================================================
+# PREREQUISITES (one-time manual setup):
+#
+# 1. Create an account at https://vercel.com (free for personal projects).
+# 2. Install the CLI:  npm i -g vercel
+# 3. Authenticate:     vercel login
+# 4. Link the repo:    vercel link  (from the repo root)
+#    → This generates an orgId and projectId (saved in .vercel/project.json)
+# 5. Create an API token in Vercel Dashboard → Settings → Tokens.
+# 6. Add these 3 secrets in GitHub (Settings → Secrets → Actions):
+#    - VERCEL_TOKEN       → the API token
+#    - VERCEL_ORG_ID      → orgId from step 4
+#    - VERCEL_PROJECT_ID  → projectId from step 4
+# 7. (Optional) In Vercel Dashboard → Project → Settings → Environment Variables:
+#    - API_URL = https://chefpro-production.up.railway.app
+#    → Update this value if the backend URL changes.
+# ============================================================
+
+name: Deploy Frontend to Vercel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/frontend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/frontend/**'
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  # ─── PRODUCTION deploy (push to main) ────────────────────
+  deploy-production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/frontend
+        run: npm ci
+
+      - name: Inject API_URL into environment.prod.ts
+        working-directory: src/frontend
+        run: |
+          # If API_URL is defined as a GitHub variable,
+          # replace the placeholder. Otherwise, use the Railway production URL.
+          API="${{ vars.API_URL }}"
+          if [ -z "$API" ]; then
+            API="https://chefpro-production.up.railway.app"
+          fi
+          sed -i "s|{API_URL}|${API}|g" src/environments/environment.prod.ts
+          echo "✅ environment.prod.ts configured with apiUrl: $API"
+          cat src/environments/environment.prod.ts
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel configuration
+        working-directory: src/frontend
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build project
+        working-directory: src/frontend
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to production
+        working-directory: src/frontend
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "🚀 Deployed to: $DEPLOY_URL"
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
+  # ─── PREVIEW deploy (pull requests) ──────────────────────
+  deploy-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/frontend
+        run: npm ci
+
+      - name: Inject API_URL into environment.prod.ts
+        working-directory: src/frontend
+        run: |
+          API="${{ vars.API_URL }}"
+          if [ -z "$API" ]; then
+            API="https://chefpro-production.up.railway.app"
+          fi
+          sed -i "s|{API_URL}|${API}|g" src/environments/environment.prod.ts
+          cat src/environments/environment.prod.ts
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel configuration
+        working-directory: src/frontend
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build project
+        working-directory: src/frontend
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy preview
+        working-directory: src/frontend
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "🔍 Preview URL: $DEPLOY_URL"
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
