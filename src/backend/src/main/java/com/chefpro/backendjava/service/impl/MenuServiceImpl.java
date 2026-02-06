@@ -213,6 +213,11 @@ public class MenuServiceImpl implements MenuService {
       cookAtClientHome
     );
 
+    // Si no hay resultados con los filtros, obtener todos los menús
+    if (menus.isEmpty()) {
+      menus = menuRepository.findAllWithDishes();
+    }
+
     // Cargar alérgenos (forzar carga lazy)
     menus.forEach(menu ->
       menu.getDishes().forEach(dish ->

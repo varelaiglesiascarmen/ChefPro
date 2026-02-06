@@ -28,7 +28,6 @@ public class Menu {
   @Column(name = "title", length = 150, nullable = false)
   private String title;
 
-  @Lob
   @Column(name = "description")
   private String description;
 
@@ -41,7 +40,6 @@ public class Menu {
   @Column(name = "max_number_diners")
   private Integer maxNumberDiners;
 
-  @Lob
   @Column(name = "kitchen_requirements")
   private String kitchenRequirements;
 

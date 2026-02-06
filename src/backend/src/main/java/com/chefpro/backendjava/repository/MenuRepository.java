@@ -34,4 +34,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Param("deliveryAvailable") Boolean deliveryAvailable,
     @Param("cookAtClientHome") Boolean cookAtClientHome
   );
+
+  // Nuevo método para obtener todos los menús sin filtros
+  @Query("SELECT DISTINCT m FROM Menu m " +
+    "LEFT JOIN FETCH m.dishes " +
+    "LEFT JOIN FETCH m.chef c " +
+    "LEFT JOIN FETCH c.user u")
+  List<Menu> findAllWithDishes();
 }
