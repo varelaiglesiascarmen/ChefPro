@@ -27,27 +27,22 @@ export class LoginComponent {
   onLogin() {
   this.errorMessage = '';
   if (!this.loginData.username || !this.loginData.password) {
-    this.errorMessage = 'Usuario o contraseña obligatorios.';
+    this.errorMessage = 'Username or password required.';
     return;
   }
 
   this.isLoading = true;
 
   this.authService.login(this.loginData).subscribe({
-    next: (res: any) => { 
+    next: (user: any) => { 
       this.isLoading = false;
-
-      if (res && res.token) {
-        console.log('Login correcto:', res.user?.name);
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
-
-        this.router.navigate(['/index']);
-      }
+      // AuthService already saves the token and session (setSession).
+      // Here we only navigate after successful login.
+      this.router.navigate(['/user-menu']);
     },
     error: (err) => {
       this.isLoading = false;
-      if (err.status === 401) {
+      if (err.status === 401 || err.status === 403) {
         this.errorMessage = 'Credenciales inválidas.';
       } else {
         this.errorMessage = 'Error de conexión con el servidor.';
