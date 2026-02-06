@@ -29,6 +29,19 @@ export class UserInfoComponent implements OnInit {
     return photoValue && photoValue.trim() !== '' ? photoValue : '/logos/users.svg';
   }
 
+  handleImageError(event: any) {
+    event.target.src = '/logos/users.svg';
+  }
+
+  urlValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if (!value || value.trim() === '') {
+      return null; // Permitir valores vacíos
+    }
+    const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+    return urlPattern.test(value) ? null : { invalidUrl: true };
+  }
+
   ngOnInit() {
     this.initForm();
 
@@ -73,25 +86,37 @@ export class UserInfoComponent implements OnInit {
       name: [''],
       lastname: [''],
       username: ['', [Validators.required], [this.usernameValidator.bind(this)]],
-      photo: [''],
+      photo: ['', [this.urlValidator]],
       bio: ['', [Validators.maxLength(200)]],
       address: [''],
       prizes: [''],
 
       emailGroup: this.fb.group({
-        email: ['', [Validators.required, Validators.email], [this.emailValidator.bind(this)]],
-        confirmEmail: ['', [Validators.required]]
+        email: ['', [Validators.email], [this.emailValidator.bind(this)]],
+        confirmEmail: ['']
       }, { validators: this.matchValidator('email', 'confirmEmail') }),
 
       passGroup: this.fb.group({
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]]
+        password: ['', [Validators.minLength(6)]],
+        confirmPassword: ['']
       }, { validators: this.matchValidator('password', 'confirmPassword') })
     });
   }
 
   usernameValidator(control: AbstractControl) {
     if (!this.editMode) return of(null);
+
+    const currentUser = this.authService.currentUserValue;
+    // Si el username es igual al actual, no validar
+    if (currentUser && control.value === currentUser.userName) {
+      return of(null);
+    }
+
+    // Si el campo está vacío, no validar
+    if (!control.value || control.value.trim() === '') {
+      return of(null);
+    }
+
     return this.authService.checkUsernameAvailability(control.value).pipe(
       debounceTime(500),
       map(isAvailable => (isAvailable ? null : { alreadyExists: true })),
@@ -101,6 +126,18 @@ export class UserInfoComponent implements OnInit {
 
   emailValidator(control: AbstractControl) {
     if (!this.editMode) return of(null);
+
+    const currentUser = this.authService.currentUserValue;
+    // Si el email es igual al actual, no validar
+    if (currentUser && control.value === currentUser.email) {
+      return of(null);
+    }
+
+    // Si el campo está vacío, no validar
+    if (!control.value || control.value.trim() === '') {
+      return of(null);
+    }
+
     return this.authService.checkEmailAvailability(control.value).pipe(
       debounceTime(500),
       map(isAvailable => (isAvailable ? null : { alreadyExists: true })),
@@ -112,7 +149,13 @@ export class UserInfoComponent implements OnInit {
     return (group: AbstractControl): ValidationErrors | null => {
       const control = group.get(controlName);
       const matchingControl = group.get(matchingControlName);
-      return (control && matchingControl && control.value !== matchingControl.value) ? { mismatch: true } : null;
+
+      // Solo validar si ambos campos tienen valor
+      if (!control?.value || !matchingControl?.value) {
+        return null;
+      }
+
+      return control.value !== matchingControl.value ? { mismatch: true } : null;
     };
   }
 
@@ -124,6 +167,10 @@ export class UserInfoComponent implements OnInit {
     const currentUser = this.authService.currentUserValue;
     if (!currentUser || currentUser.user_ID === undefined) return;
 
+    console.log('Form valid:', this.profileForm.valid);
+    console.log('Form errors:', this.profileForm.errors);
+    console.log('Form value:', this.profileForm.value);
+
     if (this.profileForm.valid) {
       const formVal = this.profileForm.value;
       let updatedUser: any = {
@@ -131,10 +178,18 @@ export class UserInfoComponent implements OnInit {
         name: formVal.name,
         lastname: formVal.lastname,
         userName: formVal.username,
-        photoUrl: formVal.photo,
-        email: formVal.emailGroup.email,
-        password: formVal.passGroup.password
+        photoUrl: formVal.photo || currentUser.photoUrl
       };
+
+      // Solo actualizar email si se modificó
+      if (formVal.emailGroup.email && formVal.emailGroup.email.trim() !== '') {
+        updatedUser.email = formVal.emailGroup.email;
+      }
+
+      // Solo actualizar contraseña si se modificó
+      if (formVal.passGroup.password && formVal.passGroup.password.trim() !== '') {
+        updatedUser.password = formVal.passGroup.password;
+      }
 
       if (this.role === 'CHEF') {
         updatedUser.bio = formVal.bio;
@@ -143,9 +198,19 @@ export class UserInfoComponent implements OnInit {
         updatedUser.address = formVal.address;
       }
 
+      console.log('Updating user:', updatedUser);
       this.authService.updateUser(updatedUser);
       this.editMode = false;
       alert('Perfil actualizado con éxito');
+    } else {
+      console.log('Form is invalid');
+      Object.keys(this.profileForm.controls).forEach(key => {
+        const control = this.profileForm.get(key);
+        if (control?.invalid) {
+          console.log(`Invalid control: ${key}`, control.errors);
+        }
+      });
+      alert('Por favor, corrige los errores en el formulario antes de guardar.');
     }
   }
 
