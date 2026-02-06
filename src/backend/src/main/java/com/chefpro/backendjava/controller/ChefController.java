@@ -146,4 +146,17 @@ public class ChefController {
       return ResponseEntity.notFound().build();
     }
   }
+
+  // ========================================
+  // AUTHENTICATED ENDPOINT - Update Chef Profile
+  // ========================================
+
+  @PatchMapping("/profile")
+  public ResponseEntity<ChefPublicDetailDto> updateChefProfile(
+    Authentication authentication,
+    @RequestBody ChefUReqDto chefUpdateDto
+  ) {
+    ChefPublicDetailDto updated = chefProfileService.updateChefProfile(authentication, chefUpdateDto);
+    return ResponseEntity.ok(updated);
+  }
 }
