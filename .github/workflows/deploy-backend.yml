@@ -1,0 +1,86 @@
+# ============================================
+# GitHub Actions Workflow: Deploy Backend to Railway
+# ============================================
+# CUÁNDO se ejecuta:
+#   - Cada vez que se hace push a la rama 'main'
+#   - Solo si hay cambios en la carpeta 'src/backend/'
+#
+# QUÉ hace:
+#   1. Compila el proyecto Java con Maven
+#   2. Ejecuta los tests
+#   3. Despliega en Railway usando el CLI oficial
+#
+# REQUISITOS:
+#   Necesitas configurar un secreto en GitHub:
+#     - RAILWAY_TOKEN: Token de API de Railway
+#   (Ve a Settings > Secrets and variables > Actions > New repository secret)
+# ============================================
+
+name: Deploy Backend to Railway
+
+# --- Cuándo se dispara el workflow ---
+on:
+  push:
+    branches:
+      - main
+    # Solo se ejecuta si cambian archivos del backend
+    paths:
+      - 'src/backend/**'
+      - 'railway.toml'
+  # También se puede disparar manualmente desde la pestaña "Actions"
+  workflow_dispatch:
+
+# --- Trabajos (jobs) ---
+jobs:
+  # ==============================
+  # JOB 1: Compilar y testear
+  # ==============================
+  build-and-test:
+    name: "Build & Test"
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Descargar el código del repo
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # Paso 2: Instalar Java 17
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          # Cachea las dependencias de Maven para que no se descarguen cada vez
+          cache: 'maven'
+          cache-dependency-path: 'src/backend/pom.xml'
+
+      # Paso 3: Compilar y ejecutar tests
+      - name: Build con Maven
+        working-directory: src/backend
+        run: ./mvnw clean verify -B
+
+  # ==============================
+  # JOB 2: Desplegar en Railway
+  # ==============================
+  deploy:
+    name: "Deploy to Railway"
+    runs-on: ubuntu-latest
+    # Solo se despliega si el build fue exitoso
+    needs: build-and-test
+
+    steps:
+      # Paso 1: Descargar el código
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # Paso 2: Instalar Railway CLI
+      - name: Instalar Railway CLI
+        run: npm install -g @railway/cli
+
+      # Paso 3: Desplegar en Railway
+      # El CLI usa el RAILWAY_TOKEN para autenticarse
+      # y el railway.toml para saber cómo construir la app
+      - name: Deploy a Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --detach

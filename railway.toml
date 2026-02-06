@@ -1,0 +1,23 @@
+# ============================================
+# railway.toml - Configuración de Railway
+# ============================================
+# Este archivo le dice a Railway CÓMO construir y desplegar tu app.
+# Railway lo detecta automáticamente en la raíz del servicio.
+#
+# Documentación: https://docs.railway.com/reference/config-as-code
+# ============================================
+
+[build]
+# Le decimos a Railway que use el Dockerfile que creamos
+dockerfilePath = "src/backend/Dockerfile"
+# El contexto de build es la carpeta del backend (donde está el pom.xml)
+dockerContext = "src/backend"
+
+[deploy]
+# Railway inyecta $PORT; Spring Boot lo lee con ${PORT:8081}
+# Healthcheck: Railway comprueba que la app responde antes de enrutar tráfico
+healthcheckPath = "/api/auth/health"
+healthcheckTimeout = 300
+# Reinicio automático si la app se cae
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

@@ -1,0 +1,14 @@
+# Ignorar carpeta target (se genera dentro del contenedor)
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
