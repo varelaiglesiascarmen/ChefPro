@@ -28,15 +28,15 @@ export class ProfileComponent implements OnInit {
   private authService = inject(AuthService);
 
   user: any;
-  // Corregimos el tipo para incluir ADMIN
   role: 'CHEF' | 'DINER' | 'ADMIN' | null = null;
 
   ngOnInit(): void {
-    // Usamos el valor actual del servicio
-    const currentUser = this.authService.currentUserValue;
-    if (currentUser) {
-      this.user = currentUser;
-      this.role = currentUser.role;
-    }
+    this.authService.user$.subscribe(currentUser => {
+      if (currentUser) {
+        this.user = currentUser;
+        this.role = currentUser.role;
+        console.log('Rol activo en perfil:', this.role);
+      }
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, User } from '../models/auth.model';
@@ -168,8 +168,10 @@ export class AuthService {
 
   // Map backend user response to frontend User model
   private mapBackendUserToFrontend(backendUser: any, additionalData?: any): User {
-    console.log('🔍 Backend user data:', backendUser);
-    console.log('🔍 Additional signup data:', additionalData);
+    let cleanRole = backendUser.role;
+    if (cleanRole && cleanRole.startsWith('ROLE_')) {
+      cleanRole = cleanRole.replace('ROLE_', '');
+    }
 
     const mappedUser: User = {
       user_ID: backendUser.id,
@@ -178,7 +180,7 @@ export class AuthService {
       lastname: additionalData?.surname || backendUser.surname || backendUser.lastname || '',
       email: backendUser.email,
       phone_number: additionalData?.phoneNumber || backendUser.phoneNumber || backendUser.phone_number,
-      role: backendUser.role,
+      role: cleanRole,
       reviews_count: backendUser.reviews_count || 0,
       rating_avg: backendUser.rating_avg || 0,
       languages: backendUser.languages || [],
@@ -186,13 +188,19 @@ export class AuthService {
       address: backendUser.address
     };
 
-    console.log('✅ Mapped user:', mappedUser);
     return mappedUser;
   }
 
   // notify the component that the user is changing
-  updateUser(updatedUser: User): void {
-    localStorage.setItem('chefpro_user', JSON.stringify(updatedUser));
-    this.currentUserSubject.next(updatedUser);
+  updateUser(updatedUser: User): Observable<User> {
+    const token = localStorage.getItem('chefpro_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.put<any>(`${this.authUrl}/update/${updatedUser.user_ID}`, updatedUser, { headers }).pipe(
+      tap(() => {
+        this.setSession(updatedUser);
+      }),
+      catchError(this.handleError)
+    );
   }
 }
