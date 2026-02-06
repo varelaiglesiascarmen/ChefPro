@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs'; 
 
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
@@ -12,15 +13,15 @@ export class ReservationService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  requestBooking(data: any) {
+  createReservation(data: any): Observable<any> {
     return this.http.post(this.url, { ...data, status: 'PENDING' }, { headers: this.getHeaders() });
   }
 
-  getReservations() {
+  getReservations(): Observable<any[]> {
     return this.http.get<any[]>(this.url, { headers: this.getHeaders() });
   }
 
-  updateStatus(id: number, status: 'ACCEPTED' | 'REJECTED') {
+  updateStatus(id: number, status: 'ACCEPTED' | 'REJECTED'): Observable<any> {
     return this.http.patch(`${this.url}/${id}`, { status }, { headers: this.getHeaders() });
   }
 }
