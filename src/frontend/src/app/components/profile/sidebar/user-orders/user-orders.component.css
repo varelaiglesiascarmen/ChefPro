@@ -1,0 +1,131 @@
+.orders-container {
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: 'Playfair Display', serif;
+}
+
+.orders-container h2 {
+  color: #2C1810;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  border-bottom: 2px solid #C5A059;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.order-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(44, 24, 16, 0.05);
+  border: 1px solid #EAE0D5;
+  transition: transform 0.2s ease;
+}
+
+.order-card:hover {
+  transform: scale(1.01);
+}
+
+.order-info h4 {
+  margin: 0 0 8px 0;
+  color: #2C1810;
+  font-size: 1.2rem;
+}
+
+.order-info p {
+  margin: 0 0 15px 0;
+  color: #666;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-badge.PENDING {
+  background-color: #FFF4E5;
+  color: #D97706;
+  border: 1px solid #FCD34D;
+}
+
+.status-badge.ACCEPTED {
+  background-color: #ECFDF5;
+  color: #059669;
+  border: 1px solid #6EE7B7;
+}
+
+.status-badge.REJECTED {
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+}
+
+.chef-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-accept {
+  background-color: #C5A059;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-accept:hover {
+  background-color: #B48F48;
+}
+
+.btn-reject {
+  background-color: transparent;
+  color: #C0392B;
+  border: 1.5px solid #C0392B;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-reject:hover {
+  background-color: #C0392B;
+  color: white;
+}
+
+.fadeIn {
+  animation: fadeInAnim 0.6s ease-out;
+}
+
+@keyframes fadeInAnim {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .order-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .chef-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
