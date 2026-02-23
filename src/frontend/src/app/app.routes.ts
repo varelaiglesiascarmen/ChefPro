@@ -17,38 +17,29 @@ import { UserCalendarComponent } from './components/profile/sidebar/user-calenda
 import { UserOrdersComponent } from './components/profile/sidebar/user-orders/user-orders.component';
 
 export const routes: Routes = [
+
   // If the path is empty (‘’), redirect to 'homepage'
   { path: '', redirectTo: 'homepage', pathMatch: 'full' },
 
   // homePage root
   { path: 'homepage', component: HomePageComponent },
-
-  // login root
-  { path: 'login', component: LoginComponent },
-
-  // signin root
-  { path: 'signIn', component: SignInComponent },
-
   // index root
   { path: 'index', component: IndexComponent },
 
   // contact root
   { path: 'contact', component: ContactComponent },
-
   // about root
   { path: 'about', component: AboutComponent },
 
-  // not found root
-  { path: 'not-found', component: NotFoundComponent },
-
-  // user-menu root
-  { path: 'user-menu', component: UserMenuComponent },
-
   // search-results root
   { path: 'search-results', component: SearchResultsComponent },
-
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
+
+  // login root
+  { path: 'login', component: LoginComponent },
+  // signin root
+  { path: 'signIn', component: SignInComponent },
 
   //profile root
   {
@@ -63,7 +54,11 @@ export const routes: Routes = [
       { path: 'orders', component: UserOrdersComponent }
     ]
   },
+  // user-menu root
+  { path: 'user-menu', component: UserMenuComponent },
 
+  // if there is a 404, display the error interface
+  { path: '404', component: NotFoundComponent },
   // If you write something strange, send it to the home page
   { path: '**', redirectTo: 'homepage' }
 ];
