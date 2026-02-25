@@ -20,6 +20,9 @@ export class UserInfoComponent implements OnInit {
   profileForm!: FormGroup;
   editMode = false;
   role: 'ADMIN' | 'CHEF' | 'DINER' | null = null;
+  showSuccessToast = false;
+  showErrorToast = false;
+  toastMessage = '';
 
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
@@ -36,13 +39,11 @@ export class UserInfoComponent implements OnInit {
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
-      // Verificar que sea una imagen
       if (!file.type.startsWith('image/')) {
         alert('Por favor, selecciona un archivo de imagen válido.');
         return;
       }
 
-      // Verificar tamaño máximo (2MB)
       if (file.size > 2 * 1024 * 1024) {
         alert('La imagen es demasiado grande. El tamaño máximo es 2MB.');
         return;
@@ -57,18 +58,15 @@ export class UserInfoComponent implements OnInit {
     reader.onload = (e: any) => {
       const img = new Image();
       img.onload = () => {
-        // Crear canvas para redimensionar
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        // Dimensiones del avatar (200x200px)
         const MAX_WIDTH = 200;
         const MAX_HEIGHT = 200;
 
         let width = img.width;
         let height = img.height;
 
-        // Calcular proporciones manteniendo aspect ratio
         if (width > height) {
           if (width > MAX_WIDTH) {
             height = (height * MAX_WIDTH) / width;
@@ -84,13 +82,10 @@ export class UserInfoComponent implements OnInit {
         canvas.width = width;
         canvas.height = height;
 
-        // Dibujar imagen redimensionada
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Convertir a Base64 JPEG con compresión
         const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
-        // Actualizar el formulario con la imagen en Base64
         this.profileForm.patchValue({ photo: base64Image });
 
         console.log('Imagen redimensionada y convertida. Tamaño aproximado:',
@@ -108,7 +103,7 @@ export class UserInfoComponent implements OnInit {
   urlValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
     if (!value || value.trim() === '') {
-      return null; // Permitir valores vacíos
+      return null;
     }
     const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
     return urlPattern.test(value) ? null : { invalidUrl: true };
@@ -179,12 +174,10 @@ export class UserInfoComponent implements OnInit {
     if (!this.editMode) return of(null);
 
     const currentUser = this.authService.currentUserValue;
-    // Si el username es igual al actual, no validar
     if (currentUser && control.value === currentUser.userName) {
       return of(null);
     }
 
-    // Si el campo está vacío, no validar
     if (!control.value || control.value.trim() === '') {
       return of(null);
     }
@@ -200,12 +193,10 @@ export class UserInfoComponent implements OnInit {
     if (!this.editMode) return of(null);
 
     const currentUser = this.authService.currentUserValue;
-    // Si el email es igual al actual, no validar
     if (currentUser && control.value === currentUser.email) {
       return of(null);
     }
 
-    // Si el campo está vacío, no validar
     if (!control.value || control.value.trim() === '') {
       return of(null);
     }
@@ -222,7 +213,6 @@ export class UserInfoComponent implements OnInit {
       const control = group.get(controlName);
       const matchingControl = group.get(matchingControlName);
 
-      // Solo validar si ambos campos tienen valor
       if (!control?.value || !matchingControl?.value) {
         return null;
       }
@@ -238,10 +228,6 @@ export class UserInfoComponent implements OnInit {
   saveChanges() {
     const currentUser = this.authService.currentUserValue;
     if (!currentUser || currentUser.user_ID === undefined) return;
-
-    console.log('Form valid:', this.profileForm.valid);
-    console.log('Form errors:', this.profileForm.errors);
-    console.log('Form value:', this.profileForm.value);
 
     if (this.profileForm.valid) {
       const formVal = this.profileForm.value;
@@ -261,31 +247,67 @@ export class UserInfoComponent implements OnInit {
         updatedUser.address = formVal.address;
       }
 
-      console.log('Updating user:', updatedUser);
-
       this.authService.updateUser(updatedUser).subscribe({
         next: (user) => {
-          this.editMode = false;
-          alert('Perfil actualizado con éxito');
+          const patchData: any = {
+            name: user.name,
+            lastname: user.lastname,
+            username: user.userName,
+            photo: user.photoUrl
+          };
+
+          if (user.role === 'CHEF') {
+            const chef = user as Chef;
+            patchData.bio = chef.bio || '';
+            if (chef.prizes) {
+              this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
+            } else {
+              this.prizesTags = [];
+            }
+          } else if (user.role === 'DINER') {
+            const diner = user as Diner;
+            patchData.address = diner.address || '';
+          }
+
+          this.profileForm.patchValue(patchData);
+
+          this.profileForm.get('emailGroup.email')?.setValue(user.email);
+          this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email);
+          this.profileForm.get('passGroup.password')?.setValue('');
+          this.profileForm.get('passGroup.confirmPassword')?.setValue('');
+
+          // Cambiar modo de edición en el siguiente ciclo para evitar error de detección de cambios
+          setTimeout(() => {
+            this.editMode = false;
+            this.showSuccessNotification('Perfil actualizado con éxito');
+          }, 0);
         },
         error: (error) => {
           console.error('Error updating profile:', error);
-          alert('Error al actualizar el perfil. Por favor, intenta de nuevo.');
+          this.showErrorNotification('Error al actualizar el perfil. Por favor, intenta de nuevo.');
         }
       });
     } else {
-      console.log('Form is invalid');
-      Object.keys(this.profileForm.controls).forEach(key => {
-        const control = this.profileForm.get(key);
-        if (control?.invalid) {
-          console.log(`Invalid control: ${key}`, control.errors);
-        }
-      });
-      alert('Por favor, corrige los errores en el formulario antes de guardar.');
+      this.showErrorNotification('Por favor, corrige los errores en el formulario antes de guardar.');
     }
   }
 
-  // count delete account action
+  showSuccessNotification(message: string) {
+    this.toastMessage = message;
+    this.showSuccessToast = true;
+    setTimeout(() => {
+      this.showSuccessToast = false;
+    }, 3000);
+  }
+
+  showErrorNotification(message: string) {
+    this.toastMessage = message;
+    this.showErrorToast = true;
+    setTimeout(() => {
+      this.showErrorToast = false;
+    }, 3000);
+  }
+
   deleteAccount() {
     const confirmacion = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.');
     if (confirmacion) {
@@ -295,7 +317,6 @@ export class UserInfoComponent implements OnInit {
     }
   }
 
-  // tags logic for prizes
   addPrizeTag(event: any): void {
     event.preventDefault();
     const value = this.currentPrizeInput.trim();

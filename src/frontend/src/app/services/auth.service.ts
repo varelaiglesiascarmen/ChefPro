@@ -185,7 +185,9 @@ export class AuthService {
       rating_avg: backendUser.rating_avg || 0,
       languages: backendUser.languages || [],
       photoUrl: backendUser.photoUrl || backendUser.photo,
-      address: backendUser.address
+      address: backendUser.address,
+      bio: backendUser.bio,
+      prizes: backendUser.prizes
     };
 
     return mappedUser;

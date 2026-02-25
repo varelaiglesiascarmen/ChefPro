@@ -354,3 +354,64 @@ textarea[readonly] {
     padding: 30px;
   }
 }
+
+.toast {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  padding: 20px 30px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateX(400px);
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 10000;
+  max-width: 400px;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast-icon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.success-toast {
+  background: linear-gradient(135deg, #C5A059 0%, #d4b16e 100%);
+  color: white;
+  border: 2px solid #FDF7F0;
+}
+
+.success-toast .toast-icon {
+  background: rgba(255, 255, 255, 0.3);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-toast {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+  border: 2px solid #fef2f2;
+}
+
+.error-toast .toast-icon {
+  background: rgba(255, 255, 255, 0.3);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
