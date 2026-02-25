@@ -25,4 +25,9 @@ public class UserLoginDto {
 
   private String role;
 
+  // Chef/Diner specific fields
+  private String bio;
+  private String prizes;
+  private String address;
+
 }
