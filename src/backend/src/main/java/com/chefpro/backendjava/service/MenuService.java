@@ -1,13 +1,16 @@
 package com.chefpro.backendjava.service;
 
-import com.chefpro.backendjava.common.object.dto.*;
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 
-import java.util.List;
+import com.chefpro.backendjava.common.object.dto.MenuCReqDto;
+import com.chefpro.backendjava.common.object.dto.MenuDTO;
+import com.chefpro.backendjava.common.object.dto.MenuUReqDto;
 
 public interface MenuService {
 
-  void createMenu (MenuCReqDto dto, Authentication authentication);
+  MenuDTO createMenu (MenuCReqDto dto, Authentication authentication);
 
   List<MenuDTO> listByChef(Authentication authentication);
 
