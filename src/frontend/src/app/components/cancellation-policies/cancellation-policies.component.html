@@ -1,0 +1,34 @@
+<div class="legal-container fadeIn">
+  <header class="legal-header">
+    <h1>Políticas de <span>Cancelación</span></h1>
+    <p>Seguridad y respeto para comensales y profesionales</p>
+  </header>
+
+  <div class="main-policy">
+    <p>
+      En <strong>Chef Pro</strong>, valoramos el tiempo y la preparación que conlleva cada experiencia gastronómica.
+      Nuestra política está diseñada para proteger la logística de nuestros chefs y asegurar la disponibilidad
+      de servicios para todos nuestros usuarios.
+    </p>
+  </div>
+
+  <div class="policy-grid">
+    <div class="policy-card" *ngFor="let rule of policyRules">
+      <div class="card-header">
+        <h3>{{ rule.type }}</h3>
+      </div>
+      <div class="card-body">
+        <p>{{ rule.detail }}</p>
+        <div class="price-badge">{{ rule.cost }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="important-notice">
+    <h3><i class="fa-solid fa-triangle-exclamation"></i> Información sobre Reembolsos</h3>
+    <p>
+      Los reembolsos correspondientes se procesarán automáticamente al método de pago original en un plazo
+      de 5 a 10 días hábiles tras la validación de la cancelación.
+    </p>
+  </div>
+</div>
