@@ -19,8 +19,8 @@
     </div>
 
     <div class="menu-card" *ngFor="let menu of menus">
-      <div class="menu-thumb" [style.backgroundImage]="'url(' + menu.photoUrl + ')'">
-        <div class="badge-price">{{ menu.price }}€</div>
+      <div class="menu-thumb" [style.backgroundImage]="menu.photoUrl ? 'url(' + menu.photoUrl + ')' : 'none'">
+        <div class="badge-price">{{ menu.pricePerPerson }}€</div>
       </div>
 
       <div class="menu-body">
@@ -28,10 +28,10 @@
         <p class="description">{{ menu.description | slice:0:60 }}...</p>
 
         <div class="menu-footer">
-          <button class="btn-action edit" (click)="goToEdit(menu.id)">
+          <button class="btn-action edit" (click)="goToEdit(menu.menu_ID)">
             <i class="icon-edit"></i> Editar
           </button>
-          <button class="btn-action delete" (click)="confirmDelete(menu.id)">
+          <button class="btn-action delete" (click)="confirmDelete(menu.menu_ID)">
             <i class="icon-trash"></i>
           </button>
         </div>

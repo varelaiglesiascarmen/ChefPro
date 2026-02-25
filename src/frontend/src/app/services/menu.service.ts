@@ -8,15 +8,15 @@ import { environment } from '../../environments/environment';
 })
 export class MenuService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/menus`;
+  private apiUrl = `${environment.apiUrl}/chef/menus`;
 
   private getHeaders() {
     const token = localStorage.getItem('chefpro_token');
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  getMenusByChef(chefId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/chef/${chefId}`, { headers: this.getHeaders() });
+  getMenusByChef(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() });
   }
 
   createMenu(menuData: any): Observable<any> {
