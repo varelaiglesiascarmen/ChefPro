@@ -1,0 +1,50 @@
+<div class="legal-container fadeIn">
+  <header class="legal-header">
+    <div class="header-content">
+      <h1>Política de <span>Privacidad</span></h1>
+      <p>Compromiso de Transparencia y Seguridad</p>
+    </div>
+  </header>
+
+  <section class="intro-section">
+    <div class="intro-content">
+      <h2>Tu confianza es nuestro ingrediente principal</h2>
+      <p>
+        En <strong>Chef Pro</strong>, tratamos tus datos con el mismo respeto y cuidado con el que nuestros chefs
+        tratan su materia prima. Esta política detalla cómo recopilamos, usamos y protegemos tu información personal
+        conforme al Reglamento General de Protección de Datos (RGPD).
+      </p>
+    </div>
+  </section>
+
+  <section class="data-section">
+    <h3 class="section-title">Información que Recopilamos</h3>
+    <div class="data-grid">
+      <div class="data-card" *ngFor="let item of dataCollected">
+        <div class="icon-wrapper">
+          <i [class]="item.icon"></i>
+        </div>
+        <h4>{{ item.title }}</h4>
+        <p>{{ item.desc }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rights-section">
+    <div class="rights-wrapper">
+      <h3 class="section-title">Tus Derechos Digitales</h3>
+      <ul class="rights-list">
+        <li *ngFor="let right of userRights">
+          <strong>{{ right.title }}:</strong> {{ right.desc }}
+        </li>
+      </ul>
+      <div class="dpo-contact">
+        <i class="fa-solid fa-lock"></i>
+        <p>
+          Para ejercer cualquiera de estos derechos, contacta con nuestro Delegado de Protección de Datos en:
+          <a href="mailto:privacy@chefpro.com">privacy&#64;chefpro.com</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
