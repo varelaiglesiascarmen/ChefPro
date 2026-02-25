@@ -50,16 +50,8 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
-    UserLoginDto userFound = userService.findByEmail(request.getUsername());
-
-    UserLoginDto userLoginDto = new UserLoginDto();
-    userLoginDto.setId(userFound.getId());
-    userLoginDto.setName(userFound.getName());
-    userLoginDto.setSurname(userFound.getSurname());
-    userLoginDto.setUsername(userFound.getUsername());
-    userLoginDto.setEmail(userFound.getEmail());
-    userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
-    userLoginDto.setPhoto(userFound.getPhoto());
+    UserLoginDto userLoginDto = userService.findByEmail(request.getUsername());
+    // Actualizar el rol con el formato correcto
     userLoginDto.setRole(role);
 
     LoginResponseDto response = new LoginResponseDto();
@@ -85,16 +77,8 @@ public class LoginController {
       .findFirst()
       .orElse(null);
 
-    UserLoginDto userFound = userService.findByEmail(user.getUsername());
-
-    UserLoginDto userLoginDto = new UserLoginDto();
-    userLoginDto.setId(userFound.getId());
-    userLoginDto.setName(userFound.getName());
-    userLoginDto.setSurname(userFound.getSurname());
-    userLoginDto.setUsername(userFound.getUsername());
-    userLoginDto.setEmail(userFound.getEmail());
-    userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
-    userLoginDto.setPhoto(userFound.getPhoto());
+    UserLoginDto userLoginDto = userService.findByEmail(user.getUsername());
+    // Actualizar el rol con el formato correcto
     userLoginDto.setRole(role);
 
     return ResponseEntity.ok(userLoginDto);
@@ -121,16 +105,8 @@ public class LoginController {
         .findFirst()
         .orElse(null);
 
-      UserLoginDto userFound = userService.findByEmail(request.getUsername());
-
-      UserLoginDto userLoginDto = new UserLoginDto();
-      userLoginDto.setId(userFound.getId());
-      userLoginDto.setName(userFound.getName());
-      userLoginDto.setSurname(userFound.getSurname());
-      userLoginDto.setUsername(userFound.getUsername());
-      userLoginDto.setEmail(userFound.getEmail());
-      userLoginDto.setPhoneNumber(userFound.getPhoneNumber());
-      userLoginDto.setPhoto(userFound.getPhoto());
+      UserLoginDto userLoginDto = userService.findByEmail(request.getUsername());
+      // Actualizar el rol con el formato correcto
       userLoginDto.setRole(role);
 
       LoginResponseDto response = new LoginResponseDto();

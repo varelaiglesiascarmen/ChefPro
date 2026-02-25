@@ -1,5 +1,11 @@
 package com.chefpro.backendjava.service.impl;
 
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.UpdateProfileDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
@@ -11,11 +17,6 @@ import com.chefpro.backendjava.repository.ChefRepository;
 import com.chefpro.backendjava.repository.CustomUserRepository;
 import com.chefpro.backendjava.repository.DinerRepository;
 import com.chefpro.backendjava.service.UserService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Component("userService")
 public class UserServiceImpl implements UserService {
@@ -53,6 +54,22 @@ public class UserServiceImpl implements UserService {
       userLoginDto.setPhoneNumber(userLogin.getPhoneNumber());
       userLoginDto.setPhoto(userLogin.getPhoto());
       userLoginDto.setRole(userLogin.getRole().name());
+
+      // Incluir datos específicos de Chef o Diner
+      if (userLogin.getRole() == UserRoleEnum.CHEF) {
+        Optional<Chef> chefOpt = chefRepository.findByUser(userLogin);
+        if (chefOpt.isPresent()) {
+          Chef chef = chefOpt.get();
+          userLoginDto.setBio(chef.getBio());
+          userLoginDto.setPrizes(chef.getPrizes());
+          userLoginDto.setAddress(chef.getAddress());
+        }
+      } else if (userLogin.getRole() == UserRoleEnum.DINER) {
+        Optional<Diner> dinerOpt = dinerRepository.findByUser(userLogin);
+        if (dinerOpt.isPresent()) {
+          userLoginDto.setAddress(dinerOpt.get().getAddress());
+        }
+      }
 
       return userLoginDto;
     }
@@ -128,7 +145,7 @@ public class UserServiceImpl implements UserService {
     userLogin.setName(updateProfileDto.getName());
     userLogin.setLastname(updateProfileDto.getSurname());
     userLogin.setUsername(updateProfileDto.getUsername());
-    
+
     // Actualizar foto si se proporciona
     if (updateProfileDto.getPhoto() != null && !updateProfileDto.getPhoto().isBlank()) {
       userLogin.setPhoto(updateProfileDto.getPhoto());
@@ -165,6 +182,22 @@ public class UserServiceImpl implements UserService {
     userLoginDto.setPhoneNumber(savedUser.getPhoneNumber());
     userLoginDto.setPhoto(savedUser.getPhoto());
     userLoginDto.setRole(savedUser.getRole().name());
+
+    // Incluir datos específicos de Chef o Diner
+    if (savedUser.getRole() == UserRoleEnum.CHEF) {
+      Optional<Chef> chefOpt = chefRepository.findByUser(savedUser);
+      if (chefOpt.isPresent()) {
+        Chef chef = chefOpt.get();
+        userLoginDto.setBio(chef.getBio());
+        userLoginDto.setPrizes(chef.getPrizes());
+        userLoginDto.setAddress(chef.getAddress());
+      }
+    } else if (savedUser.getRole() == UserRoleEnum.DINER) {
+      Optional<Diner> dinerOpt = dinerRepository.findByUser(savedUser);
+      if (dinerOpt.isPresent()) {
+        userLoginDto.setAddress(dinerOpt.get().getAddress());
+      }
+    }
 
     return userLoginDto;
   }

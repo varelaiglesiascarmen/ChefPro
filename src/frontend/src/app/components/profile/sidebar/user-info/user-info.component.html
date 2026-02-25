@@ -19,10 +19,10 @@
             <div class="photo-controls" *ngIf="editMode">
               <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;">
               <button type="button" class="btn-upload" (click)="fileInput.click()">
-                📁 Seleccionar imagen
+                Seleccionar imagen
               </button>
               <button type="button" class="btn-remove" (click)="removePhoto()" *ngIf="profileForm.get('photo')?.value">
-                🗑️ Eliminar
+                Eliminar
               </button>
             </div>
           </div>
@@ -112,5 +112,15 @@
       </div>
 
     </form>
+  </div>
+
+  <div class="toast success-toast" [class.show]="showSuccessToast">
+    <div class="toast-icon">✓</div>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+  <div class="toast error-toast" [class.show]="showErrorToast">
+    <div class="toast-icon">⚠</div>
+    <span>{{ toastMessage }}</span>
   </div>
 </div>
