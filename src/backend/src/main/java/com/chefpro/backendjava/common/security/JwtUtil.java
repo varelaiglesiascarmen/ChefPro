@@ -19,8 +19,6 @@ public class JwtUtil {
   private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 horas
 
-
-  //TODO solo para local
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
     String role = userDetails.getAuthorities().stream()
@@ -30,7 +28,6 @@ public class JwtUtil {
     claims.put("role", role);
     return createToken(claims, userDetails.getUsername());
   }
-  //TODO solo para local
 
   private String createToken(Map<String, Object> claims, String subject) {
     return Jwts.builder()
