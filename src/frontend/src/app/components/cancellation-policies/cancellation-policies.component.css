@@ -1,0 +1,253 @@
+.legal-container {
+  background-color: #ffffff;
+  color: #2C1810;
+  font-family: 'Playfair Display', serif;
+  padding-bottom: 100px;
+}
+
+.legal-header {
+  padding: 100px 20px 80px;
+  text-align: center;
+  background-color: #FDF7F0;
+  border-bottom: 1px solid #EAE0D5;
+  position: relative;
+}
+
+.legal-header i {
+  font-size: 2rem;
+  color: #C5A059;
+  margin-bottom: 20px;
+  display: block;
+  opacity: 0.8;
+}
+
+.legal-header h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -1px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.legal-header h1 span {
+  color: #C5A059;
+  font-style: italic;
+}
+
+.legal-header p {
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 0.8rem;
+  margin-top: 20px;
+  color: #8D7B6D;
+}
+
+.main-policy {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 0 40px;
+  text-align: center;
+  position: relative;
+}
+
+.main-policy::before {
+  content: "“";
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 5rem;
+  color: #F4ECE1;
+  font-family: serif;
+}
+
+.main-policy p {
+  font-size: 1.3rem;
+  line-height: 1.9;
+  color: #5D4037;
+  font-style: italic;
+}
+
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  border: 1px solid #EAE0D5;
+}
+
+.policy-card {
+  padding: 60px 40px;
+  background: white;
+  border: 1px solid #EAE0D5;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.policy-card:hover {
+  background: #2C1810;
+  z-index: 2;
+  transform: scale(1.02);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+}
+
+.card-header h3 {
+  font-size: 1.4rem;
+  margin-bottom: 30px;
+  text-transform: none;
+  border-bottom: 1px solid #C5A059;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.policy-card:hover .card-header h3 {
+  color: #C5A059;
+}
+
+.card-body p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #6D6D6D;
+  margin-bottom: 40px;
+}
+
+.policy-card:hover .card-body p {
+  color: #FDF7F0;
+  opacity: 0.8;
+}
+
+.price-badge {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #C5A059;
+  border: 1px solid #C5A059;
+  padding: 12px 24px;
+  align-self: flex-start;
+  transition: 0.3s;
+}
+
+.policy-card:hover .price-badge {
+  background: #C5A059;
+  color: white;
+}
+
+.important-notice {
+  max-width: 1200px;
+  margin: 100px auto 0;
+  padding: 60px 40px;
+  background: #F4ECE1;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.important-notice h3 {
+  flex: 1;
+  font-size: 1.8rem;
+  margin: 0;
+  color: #2C1810;
+}
+
+.important-notice p {
+  flex: 2;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  margin: 0;
+  color: #5D4037;
+  border-left: 1px solid #C5A059;
+  padding-left: 40px;
+}
+
+@media (min-width: 1400px) {
+  .main-policy p {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 1366px) {
+  .legal-header {
+    padding: 70px 20px 50px;
+  }
+  .main-policy {
+    margin: 60px auto;
+  }
+  .policy-card {
+    padding: 40px 30px;
+  }
+  .important-notice {
+    margin-top: 60px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .important-notice {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+    padding: 40px 30px;
+  }
+
+  .important-notice p {
+    border-left: none;
+    border-top: 1px solid #C5A059;
+    padding-left: 0;
+    padding-top: 30px;
+  }
+}
+
+@media (max-width: 767px) {
+  .legal-header {
+    padding: 60px 20px 40px;
+  }
+
+  .legal-header h1 {
+    font-size: 2.8rem;
+  }
+
+  .main-policy {
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .main-policy p {
+    font-size: 1.1rem;
+  }
+
+  .policy-grid {
+    grid-template-columns: 1fr; 
+    border: none;
+  }
+
+  .policy-card {
+    border-bottom: 1px solid #EAE0D5;
+    padding: 40px 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .legal-header p {
+    letter-spacing: 2px;
+    font-size: 0.7rem;
+  }
+
+  .price-badge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .important-notice h3 {
+    font-size: 1.4rem;
+  }
+}
