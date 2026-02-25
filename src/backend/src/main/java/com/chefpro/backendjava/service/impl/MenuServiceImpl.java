@@ -1,5 +1,13 @@
 package com.chefpro.backendjava.service.impl;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.chefpro.backendjava.common.object.dto.DishDto;
 import com.chefpro.backendjava.common.object.dto.MenuCReqDto;
 import com.chefpro.backendjava.common.object.dto.MenuDTO;
@@ -10,13 +18,6 @@ import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.repository.ChefRepository;
 import com.chefpro.backendjava.repository.MenuRepository;
 import com.chefpro.backendjava.service.MenuService;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component("menuService")
 public class MenuServiceImpl implements MenuService {
@@ -32,7 +33,7 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   @Transactional
-  public void createMenu(MenuCReqDto dto, Authentication authentication) {
+  public MenuDTO createMenu(MenuCReqDto dto, Authentication authentication) {
 
     System.out.println("AUTH NAME = " + authentication.getName());
 
@@ -57,7 +58,16 @@ public class MenuServiceImpl implements MenuService {
       .kitchenRequirements(dto.getKitchenRequirements())
       .build();
 
-    menuRepository.save(menu);
+    Menu savedMenu = menuRepository.save(menu);
+
+    // Devolver el menú creado con su ID para que el frontend pueda crear los platos
+    return MenuDTO.builder()
+      .id(savedMenu.getId())
+      .title(savedMenu.getTitle())
+      .description(savedMenu.getDescription())
+      .pricePerPerson(savedMenu.getPricePerPerson())
+      .chefUsername(chef.getUser().getUsername())
+      .build();
   }
 
   @Override
