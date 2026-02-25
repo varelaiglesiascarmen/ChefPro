@@ -1,15 +1,17 @@
 .legal-container {
-  background-color: #ffffff;
+  background-color: #FDF7F0;
   color: #2C1810;
   font-family: 'Playfair Display', serif;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
 }
 
 .legal-header {
-  padding: 100px 20px 80px;
+  background-color: #2C1810;
+  background-image: linear-gradient(rgba(44, 24, 16, 0.65), rgba(44, 24, 16, 0.75)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  padding: 160px 20px 120px;
   text-align: center;
-  background-color: #FDF7F0;
-  border-bottom: 1px solid #EAE0D5;
   position: relative;
 }
 
@@ -18,12 +20,13 @@
   color: #C5A059;
   margin-bottom: 20px;
   display: block;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .legal-header h1 {
+  color: #ffffff;
   font-size: clamp(2.5rem, 6vw, 4.5rem);
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: -1px;
   margin: 0;
   line-height: 1.1;
@@ -35,12 +38,12 @@
 }
 
 .legal-header p {
+  color: rgba(253, 247, 240, 0.9);
   font-family: 'Montserrat', sans-serif;
   text-transform: uppercase;
   letter-spacing: 4px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   margin-top: 20px;
-  color: #8D7B6D;
 }
 
 .main-policy {
@@ -58,7 +61,7 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 5rem;
-  color: #F4ECE1;
+  color: #EAE0D5;
   font-family: serif;
 }
 
@@ -143,10 +146,11 @@
   max-width: 1200px;
   margin: 100px auto 0;
   padding: 60px 40px;
-  background: #F4ECE1;
+  background: #ffffff;
   display: flex;
   align-items: center;
   gap: 40px;
+  border: 1px solid #EAE0D5;
 }
 
 .important-notice h3 {
@@ -174,17 +178,11 @@
 
 @media (max-width: 1366px) {
   .legal-header {
-    padding: 70px 20px 50px;
+    padding: 140px 20px 100px;
   }
-  .main-policy {
-    margin: 60px auto;
-  }
-  .policy-card {
-    padding: 40px 30px;
-  }
-  .important-notice {
-    margin-top: 60px;
-  }
+  .main-policy { margin: 60px auto; }
+  .policy-card { padding: 40px 30px; }
+  .important-notice { margin-top: 60px; }
 }
 
 @media (max-width: 1023px) {
@@ -194,7 +192,6 @@
     gap: 30px;
     padding: 40px 30px;
   }
-
   .important-notice p {
     border-left: none;
     border-top: 1px solid #C5A059;
@@ -204,50 +201,17 @@
 }
 
 @media (max-width: 767px) {
-  .legal-header {
-    padding: 60px 20px 40px;
-  }
-
-  .legal-header h1 {
-    font-size: 2.8rem;
-  }
-
-  .main-policy {
-    margin: 40px auto;
-    padding: 0 20px;
-  }
-
-  .main-policy p {
-    font-size: 1.1rem;
-  }
-
-  .policy-grid {
-    grid-template-columns: 1fr; 
-    border: none;
-  }
-
-  .policy-card {
-    border-bottom: 1px solid #EAE0D5;
-    padding: 40px 25px;
-  }
+  .legal-header { padding: 120px 20px 80px; }
+  .legal-header h1 { font-size: 2.8rem; }
+  .main-policy { margin: 40px auto; padding: 0 20px; }
+  .main-policy p { font-size: 1.1rem; }
+  .policy-grid { grid-template-columns: 1fr; border: none; }
+  .policy-card { border-bottom: 1px solid #EAE0D5; padding: 40px 25px; }
 }
 
 @media (max-width: 480px) {
-  .legal-header h1 {
-    font-size: 2.2rem;
-  }
-
-  .legal-header p {
-    letter-spacing: 2px;
-    font-size: 0.7rem;
-  }
-
-  .price-badge {
-    width: 100%;
-    text-align: center;
-  }
-
-  .important-notice h3 {
-    font-size: 1.4rem;
-  }
+  .legal-header h1 { font-size: 2.2rem; }
+  .legal-header p { letter-spacing: 2px; font-size: 0.7rem; }
+  .price-badge { width: 100%; text-align: center; }
+  .important-notice h3 { font-size: 1.4rem; }
 }
