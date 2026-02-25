@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MenuService } from '../../../../services/menu.service';
@@ -15,6 +15,7 @@ export class ChefMenusComponent implements OnInit {
   private router = inject(Router);
   private menuService = inject(MenuService);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   menus: any[] = [];
 
@@ -23,12 +24,15 @@ export class ChefMenusComponent implements OnInit {
   }
 
   loadMenus() {
-    const chefId = this.authService.currentUserValue?.user_ID;
-    if (chefId) {
-      this.menuService.getMenusByChef(chefId).subscribe(data => {
-        this.menus = data;
-      });
-    }
+    this.menuService.getMenusByChef().subscribe({
+      next: (data) => {
+        this.menus = [...data];
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error cargando menús:', err);
+      }
+    });
   }
 
   confirmDelete(id: number) {
