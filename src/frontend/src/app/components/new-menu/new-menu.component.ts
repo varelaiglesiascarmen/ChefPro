@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; 
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ChefService } from '../../services/chef.service';
 
@@ -18,12 +18,12 @@ export class NewMenuComponent implements OnInit {
   private router = inject(Router);
 
   officialAllergens = [
-    { id: 1, name: 'Cereales con gluten' }, { id: 2, name: 'Crustáceos' },
+    { id: 1, name: 'Gluten' }, { id: 2, name: 'Crustáceos' },
     { id: 3, name: 'Huevos' }, { id: 4, name: 'Pescado' },
     { id: 5, name: 'Cacahuetes' }, { id: 6, name: 'Soja' },
-    { id: 7, name: 'Leche' }, { id: 8, name: 'Frutos de cáscara' },
+    { id: 7, name: 'Lácteos' }, { id: 8, name: 'Frutos de cáscara' },
     { id: 9, name: 'Apio' }, { id: 10, name: 'Mostaza' },
-    { id: 11, name: 'Sésamo' }, { id: 12, name: 'Sulfitos' },
+    { id: 11, name: 'Granos de sésamo' }, { id: 12, name: 'Dióxido de azufre y sulfitos' },
     { id: 13, name: 'Altramuces' }, { id: 14, name: 'Moluscos' }
   ];
 
@@ -153,13 +153,19 @@ export class NewMenuComponent implements OnInit {
         const newMenuId = resMenu.menu_ID;
 
         this.dishes.forEach((dish, index) => {
+          // Convertir los IDs de alérgenos a nombres para enviar al backend
+          const allergenNames = dish.allergenIds.map((id: number) => {
+            const allergen = this.officialAllergens.find(a => a.id === id);
+            return allergen ? allergen.name : null;
+          }).filter((name: string | null) => name !== null);
+
           const dishPayload = {
             menu_ID: newMenuId,
             dish_ID: index + 1,
             title: dish.title,
             description: dish.description,
             category: dish.category,
-            allergenIds: dish.allergenIds
+            allergens: allergenNames
           };
 
           this.chefService.createDish(dishPayload).subscribe();
