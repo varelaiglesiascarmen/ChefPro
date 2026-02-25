@@ -15,6 +15,7 @@ import { UserInfoComponent } from './components/profile/sidebar/user-info/user-i
 import { ChefMenusComponent } from './components/profile/sidebar/chef-menus/chef-menus.component';
 import { UserCalendarComponent } from './components/profile/sidebar/user-calendar/user-calendar.component';
 import { UserOrdersComponent } from './components/profile/sidebar/user-orders/user-orders.component';
+import { CancellationPoliciesComponent } from './components/cancellation-policies/cancellation-policies.component';
 
 export const routes: Routes = [
 
@@ -30,6 +31,8 @@ export const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   // about root
   { path: 'about', component: AboutComponent },
+  // cancellation-policies root
+  { path: 'cancellation-policies', component: CancellationPoliciesComponent },
 
   // search-results root
   { path: 'search-results', component: SearchResultsComponent },
