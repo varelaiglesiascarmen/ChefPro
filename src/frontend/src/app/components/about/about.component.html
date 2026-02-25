@@ -1,29 +1,33 @@
-<div class="about-container fadeIn">
-  <section class="about-hero">
-    <h1>¿Qué es <span>Chef Pro</span>?</h1>
-    <div class="project-badge">TFG | Proyecto Final de Grado</div>
-    <p class="project-info">
-      Chef Pro es una aplicación web creada como parte de un <strong>Trabajo de Fin de Grado del Grado Superior en
-        Desarrollo de
-        Aplicaciones Web</strong>. Su objetivo es conectar a chefs y cocineros autónomos con personas que buscan
-      servicios
-      culinarios personalizados bajo demanda, de forma accesible y flexible.
-    </p>
-    <p class="project-info">
-      La plataforma permite reservar servicios, gestionar disponibilidades, coordinar citas y valorar experiencias,
-      ofreciendo funcionalidades tanto para chefs como para comensales. El proyecto ha sido desarrollado aplicando
-      principios de arquitectura web modular, diseño responsive e integración entre frontend, backend, APIs, bases de
-      datos y despliegue.
-    </p>
-    <p class="project-info">
-      <strong>Aviso importante:</strong> Chef Pro <strong>no es una empresa real ni ofrece servicios
-        comerciales.</strong> Se trata exclusivamente de un proyecto académico con fines educativos y demostrativos.
-    </p>
+<div class="about-wrapper fadeIn">
+  <header class="about-hero">
+    <div class="header-content">
+      <h1>¿Qué es <span>Chef Pro</span>?</h1>
+      <div class="project-badge">TFG | Proyecto Final de Grado</div>
+    </div>
+  </header>
+
+  <section class="intro-section">
+    <div class="intro-content">
+      <p class="project-info">
+        Chef Pro es una aplicación web creada como parte de un <strong>Trabajo de Fin de Grado del Grado Superior en Desarrollo de Aplicaciones Web</strong>. Su objetivo es conectar a chefs y cocineros autónomos con personas que buscan servicios culinarios personalizados bajo demanda, de forma accesible y flexible.
+      </p>
+      <p class="project-info">
+        La plataforma permite reservar servicios, gestionar disponibilidades, coordinar citas y valorar experiencias, ofreciendo funcionalidades tanto para chefs y cocineros como para comensales. El proyecto ha sido desarrollado aplicando principios de arquitectura web modular, diseño responsive e integración entre frontend, backend, APIs, bases de datos y despliegue.
+      </p>
+
+      <div class="warning-box">
+        <i class="fa-solid fa-circle-info"></i>
+        <p>
+          <strong>Aviso importante:</strong> Chef Pro <strong>no es una empresa real ni ofrece servicios comerciales.</strong> Se trata exclusivamente de un proyecto académico con fines educativos y demostrativos.
+        </p>
+      </div>
+    </div>
   </section>
 
-  <div class="team-section">
+  <div class="team-container">
     <h2 class="section-title">Nuestro equipo de desarrollo</h2>
     <div class="team-grid">
+
       <div class="team-card" *ngFor="let member of team">
         <div class="image-container">
           <img [src]="member.photo" [alt]="member.name">
@@ -42,11 +46,7 @@
           </a>
         </div>
       </div>
+
     </div>
   </div>
-
-  <footer class="about-footer">
-    <p>Tecnologías usadas: Angular • Spring Boot • SQL</p>
-    <p>© Promoción 2024-2026 DAW | Davante MEDAC Sevilla Este</p>
-  </footer>
 </div>
