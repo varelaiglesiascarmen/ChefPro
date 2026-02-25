@@ -1,16 +1,101 @@
-<div class="orders-container fadeIn">
-  <h2>{{ role === 'CHEF' ? 'Solicitudes de Comensales' : 'Mis Reservas Gourmet' }}</h2>
+<div class="orders-wrapper fadeIn">
+  <div class="orders-header">
+    <h1>Gestión de <span>Reservas</span></h1>
+    <p>Administra tus servicios y controla tu agenda</p>
+  </div>
 
-  <div class="order-card" *ngFor="let order of orders">
-    <div class="order-info">
-      <h4>Menú: {{ order.menuTitle }}</h4>
-      <p>{{ order.date | date:'mediumDate' }} | 👥 {{ order.diners }} pers.</p>
-      <span class="status-badge" [ngClass]="order.status">{{ order.status }}</span>
+  <div class="orders-container">
+    <div class="tabs-nav">
+      <button class="tab-btn" [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">
+        Solicitudes Pendientes
+        <span class="badge" *ngIf="pendingOrders.length > 0">{{ pendingOrders.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'CONFIRMED'" (click)="setTab('CONFIRMED')">
+        Reservas Confirmadas
+      </button>
     </div>
 
-    <div class="chef-actions" *ngIf="role === 'CHEF' && order.status === 'PENDING'">
-      <button class="btn-accept" (click)="handleRequest(order.id, 'ACCEPTED')">Aceptar</button>
-      <button class="btn-reject" (click)="handleRequest(order.id, 'REJECTED')">Rechazar</button>
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Cargando tu agenda...</p>
     </div>
+
+    <div class="tab-content" *ngIf="!isLoading && activeTab === 'PENDING'">
+
+      <div class="empty-state" *ngIf="pendingOrders.length === 0">
+        <i class="fa-solid fa-bell-slash"></i>
+        <h3>No tienes solicitudes nuevas</h3>
+        <p>Cuando un comensal reserve uno de tus menús, aparecerá aquí para tu revisión.</p>
+      </div>
+
+      <div class="orders-grid">
+        <div class="order-card pending-card" *ngFor="let order of pendingOrders">
+          <div class="card-top">
+            <span class="order-id">{{ order.id }}</span>
+            <span class="status-badge warning">Pendiente de revisión</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="diner-name">{{ order.dinerName }}</h3>
+            <p class="menu-name">{{ order.menuName }}</p>
+
+            <div class="order-details">
+              <div class="detail"><i class="fa-regular fa-calendar"></i> {{ order.date }}</div>
+              <div class="detail"><i class="fa-solid fa-user-group"></i> {{ order.guests }} pax</div>
+              <div class="detail"><i class="fa-solid fa-location-dot"></i> {{ order.location }}</div>
+            </div>
+
+            <div class="price-tag">{{ order.price }}</div>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn-reject" (click)="rejectOrder(order)">
+              <i class="fa-solid fa-xmark"></i> Rechazar
+            </button>
+            <button class="btn-accept" (click)="acceptOrder(order)">
+              <i class="fa-solid fa-check"></i> Aceptar Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" *ngIf="!isLoading && activeTab === 'CONFIRMED'">
+
+      <div class="empty-state" *ngIf="confirmedOrders.length === 0">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h3>Tu agenda está despejada</h3>
+        <p>Acepta las solicitudes pendientes para llenar tu calendario de servicios.</p>
+      </div>
+
+      <div class="orders-grid">
+        <div class="order-card confirmed-card" *ngFor="let order of confirmedOrders">
+          <div class="card-top">
+            <span class="order-id">{{ order.id }}</span>
+            <span class="status-badge success">Confirmada</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="diner-name">{{ order.dinerName }}</h3>
+            <p class="menu-name">{{ order.menuName }}</p>
+
+            <div class="order-details">
+              <div class="detail"><i class="fa-regular fa-calendar"></i> {{ order.date }}</div>
+              <div class="detail"><i class="fa-solid fa-user-group"></i> {{ order.guests }} pax</div>
+              <div class="detail"><i class="fa-solid fa-location-dot"></i> {{ order.location }}</div>
+            </div>
+
+            <div class="price-tag">{{ order.price }}</div>
+          </div>
+
+          <div class="card-actions single-action">
+            <button class="btn-cancel" (click)="cancelOrder(order)">
+              Cancelar Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
