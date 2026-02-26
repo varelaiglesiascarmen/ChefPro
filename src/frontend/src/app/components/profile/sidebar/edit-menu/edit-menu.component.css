@@ -324,7 +324,7 @@ textarea {
 
 .allergen-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
   margin-top: 12px;
 }
@@ -444,6 +444,14 @@ textarea {
   .edit-menu-container {
     margin-top: -20px;
   }
+
+  .allergen-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .edit-menu-hero h1 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+  }
 }
 
 @media (max-width: 600px) {
@@ -451,10 +459,14 @@ textarea {
     padding: 60px 20px 50px;
   }
 
+  .edit-menu-container {
+    padding: 0 16px 40px;
+  }
+
   .edit-card,
   .loading-state,
   .error-state {
-    padding: 24px;
+    padding: 20px;
   }
 
   .form-grid,
@@ -462,15 +474,58 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .allergen-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .allergen-grid label {
+    padding: 12px;
+  }
+
+  .dish-card {
+    padding: 20px;
+  }
+
+  .dishes-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-add {
+    width: 100%;
+  }
+
+  .dish-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-remove-dish {
+    width: 100%;
+  }
+
   .action-row {
-    justify-content: stretch;
+    flex-direction: column;
   }
 
   .btn-primary,
   .btn-secondary,
   .btn-danger {
-    flex: 1 1 auto;
+    width: 100%;
     text-align: center;
+  }
+
+  .modal-content {
+    padding: 32px 24px;
+    width: 95%;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .modal-buttons button {
+    width: 100%;
   }
 }
 

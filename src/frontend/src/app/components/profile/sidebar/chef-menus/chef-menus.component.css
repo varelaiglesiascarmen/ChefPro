@@ -332,3 +332,62 @@
     opacity: 1;
   }
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chef-menus-container {
+    padding: 24px 20px;
+  }
+
+  .header-dashboard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .btn-create-main {
+    width: 100%;
+  }
+
+  .menus-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .create-new-card {
+    min-height: 250px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 32px 24px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .modal-buttons button {
+    width: 100%;
+  }
+
+  .header-dashboard h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chef-menus-container {
+    padding: 20px 16px;
+  }
+
+  .header-dashboard h1 {
+    font-size: 1.8rem;
+  }
+
+  .success-message,
+  .error-message {
+    padding: 14px 18px;
+    font-size: 0.9rem;
+  }
+}
