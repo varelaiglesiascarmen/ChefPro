@@ -84,13 +84,14 @@ public class ReviewServiceImpl implements ReviewService {
       throw new IllegalArgumentException("You can only review a confirmed reservation");
     }
 
-    // 8. Verificar que este diner no ha reseñado ya a este chef
-    boolean alreadyReviewed = reviewRepository.existsByReviewedUser_IdAndReviewerUser_Id(
+    // 8. Verificar que este diner no ha reseñado ya esta reserva con este chef
+    boolean alreadyReviewed = reviewRepository.existsByReviewedUser_IdAndReviewerUser_IdAndReservationDate(
       chef.getUser().getId(),
-      diner.getId()
+      diner.getId(),
+      dto.getReservationDate()
     );
     if (alreadyReviewed) {
-      throw new IllegalArgumentException("You have already submitted a review for this chef");
+      throw new IllegalArgumentException("You have already submitted a review for this reservation");
     }
 
     // 9. Crear y persistir la review usando los user_ID de ambos, como indica la tabla
