@@ -2,6 +2,67 @@
   padding: 40px;
 }
 
+.success-message,
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease-out;
+}
+
+.success-message {
+  background: linear-gradient(135deg, #f4f6f1 0%, #e8ebe5 100%);
+  border: 1px solid #2e3f21;
+  color: #2e3f21;
+}
+
+.success-message i {
+  color: #2e3f21;
+  font-size: 1.3rem;
+}
+
+.error-message {
+  background: linear-gradient(135deg, #faf2f0 0%, #f5e8e5 100%);
+  border: 1px solid #8b2a2a;
+  color: #570a0a;
+  justify-content: space-between;
+}
+
+.error-message i {
+  color: #8b2a2a;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.error-message .close-btn {
+  background: transparent;
+  border: none;
+  color: #570a0a;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 8px;
+  font-size: 1.2rem;
+}
+
+.error-message .close-btn:hover {
+  opacity: 0.7;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .header-dashboard {
   display: flex;
   justify-content: space-between;
@@ -164,4 +225,231 @@
   border: none;
   color: #C0392B;
   cursor: pointer;
+}
+
+/* Modal Confirmation Dialog */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(44, 24, 16, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: #ffffff;
+  border: 1px solid #EAE0D5;
+  border-radius: 16px;
+  padding: 40px 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(44, 24, 16, 0.15);
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-icon {
+  font-size: 2.5rem;
+  color: #C85A3C;
+  margin-bottom: 16px;
+}
+
+.modal-content h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: #2C1810;
+  margin: 0 0 12px;
+}
+
+.modal-content p {
+  color: #6B5344;
+  margin: 0 0 28px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.modal-buttons .btn-secondary {
+  background: #ffffff;
+  border: 1px solid #EAE0D5;
+  color: #2C1810;
+}
+
+.modal-buttons .btn-secondary:hover {
+  border-color: #C5A059;
+  color: #C5A059;
+}
+
+.modal-buttons .btn-danger {
+  background: #570a0a;
+  color: #ffffff;
+  border: none;
+}
+
+.modal-buttons .btn-danger:hover {
+  background: #3d0707;
+  box-shadow: 0 4px 12px rgba(87, 10, 10, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chef-menus-container {
+    padding: 24px 20px 60px;
+    min-height: calc(100vh - 80px);
+  }
+
+  .header-dashboard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .btn-create-main {
+    width: 100%;
+  }
+
+  .menus-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .menu-card {
+    max-width: 100%;
+  }
+
+  .menu-thumb {
+    height: 200px;
+  }
+
+  .menu-body {
+    padding: 20px;
+  }
+
+  .menu-body h3 {
+    font-size: 1.3rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .menu-footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-action.edit,
+  .btn-action.delete {
+    width: 100%;
+    padding: 10px 20px;
+    text-align: center;
+  }
+
+  .create-new-card {
+    min-height: 250px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 32px 24px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .modal-buttons button {
+    width: 100%;
+  }
+
+  .header-dashboard h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chef-menus-container {
+    padding: 20px 16px 80px;
+  }
+
+  .header-dashboard {
+    margin-bottom: 24px;
+  }
+
+  .header-dashboard h1 {
+    font-size: 1.8rem;
+  }
+
+  .success-message,
+  .error-message {
+    padding: 14px 18px;
+    font-size: 0.9rem;
+  }
+
+  .menus-grid {
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+
+  .menu-thumb {
+    height: 180px;
+  }
+
+  .menu-body {
+    padding: 18px;
+  }
+
+  .menu-body h3 {
+    font-size: 1.2rem;
+  }
+
+  .badge-price {
+    font-size: 0.85rem;
+    padding: 4px 12px;
+  }
 }
