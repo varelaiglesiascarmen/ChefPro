@@ -3,7 +3,9 @@ package com.chefpro.backendjava.controller;
 import com.chefpro.backendjava.common.object.dto.ReservationsCReqDto;
 import com.chefpro.backendjava.common.object.dto.ReservationDTO;
 import com.chefpro.backendjava.common.object.dto.ReservationsUReqDto;
+import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
 import com.chefpro.backendjava.service.ReservationService;
+import com.chefpro.backendjava.service.ReviewService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,9 +19,11 @@ import java.util.List;
 public class ReservationController {
 
   private final ReservationService reservationService;
+  private final ReviewService reviewService;
 
-  public ReservationController(ReservationService reservationService) {
+  public ReservationController(ReservationService reservationService, ReviewService reviewService) {
     this.reservationService = reservationService;
+    this.reviewService = reviewService;
   }
 
   @GetMapping("/chef")
@@ -54,8 +58,20 @@ public class ReservationController {
   }
 
   @PatchMapping("/status")
-  public ResponseEntity<ReservationDTO> updateReservationStatus(Authentication authentication, @RequestBody ReservationsUReqDto reservaUpdateDto) {
+  public ResponseEntity<ReservationDTO> updateReservationStatus(
+    Authentication authentication,
+    @RequestBody ReservationsUReqDto reservaUpdateDto
+  ) {
     ReservationDTO updated = reservationService.updateReservationStatus(authentication, reservaUpdateDto);
     return ResponseEntity.ok(updated);
+  }
+
+  @PostMapping("/review")
+  public ResponseEntity<Void> createReview(
+    Authentication authentication,
+    @RequestBody ReviewCReqDto reviewDto
+  ) {
+    reviewService.createReview(reviewDto, authentication);
+    return ResponseEntity.status(201).build();
   }
 }

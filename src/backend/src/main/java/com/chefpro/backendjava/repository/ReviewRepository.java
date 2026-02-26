@@ -4,22 +4,27 @@ import com.chefpro.backendjava.common.object.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
+  // Usado en ChefProfileServiceImpl.getChefPublicProfile() para listar reseñas
+  // Hace fetch del reviewer para poder acceder a nombre/apellido sin lazy load adicional
   @Query("SELECT r FROM Review r " +
     "JOIN FETCH r.reviewerUser " +
-    "WHERE r.reviewedUser.id = :userId " +
+    "WHERE r.reviewedUser.id = :reviewedUserId " +
     "ORDER BY r.date DESC")
-  List<Review> findByReviewedUserIdWithReviewer(@Param("userId") Long userId);
+  List<Review> findByReviewedUserIdWithReviewer(@Param("reviewedUserId") Long reviewedUserId);
 
-  @Query("SELECT COALESCE(AVG(r.score), 0) FROM Review r WHERE r.reviewedUser.id = :userId")
-  Double findAverageScoreByReviewedUserId(@Param("userId") Long userId);
+  // Usado en ChefProfileServiceImpl para calcular la media de puntuación
+  @Query("SELECT COALESCE(AVG(r.score), 0) FROM Review r WHERE r.reviewedUser.id = :reviewedUserId")
+  Double findAverageScoreByReviewedUserId(@Param("reviewedUserId") Long reviewedUserId);
 
-  @Query("SELECT COUNT(r) FROM Review r WHERE r.reviewedUser.id = :userId")
-  Long countByReviewedUserId(@Param("userId") Long userId);
+  // Usado en ChefProfileServiceImpl para contar el número de reseñas
+  @Query("SELECT COUNT(r) FROM Review r WHERE r.reviewedUser.id = :reviewedUserId")
+  Long countByReviewedUserId(@Param("reviewedUserId") Long reviewedUserId);
+
+  // Usado en ReviewServiceImpl para evitar reseñas duplicadas del mismo diner al mismo chef
+  boolean existsByReviewedUser_IdAndReviewerUser_Id(Long reviewedUserId, Long reviewerUserId);
 }
