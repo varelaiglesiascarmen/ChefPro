@@ -59,6 +59,9 @@ export class EditMenuComponent implements OnInit, OnDestroy {
   isSaving = false;
   errorMessage = '';
   successMessage = '';
+  showConfirmDialog = false;
+  confirmAction: 'delete-menu' | 'delete-dish' | null = null;
+  confirmDishIndex = -1;
 
   menuId = 0;
 
@@ -226,9 +229,12 @@ export class EditMenuComponent implements OnInit, OnDestroy {
   }
 
   deleteMenu(): void {
-    const confirmacion = confirm('¿Deseas eliminar definitivamente este menú? Esta acción no se puede deshacer.');
-    if (!confirmacion) return;
+    this.confirmAction = 'delete-menu';
+    this.showConfirmDialog = true;
+  }
 
+  confirmDeleteMenu(): void {
+    this.showConfirmDialog = false;
     console.log('EditMenu: Eliminando menú con ID:', this.menuId);
     this.menuService.deleteMenu(this.menuId).pipe(
       takeUntil(this.destroy$)
@@ -259,6 +265,13 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+    this.confirmAction = null;
+  }
+
+  cancelConfirmDialog(): void {
+    this.showConfirmDialog = false;
+    this.confirmAction = null;
+    this.confirmDishIndex = -1;
   }
 
   cancel(): void {
@@ -312,8 +325,15 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const confirmacion = confirm('Deseas eliminar este plato del menu?');
-    if (!confirmacion) return;
+    this.confirmAction = 'delete-dish';
+    this.confirmDishIndex = index;
+    this.showConfirmDialog = true;
+  }
+
+  confirmDeleteDish(): void {
+    this.showConfirmDialog = false;
+    const index = this.confirmDishIndex;
+    const dish = this.dishes[index];
 
     console.log('EditMenu: Eliminando plato con ID:', dish.dishId);
     this.menuService.deleteDish(this.menuId, dish.dishId).pipe(
@@ -330,6 +350,9 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.errorMessage = 'No se pudo eliminar el plato. Intentalo de nuevo.';
         this.cdr.detectChanges();
       }
+    });
+    this.confirmAction = null;
+    this.confirmDishIndex = -1;
     });
   }
 

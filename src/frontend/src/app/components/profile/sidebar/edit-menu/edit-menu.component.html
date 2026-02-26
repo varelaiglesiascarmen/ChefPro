@@ -134,6 +134,34 @@
         </div>
       </section>
 
+    <!-- Confirmation Dialog Modal -->
+    <div class="modal-overlay" *ngIf="showConfirmDialog" (click)="cancelConfirmDialog()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-icon">
+          <i class="fa-solid fa-exclamation-circle"></i>
+        </div>
+        <h3 *ngIf="confirmAction === 'delete-menu'">Eliminar menú</h3>
+        <h3 *ngIf="confirmAction === 'delete-dish'">Eliminar plato</h3>
+
+        <p *ngIf="confirmAction === 'delete-menu'">
+          ¿Deseas eliminar definitivamente este menú? Esta acción no se puede deshacer.
+        </p>
+        <p *ngIf="confirmAction === 'delete-dish'">
+          ¿Deseas eliminar este plato del menú?
+        </p>
+
+        <div class="modal-buttons">
+          <button class="btn-secondary" type="button" (click)="cancelConfirmDialog()">
+            Cancelar
+          </button>
+          <button class="btn-danger" type="button"
+            (click)="confirmAction === 'delete-menu' ? confirmDeleteMenu() : confirmDeleteDish()">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
       <div class="action-row">
         <button class="btn-secondary" type="button" (click)="cancel()">Cancelar</button>
         <button class="btn-danger" type="button" (click)="deleteMenu()">Eliminar menú</button>

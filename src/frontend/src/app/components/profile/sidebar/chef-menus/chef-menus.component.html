@@ -49,4 +49,24 @@
       </div>
     </div>
   </div>
+
+  <!-- Confirmation Dialog Modal -->
+  <div class="modal-overlay" *ngIf="showConfirmDialog" (click)="cancelConfirmDialog()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-icon">
+        <i class="fa-solid fa-exclamation-circle"></i>
+      </div>
+      <h3>Eliminar menú</h3>
+      <p>¿Deseas retirar este menú de tu carta profesional?</p>
+
+      <div class="modal-buttons">
+        <button class="btn-secondary" type="button" (click)="cancelConfirmDialog()">
+          Cancelar
+        </button>
+        <button class="btn-danger" type="button" (click)="confirmDeleteMenu()">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

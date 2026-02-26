@@ -23,6 +23,8 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
   menus: any[] = [];
   errorMessage = '';
   successMessage = '';
+  showConfirmDialog = false;
+  confirmMenuId = -1;
 
   ngOnInit() {
     this.loadMenus();
@@ -45,41 +47,52 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(id: number) {
-    if (confirm('¿Deseas retirar este menú de tu carta profesional?')) {
-      console.log('ChefMenus: Eliminando menú con ID:', id);
-      this.menuService.deleteMenu(id).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: () => {
-          console.log('ChefMenus: Menú eliminado exitosamente, recargando lista...');
-          this.successMessage = 'Menú eliminado exitosamente.';
-          this.cdr.detectChanges();
-          setTimeout(() => {
-            this.successMessage = '';
-            this.loadMenus();
-          }, 1000);
-        },
-        error: (err) => {
-          console.error('ChefMenus: Error al eliminar menú:', err);
+    this.confirmMenuId = id;
+    this.showConfirmDialog = true;
+  }
 
-          // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
-          if (err.status === 403) {
+  confirmDeleteMenu(): void {
+    const id = this.confirmMenuId;
+    this.showConfirmDialog = false;
+    console.log('ChefMenus: Eliminando menú con ID:', id);
+    this.menuService.deleteMenu(id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        console.log('ChefMenus: Menú eliminado exitosamente, recargando lista...');
+        this.successMessage = 'Menú eliminado exitosamente.';
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.successMessage = '';
+          this.loadMenus();
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('ChefMenus: Error al eliminar menú:', err);
+
+        // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
+        if (err.status === 403) {
+          this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
+        } else {
+          // Verificar si el mensaje contiene información sobre reservas
+          const errorMsg = err.error?.message || err.error || err.message || '';
+          if (errorMsg.includes('reservas confirmadas') ||
+              errorMsg.includes('reservations') ||
+              errorMsg.includes('foreign key constraint')) {
             this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
           } else {
-            // Verificar si el mensaje contiene información sobre reservas
-            const errorMsg = err.error?.message || err.error || err.message || '';
-            if (errorMsg.includes('reservas confirmadas') ||
-                errorMsg.includes('reservations') ||
-                errorMsg.includes('foreign key constraint')) {
-              this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
-            } else {
-              this.errorMessage = 'No se pudo eliminar el menú. Inténtalo de nuevo.';
-            }
+            this.errorMessage = 'No se pudo eliminar el menú. Inténtalo de nuevo.';
           }
-          this.cdr.detectChanges();
         }
-      });
-    }
+        this.cdr.detectChanges();
+      }
+    });
+    this.confirmMenuId = -1;
+  }
+
+  cancelConfirmDialog(): void {
+    this.showConfirmDialog = false;
+    this.confirmMenuId = -1;
   }
 
   goToEdit(id: number) {
