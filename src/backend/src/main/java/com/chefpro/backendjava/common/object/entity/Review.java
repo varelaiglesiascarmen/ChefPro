@@ -36,4 +36,11 @@ public class Review {
 
   @Column(name = "date")
   private LocalDate date;
+
+  @PrePersist
+  public void prePersist() {
+    if (date == null) {
+      date = LocalDate.now();
+    }
+  }
 }
