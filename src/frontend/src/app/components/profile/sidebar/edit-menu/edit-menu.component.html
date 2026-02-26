@@ -1,0 +1,144 @@
+<section class="edit-menu-wrapper fadeIn">
+  <header class="edit-menu-hero">
+    <div class="hero-content">
+      <p class="eyebrow">Carta Gourmet</p>
+      <h1>Editar <span>Menú</span></h1>
+      <p class="subtitle">Ajusta tu propuesta culinaria sin perder tu esencia.</p>
+    </div>
+  </header>
+
+  <div class="edit-menu-container">
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Cargando menú...</p>
+    </div>
+
+    <div class="error-state" *ngIf="!isLoading && errorMessage">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h3>Ups, algo salió mal</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="btn-secondary" (click)="cancel()">Volver a mis menús</button>
+    </div>
+
+    <form class="edit-menu-form" *ngIf="!isLoading && !errorMessage" (ngSubmit)="saveMenu()">
+      <section class="edit-card">
+        <div class="card-header">
+          <h2>Detalles del menú</h2>
+          <p>Completa los campos principales para mantener tu carta actualizada.</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="field field-span-2">
+            <label for="title">Nombre del menú</label>
+            <input id="title" name="title" type="text" [(ngModel)]="menuForm.title" placeholder="Ej. Italia Clásica" />
+          </div>
+
+          <div class="field field-wide">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" rows="4" [(ngModel)]="menuForm.description"
+              placeholder="Describe la experiencia gastronómica, ingredientes y estilo."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="price">Precio por persona</label>
+            <input id="price" name="price" type="number" min="1" [(ngModel)]="menuForm.pricePerPerson"
+              placeholder="120" (keydown)="blockSomeKeys($event)" />
+          </div>
+
+          <div class="field">
+            <label for="minDiners">Mínimo de comensales</label>
+            <input id="minDiners" name="minDiners" type="number" min="1" [(ngModel)]="menuForm.minNumberDiners"
+              placeholder="2" (keydown)="blockSomeKeys($event)" (blur)="sanitizeInteger('minNumberDiners')" />
+          </div>
+
+          <div class="field">
+            <label for="maxDiners">Máximo de comensales</label>
+            <input id="maxDiners" name="maxDiners" type="number" min="1" [(ngModel)]="menuForm.maxNumberDiners"
+              placeholder="10" (keydown)="blockSomeKeys($event)" (blur)="sanitizeInteger('maxNumberDiners')" />
+          </div>
+        </div>
+
+        <div class="kitchen-section">
+          <label>Requisitos de tu cocina</label>
+          <p class="helper-text">Escribe un requisito (ej: Horno) y pulsa Enter.</p>
+          <div class="tags-container">
+            <span *ngFor="let tag of kitchenTags; let i = index" class="skill-tag">
+              {{ tag }}
+              <button type="button" class="remove-tag" (click)="removeKitchenTag(i)">&times;</button>
+            </span>
+            <input name="kitchenTag" [(ngModel)]="currentTagInput" (keydown.enter)="addKitchenTag($event)"
+              placeholder="Añadir requisito..." />
+          </div>
+        </div>
+      </section>
+
+      <section class="edit-card dishes-section">
+        <div class="dishes-header">
+          <h2>Platos del menú</h2>
+          <button class="btn-add" type="button" (click)="addDish()" [disabled]="dishes.length >= 6">+ Añadir plato</button>
+        </div>
+
+        <div *ngFor="let dish of dishes; let i = index" class="dish-card fadeIn">
+          <div class="dish-header-row">
+            <h3>Plato {{ i + 1 }}</h3>
+            <button class="btn-remove-dish" type="button" (click)="removeDish(i)" [disabled]="dishes.length === 1">
+              Eliminar plato
+            </button>
+          </div>
+
+          <div class="dish-main-info">
+            <div class="input-row">
+              <div class="field">
+                <label>Nombre del plato</label>
+                <input name="dishTitle-{{ i }}" [(ngModel)]="dish.title" placeholder="Ej: Solomillo al Pedro Ximénez" />
+              </div>
+              <div class="field">
+                <label>Categoría</label>
+                <select name="dishCategory-{{ i }}" [(ngModel)]="dish.category">
+                  <option value="Entrante">Entrante</option>
+                  <option value="Plato Principal">Plato Principal</option>
+                  <option value="Postre">Postre</option>
+                  <option value="Bebida">Bebida</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Descripción del plato</label>
+              <textarea name="dishDescription-{{ i }}" [(ngModel)]="dish.description" rows="2"
+                placeholder="Detalla los ingredientes clave..."></textarea>
+            </div>
+
+            <div class="allergen-box">
+              <label>Alergenos presentes</label>
+              <div class="allergen-grid">
+                <label *ngFor="let alg of officialAllergens" [class.selected]="dish.allergenIds.includes(alg.id)"
+                  (click)="toggleAllergen(i, alg.id)">
+                  <span class="alg-num">{{ alg.id }}</span>
+                  <span class="allergen-name">{{ alg.name }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="photo-upload">
+              <label>Foto del plato (Máx 2MB)</label>
+              <input type="file" name="dishPhoto-{{ i }}" (change)="onFileSelected($event, i)" accept="image/*" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="action-row">
+        <button class="btn-secondary" type="button" (click)="cancel()">Cancelar</button>
+        <button class="btn-danger" type="button" (click)="deleteMenu()">Eliminar menú</button>
+        <button class="btn-primary" type="submit" [disabled]="isSaving || !isFormValid()">
+          {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+      <p class="form-hint" *ngIf="!isFormValid()">
+        * Debes completar todos los titulos, descripciones, rango de comensales y al menos un alérgeno por plato.
+      </p>
+    </form>
+  </div>
+</section>

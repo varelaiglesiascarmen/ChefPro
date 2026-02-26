@@ -124,6 +124,9 @@ public class MenuServiceImpl implements MenuService {
       .title(menu.getTitle())
       .description(menu.getDescription())
       .pricePerPerson(menu.getPricePerPerson())
+      .minNumberDiners(menu.getMinNumberDiners())
+      .maxNumberDiners(menu.getMaxNumberDiners())
+      .kitchenRequirements(menu.getKitchenRequirements())
       .dishes(dishes)
       .allergens(allergens)
       .deliveryAvailable(false)
@@ -181,6 +184,18 @@ public class MenuServiceImpl implements MenuService {
       menu.setPricePerPerson(uReq.getPricePerPerson());
     }
 
+    if (uReq.getMinNumberDiners() != null && uReq.getMinNumberDiners() > 0) {
+      menu.setMinNumberDiners(uReq.getMinNumberDiners());
+    }
+
+    if (uReq.getMaxNumberDiners() != null && uReq.getMaxNumberDiners() > 0) {
+      menu.setMaxNumberDiners(uReq.getMaxNumberDiners());
+    }
+
+    if (uReq.getKitchenRequirements() != null) {
+      menu.setKitchenRequirements(uReq.getKitchenRequirements());
+    }
+
 
     Menu saved = menuRepository.save(menu);
 
@@ -189,6 +204,9 @@ public class MenuServiceImpl implements MenuService {
       .title(saved.getTitle())
       .description(saved.getDescription())
       .pricePerPerson(saved.getPricePerPerson())
+      .minNumberDiners(saved.getMinNumberDiners())
+      .maxNumberDiners(saved.getMaxNumberDiners())
+      .kitchenRequirements(saved.getKitchenRequirements())
 
       .dishes(List.of())
       .allergens(Set.of())
