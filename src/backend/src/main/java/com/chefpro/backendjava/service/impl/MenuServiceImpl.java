@@ -151,6 +151,12 @@ public class MenuServiceImpl implements MenuService {
       throw new RuntimeException("Not allowed to delete this menu");
     }
 
+    // Verificar si el menú tiene reservas activas
+    if (menu.getReservations() != null && !menu.getReservations().isEmpty()) {
+      throw new RuntimeException("No se puede eliminar este menú porque tiene reservas confirmadas. " +
+        "Por favor, espera a que finalicen las reservas antes de eliminar el menú.");
+    }
+
     menuRepository.delete(menu);
   }
 

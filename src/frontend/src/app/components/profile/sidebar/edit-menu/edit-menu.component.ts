@@ -1,8 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../../services/auth.service';
 import { MenuService } from '../../../../services/menu.service';
 
@@ -47,12 +48,13 @@ type EditableDish = {
   templateUrl: './edit-menu.component.html',
   styleUrls: ['./edit-menu.component.css']
 })
-export class EditMenuComponent implements OnInit {
+export class EditMenuComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private menuService = inject(MenuService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-
+  private cdr = inject(ChangeDetectorRef);
+  private destroy$ = new Subject<void>();
   isLoading = true;
   isSaving = false;
   errorMessage = '';
@@ -106,16 +108,24 @@ export class EditMenuComponent implements OnInit {
 
   loadMenu(): void {
     this.isLoading = true;
-    this.menuService.getMenusByChef().subscribe({
+    this.errorMessage = '';
+    console.log('EditMenu: Cargando menú con ID:', this.menuId);
+    this.menuService.getMenusByChef().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (menus) => {
+        console.log('EditMenu: Menús obtenidos del servidor:', menus);
         const found = menus.find(menu => menu.menu_ID === this.menuId || menu.id === this.menuId);
 
         if (!found) {
+          console.error('EditMenu: Menú no encontrado con ID:', this.menuId);
           this.errorMessage = 'No encontramos el menú. Vuelve a tu carta y selecciona otro.';
           this.isLoading = false;
+          this.cdr.detectChanges();
           return;
         }
 
+        console.log('EditMenu: Menú encontrado:', found);
         this.menuForm = {
           title: found.title || '',
           description: found.description || '',
@@ -141,15 +151,19 @@ export class EditMenuComponent implements OnInit {
           allergenIds: this.mapAllergenNamesToIds(dish.allergens || [])
         }));
 
+        console.log('EditMenu: Platos cargados:', this.dishes.length);
         if (this.dishes.length === 0) {
           this.addDish();
         }
 
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('EditMenu: Error cargando menú:', err);
         this.errorMessage = 'No pudimos cargar tu menú. Revisa tu conexión e inténtalo de nuevo.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -177,6 +191,7 @@ export class EditMenuComponent implements OnInit {
     if (!this.isFormValid()) return;
 
     this.isSaving = true;
+    console.log('EditMenu: Guardando menú con ID:', this.menuId);
 
     this.syncKitchenRequirements();
 
@@ -193,11 +208,18 @@ export class EditMenuComponent implements OnInit {
       pickupAvailable: this.menuForm.pickupAvailable
     };
 
-    this.menuService.updateMenu(payload).subscribe({
-      next: () => this.saveDishes(),
-      error: () => {
+    this.menuService.updateMenu(payload).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        console.log('EditMenu: Menú actualizado exitosamente, guardando platos...');
+        this.saveDishes();
+      },
+      error: (err) => {
+        console.error('EditMenu: Error al guardar menú:', err);
         this.isSaving = false;
         this.errorMessage = 'No se pudo guardar el menú. Inténtalo de nuevo.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -206,10 +228,31 @@ export class EditMenuComponent implements OnInit {
     const confirmacion = confirm('¿Deseas eliminar definitivamente este menú? Esta acción no se puede deshacer.');
     if (!confirmacion) return;
 
-    this.menuService.deleteMenu(this.menuId).subscribe({
-      next: () => this.router.navigate(['/profile/menus']),
-      error: () => {
-        this.errorMessage = 'No se pudo eliminar el menú. Inténtalo de nuevo.';
+    console.log('EditMenu: Eliminando menú con ID:', this.menuId);
+    this.menuService.deleteMenu(this.menuId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        console.log('EditMenu: Menú eliminado exitosamente, redirigiendo a /profile/menus');
+        alert('Menú eliminado exitosamente');
+        this.router.navigate(['/profile/menus']);
+      },
+      error: (err) => {
+        console.error('EditMenu: Error al eliminar menú:', err);
+
+        // Verificar si el mensaje del backend indica que hay reservas
+        const errorMsg = err.error?.message || err.error || err.message || '';
+        if (errorMsg.includes('reservas confirmadas') ||
+            errorMsg.includes('reservations') ||
+            errorMsg.includes('foreign key constraint')) {
+          alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
+                'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
+        } else {
+          alert('No se pudo eliminar el menú. Inténtalo de nuevo.');
+        }
+        this.errorMessage = '';
+
+        this.cdr.detectChanges();
       }
     });
   }
@@ -251,6 +294,7 @@ export class EditMenuComponent implements OnInit {
   removeDish(index: number): void {
     if (this.dishes.length === 1) {
       this.errorMessage = 'Debes mantener al menos un plato en el menú.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -260,19 +304,27 @@ export class EditMenuComponent implements OnInit {
     if (!dish.dishId) {
       this.dishes.splice(index, 1);
       this.errorMessage = '';
+      this.cdr.detectChanges();
       return;
     }
 
     const confirmacion = confirm('Deseas eliminar este plato del menu?');
     if (!confirmacion) return;
 
-    this.menuService.deleteDish(this.menuId, dish.dishId).subscribe({
+    console.log('EditMenu: Eliminando plato con ID:', dish.dishId);
+    this.menuService.deleteDish(this.menuId, dish.dishId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: () => {
+        console.log('EditMenu: Plato eliminado exitosamente');
         this.dishes.splice(index, 1);
         this.errorMessage = '';
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('EditMenu: Error al eliminar plato:', err);
         this.errorMessage = 'No se pudo eliminar el plato. Intentalo de nuevo.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -358,19 +410,26 @@ export class EditMenuComponent implements OnInit {
     });
 
     if (requests.length === 0) {
+      console.log('EditMenu: No hay platos para guardar, redirigiendo...');
       this.isSaving = false;
       this.router.navigate(['/profile/menus']);
       return;
     }
 
-    forkJoin(requests).subscribe({
+    console.log('EditMenu: Guardando', requests.length, 'platos...');
+    forkJoin(requests).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: () => {
+        console.log('EditMenu: Todos los platos guardados exitosamente, redirigiendo...');
         this.isSaving = false;
         this.router.navigate(['/profile/menus']);
       },
-      error: () => {
+      error: (err) => {
+        console.error('EditMenu: Error al guardar platos:', err);
         this.isSaving = false;
         this.errorMessage = 'No se pudieron guardar los platos. Intentalo de nuevo.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -380,5 +439,10 @@ export class EditMenuComponent implements OnInit {
       .map(dish => dish.dishId || 0)
       .filter(id => id > 0);
     return ids.length ? Math.max(...ids) : 0;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

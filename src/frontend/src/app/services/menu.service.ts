@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -11,39 +11,33 @@ export class MenuService {
   private apiUrl = `${environment.apiUrl}/chef/menus`;
   private dishApiUrl = `${environment.apiUrl}/chef/plato`;
 
-  private getHeaders() {
-    const token = localStorage.getItem('chefpro_token');
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  }
-
   getMenusByChef(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() });
+    return this.http.get<any[]>(this.apiUrl);
   }
 
   createMenu(menuData: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, menuData, { headers: this.getHeaders() });
+    return this.http.post<any>(this.apiUrl, menuData);
   }
 
   updateMenu(menuData: any): Observable<any> {
-    return this.http.patch<any>(this.apiUrl, menuData, { headers: this.getHeaders() });
+    return this.http.patch<any>(this.apiUrl, menuData);
   }
 
   createDish(dishData: any): Observable<any> {
-    return this.http.post<any>(this.dishApiUrl, dishData, { headers: this.getHeaders() });
+    return this.http.post<any>(this.dishApiUrl, dishData);
   }
 
   updateDish(dishData: any): Observable<any> {
-    return this.http.patch<any>(this.dishApiUrl, dishData, { headers: this.getHeaders() });
+    return this.http.patch<any>(this.dishApiUrl, dishData);
   }
 
   deleteDish(menuId: number, dishId: number): Observable<any> {
     return this.http.delete<any>(this.dishApiUrl, {
-      headers: this.getHeaders(),
       params: { menuId, dishId }
     });
   }
 
   deleteMenu(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 }
