@@ -21,6 +21,8 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   menus: any[] = [];
+  errorMessage = '';
+  successMessage = '';
 
   ngOnInit() {
     this.loadMenus();
@@ -50,27 +52,31 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
       ).subscribe({
         next: () => {
           console.log('ChefMenus: Menú eliminado exitosamente, recargando lista...');
-          this.loadMenus();
+          this.successMessage = 'Menú eliminado exitosamente.';
+          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.successMessage = '';
+            this.loadMenus();
+          }, 1000);
         },
         error: (err) => {
           console.error('ChefMenus: Error al eliminar menú:', err);
 
           // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
           if (err.status === 403) {
-            alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
-                  'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
+            this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
           } else {
             // Verificar si el mensaje contiene información sobre reservas
             const errorMsg = err.error?.message || err.error || err.message || '';
             if (errorMsg.includes('reservas confirmadas') ||
                 errorMsg.includes('reservations') ||
                 errorMsg.includes('foreign key constraint')) {
-              alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
-                    'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
+              this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
             } else {
-              alert('No se pudo eliminar el menú. Inténtalo de nuevo.');
+              this.errorMessage = 'No se pudo eliminar el menú. Inténtalo de nuevo.';
             }
           }
+          this.cdr.detectChanges();
         }
       });
     }

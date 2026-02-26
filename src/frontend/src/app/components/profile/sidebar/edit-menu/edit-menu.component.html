@@ -13,6 +13,12 @@
       <p>Cargando menú...</p>
     </div>
 
+    <div class="success-state" *ngIf="successMessage">
+      <i class="fa-solid fa-check-circle"></i>
+      <h3>Éxito</h3>
+      <p>{{ successMessage }}</p>
+    </div>
+
     <div class="error-state" *ngIf="!isLoading && errorMessage">
       <i class="fa-solid fa-triangle-exclamation"></i>
       <h3>Ups, algo salió mal</h3>

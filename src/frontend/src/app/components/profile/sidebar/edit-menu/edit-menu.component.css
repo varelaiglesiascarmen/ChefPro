@@ -70,7 +70,8 @@
 }
 
 .loading-state,
-.error-state {
+.error-state,
+.success-state {
   background: #ffffff;
   border: 1px solid #EAE0D5;
   border-radius: 16px;
@@ -80,7 +81,8 @@
 }
 
 .loading-state i,
-.error-state i {
+.error-state i,
+.success-state i {
   font-size: 1.8rem;
   color: #C5A059;
   margin-bottom: 12px;
@@ -89,6 +91,21 @@
 .error-state h3 {
   font-family: 'Playfair Display', serif;
   margin: 0 0 8px;
+}
+
+.success-state {
+  border-color: #4CAF50;
+  background: linear-gradient(135deg, #ffffff 0%, #f1f8f4 100%);
+}
+
+.success-state i {
+  color: #4CAF50;
+}
+
+.success-state h3 {
+  font-family: 'Playfair Display', serif;
+  margin: 0 0 8px;
+  color: #4CAF50;
 }
 
 .edit-card {

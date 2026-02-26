@@ -1,4 +1,15 @@
 <div class="chef-menus-container fadeIn">
+  <div class="success-message" *ngIf="successMessage">
+    <i class="fa-solid fa-check-circle"></i>
+    <p>{{ successMessage }}</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <p>{{ errorMessage }}</p>
+    <button class="close-btn" (click)="errorMessage = ''">Cerrar</button>
+  </div>
+
   <div class="header-dashboard">
     <div class="text-group">
       <h1>Gestión de Carta Gourmet</h1>
