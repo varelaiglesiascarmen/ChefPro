@@ -1,6 +1,8 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { MenuService } from '../../../../services/menu.service';
 import { AuthService } from '../../../../services/auth.service';
 
@@ -11,37 +13,94 @@ import { AuthService } from '../../../../services/auth.service';
   templateUrl: './chef-menus.component.html',
   styleUrls: ['./chef-menus.component.css']
 })
-export class ChefMenusComponent implements OnInit {
+export class ChefMenusComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private menuService = inject(MenuService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
+  private destroy$ = new Subject<void>();
 
   menus: any[] = [];
+  errorMessage = '';
+  successMessage = '';
+  showConfirmDialog = false;
+  confirmMenuId = -1;
 
   ngOnInit() {
     this.loadMenus();
   }
 
   loadMenus() {
-    this.menuService.getMenusByChef().subscribe({
+    console.log('ChefMenus: Cargando menús del chef...');
+    this.menuService.getMenusByChef().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (data) => {
+        console.log('ChefMenus: Menús cargados:', data.length);
         this.menus = [...data];
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error cargando menús:', err);
+        console.error('ChefMenus: Error cargando menús:', err);
       }
     });
   }
 
   confirmDelete(id: number) {
-    if (confirm('¿Deseas retirar este menú de tu carta profesional?')) {
-      this.menuService.deleteMenu(id).subscribe(() => this.loadMenus());
-    }
+    this.confirmMenuId = id;
+    this.showConfirmDialog = true;
+  }
+
+  confirmDeleteMenu(): void {
+    const id = this.confirmMenuId;
+    this.showConfirmDialog = false;
+    console.log('ChefMenus: Eliminando menú con ID:', id);
+    this.menuService.deleteMenu(id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        console.log('ChefMenus: Menú eliminado exitosamente, recargando lista...');
+        this.successMessage = 'Menú eliminado exitosamente.';
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.successMessage = '';
+          this.loadMenus();
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('ChefMenus: Error al eliminar menú:', err);
+
+        // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
+        if (err.status === 403) {
+          this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
+        } else {
+          // Verificar si el mensaje contiene información sobre reservas
+          const errorMsg = err.error?.message || err.error || err.message || '';
+          if (errorMsg.includes('reservas confirmadas') ||
+              errorMsg.includes('reservations') ||
+              errorMsg.includes('foreign key constraint')) {
+            this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
+          } else {
+            this.errorMessage = 'No se pudo eliminar el menú. Inténtalo de nuevo.';
+          }
+        }
+        this.cdr.detectChanges();
+      }
+    });
+    this.confirmMenuId = -1;
+  }
+
+  cancelConfirmDialog(): void {
+    this.showConfirmDialog = false;
+    this.confirmMenuId = -1;
   }
 
   goToEdit(id: number) {
     this.router.navigate(['/profile/edit-menu', id]);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

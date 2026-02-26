@@ -11,6 +11,7 @@ import { UserMenuComponent } from './components/user-menu/user-menu.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
 import { NewMenuComponent } from './components/new-menu/new-menu.component';
+import { EditMenuComponent } from './components/profile/sidebar/edit-menu/edit-menu.component';
 import { UserInfoComponent } from './components/profile/sidebar/user-info/user-info.component';
 import { ChefMenusComponent } from './components/profile/sidebar/chef-menus/chef-menus.component';
 import { UserCalendarComponent } from './components/profile/sidebar/user-calendar/user-calendar.component';
@@ -56,6 +57,7 @@ export const routes: Routes = [
       { path: 'info', component: UserInfoComponent },
       { path: 'menus', component: ChefMenusComponent },
       { path: 'new-menu', component: NewMenuComponent },
+      { path: 'edit-menu/:id', component: EditMenuComponent },
       { path: 'calendar', component: UserCalendarComponent },
       { path: 'orders', component: UserOrdersComponent }
     ]
