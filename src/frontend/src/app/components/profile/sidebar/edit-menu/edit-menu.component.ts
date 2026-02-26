@@ -336,7 +336,7 @@ export class EditMenuComponent implements OnInit, OnDestroy {
     const dish = this.dishes[index];
 
     console.log('EditMenu: Eliminando plato con ID:', dish.dishId);
-    this.menuService.deleteDish(this.menuId, dish.dishId).pipe(
+    this.menuService.deleteDish(this.menuId, dish.dishId!).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
@@ -353,7 +353,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
     });
     this.confirmAction = null;
     this.confirmDishIndex = -1;
-    });
   }
 
   toggleAllergen(dishIndex: number, allergenId: number): void {
