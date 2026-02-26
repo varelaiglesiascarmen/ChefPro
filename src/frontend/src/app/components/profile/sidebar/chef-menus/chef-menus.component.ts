@@ -55,13 +55,21 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('ChefMenus: Error al eliminar menú:', err);
 
-          // Show user-friendly error message
-          if (err.error?.message?.includes('foreign key constraint') ||
-              err.error?.message?.includes('reservations') ||
-              err.status === 409) {
-            alert('No se puede eliminar este menú porque tiene reservas activas. Por favor, cancela las reservas primero.');
+          // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
+          if (err.status === 403) {
+            alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
+                  'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
           } else {
-            alert('No se pudo eliminar el menú. Inténtalo de nuevo.');
+            // Verificar si el mensaje contiene información sobre reservas
+            const errorMsg = err.error?.message || err.error || err.message || '';
+            if (errorMsg.includes('reservas confirmadas') ||
+                errorMsg.includes('reservations') ||
+                errorMsg.includes('foreign key constraint')) {
+              alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
+                    'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
+            } else {
+              alert('No se pudo eliminar el menú. Inténtalo de nuevo.');
+            }
           }
         }
       });

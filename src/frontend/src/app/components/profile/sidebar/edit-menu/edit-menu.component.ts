@@ -240,18 +240,23 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('EditMenu: Error al eliminar menú:', err);
 
-        // Verificar si el mensaje del backend indica que hay reservas
-        const errorMsg = err.error?.message || err.error || err.message || '';
-        if (errorMsg.includes('reservas confirmadas') ||
-            errorMsg.includes('reservations') ||
-            errorMsg.includes('foreign key constraint')) {
+        // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
+        if (err.status === 403) {
           alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
                 'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
         } else {
-          alert('No se pudo eliminar el menú. Inténtalo de nuevo.');
+          // Verificar si el backend envía mensaje con detalles
+          const errorMsg = err.error?.message || err.error || err.message || '';
+          if (errorMsg.includes('reservas confirmadas') ||
+              errorMsg.includes('reservations') ||
+              errorMsg.includes('foreign key constraint')) {
+            alert('No se puede eliminar este menú porque tiene reservas confirmadas.\n\n' +
+                  'Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.');
+          } else {
+            alert('No se pudo eliminar el menú. Inténtalo de nuevo.');
+          }
         }
         this.errorMessage = '';
-
         this.cdr.detectChanges();
       }
     });
