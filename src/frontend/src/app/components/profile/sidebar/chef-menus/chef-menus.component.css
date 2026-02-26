@@ -336,13 +336,15 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .chef-menus-container {
-    padding: 24px 20px;
+    padding: 24px 20px 60px;
+    min-height: calc(100vh - 80px);
   }
 
   .header-dashboard {
     flex-direction: column;
     align-items: flex-start;
     gap: 20px;
+    margin-bottom: 30px;
   }
 
   .btn-create-main {
@@ -352,6 +354,40 @@
   .menus-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .menu-card {
+    max-width: 100%;
+  }
+
+  .menu-thumb {
+    height: 200px;
+  }
+
+  .menu-body {
+    padding: 20px;
+  }
+
+  .menu-body h3 {
+    font-size: 1.3rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .menu-footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-action.edit,
+  .btn-action.delete {
+    width: 100%;
+    padding: 10px 20px;
+    text-align: center;
   }
 
   .create-new-card {
@@ -378,7 +414,11 @@
 
 @media (max-width: 480px) {
   .chef-menus-container {
-    padding: 20px 16px;
+    padding: 20px 16px 80px;
+  }
+
+  .header-dashboard {
+    margin-bottom: 24px;
   }
 
   .header-dashboard h1 {
@@ -389,5 +429,27 @@
   .error-message {
     padding: 14px 18px;
     font-size: 0.9rem;
+  }
+
+  .menus-grid {
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+
+  .menu-thumb {
+    height: 180px;
+  }
+
+  .menu-body {
+    padding: 18px;
+  }
+
+  .menu-body h3 {
+    font-size: 1.2rem;
+  }
+
+  .badge-price {
+    font-size: 0.85rem;
+    padding: 4px 12px;
   }
 }
