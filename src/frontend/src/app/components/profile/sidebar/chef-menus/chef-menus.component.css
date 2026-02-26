@@ -15,25 +15,25 @@
 }
 
 .success-message {
-  background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
-  border: 1px solid #4CAF50;
-  color: #2e7d32;
+  background: linear-gradient(135deg, #f4f6f1 0%, #e8ebe5 100%);
+  border: 1px solid #2e3f21;
+  color: #2e3f21;
 }
 
 .success-message i {
-  color: #4CAF50;
+  color: #2e3f21;
   font-size: 1.3rem;
 }
 
 .error-message {
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-  border: 1px solid #f44336;
-  color: #c62828;
+  background: linear-gradient(135deg, #faf2f0 0%, #f5e8e5 100%);
+  border: 1px solid #8b2a2a;
+  color: #570a0a;
   justify-content: space-between;
 }
 
 .error-message i {
-  color: #f44336;
+  color: #8b2a2a;
   font-size: 1.3rem;
   flex-shrink: 0;
 }
@@ -41,7 +41,7 @@
 .error-message .close-btn {
   background: transparent;
   border: none;
-  color: #c62828;
+  color: #570a0a;
   cursor: pointer;
   font-weight: bold;
   padding: 0 8px;
@@ -256,7 +256,7 @@
 
 .modal-icon {
   font-size: 2.5rem;
-  color: #D4602C;
+  color: #C85A3C;
   margin-bottom: 16px;
 }
 
@@ -284,11 +284,33 @@
   flex: 1;
   padding: 12px 20px;
   border-radius: 8px;
-  border: none;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.modal-buttons .btn-secondary {
+  background: #ffffff;
+  border: 1px solid #EAE0D5;
+  color: #2C1810;
+}
+
+.modal-buttons .btn-secondary:hover {
+  border-color: #C5A059;
+  color: #C5A059;
+}
+
+.modal-buttons .btn-danger {
+  background: #570a0a;
+  color: #ffffff;
+  border: none;
+}
+
+.modal-buttons .btn-danger:hover {
+  background: #3d0707;
+  box-shadow: 0 4px 12px rgba(87, 10, 10, 0.3);
 }
 
 @keyframes slideUp {
