@@ -237,7 +237,6 @@ export class ServiceDetailPageComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error cargando perfil del chef:', err);
         if (err.status === 404) {
           this.errorMessage = 'Chef no encontrado.';
         } else {
@@ -274,7 +273,6 @@ export class ServiceDetailPageComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error cargando detalle del menú:', err);
         if (err.status === 404) {
           this.errorMessage = 'Menú no encontrado.';
         } else {

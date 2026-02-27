@@ -147,7 +147,6 @@ export class UserCalendarComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error al cancelar la reserva:', err);
         this.deferViewUpdate(() => {
           this.isCancelling = false;
           this.cancelModalMode = 'error';

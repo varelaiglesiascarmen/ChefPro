@@ -316,7 +316,6 @@ export class ReviewFormComponent implements OnInit {
         this.isSubmitting = false;
       },
       error: (err) => {
-        console.error('Review error:', err);
         this.isSubmitting = false;
       }
     });

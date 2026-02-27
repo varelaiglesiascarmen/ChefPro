@@ -120,7 +120,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         const found = menus.find(menu => menu.menu_ID === this.menuId || menu.id === this.menuId);
 
         if (!found) {
-          console.error('EditMenu: Menú no encontrado con ID:', this.menuId);
           this.errorMessage = 'No encontramos el menú. Vuelve a tu carta y selecciona otro.';
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -160,7 +159,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('EditMenu: Error cargando menú:', err);
         this.errorMessage = 'No pudimos cargar tu menú. Revisa tu conexión e inténtalo de nuevo.';
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -214,7 +212,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.saveDishes();
       },
       error: (err) => {
-        console.error('EditMenu: Error al guardar menú:', err);
         this.isSaving = false;
         this.errorMessage = 'No se pudo guardar el menú. Inténtalo de nuevo.';
         this.cdr.detectChanges();
@@ -238,7 +235,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         setTimeout(() => this.router.navigate(['/profile/menus']), 1500);
       },
       error: (err) => {
-        console.error('EditMenu: Error al eliminar menú:', err);
 
         // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
         if (err.status === 403) {
@@ -336,7 +332,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('EditMenu: Error al eliminar plato:', err);
         this.errorMessage = 'No se pudo eliminar el plato. Intentalo de nuevo.';
         this.cdr.detectChanges();
       }
@@ -446,7 +441,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.router.navigate(['/profile/menus']);
       },
       error: (err) => {
-        console.error('EditMenu: Error al guardar platos:', err);
         this.isSaving = false;
         this.errorMessage = 'No se pudieron guardar los platos. Intentalo de nuevo.';
         this.cdr.detectChanges();

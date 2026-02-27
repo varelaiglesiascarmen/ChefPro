@@ -57,7 +57,6 @@ export class LoginComponent {
           this.errorMessage = 'Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.';
         }
         this.cdr.detectChanges();
-        console.error('Login error:', err);
       }
     });
   }

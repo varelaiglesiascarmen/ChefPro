@@ -87,7 +87,6 @@ export class UserOrdersComponent implements OnInit {
         this.orders = data.map((reservation) => this.toOrder(reservation));
       },
       error: (err) => {
-        console.error('Error al cargar las reservas:', err);
         this.orders = [];
         this.toastService.error('No pudimos cargar tus reservas. Intenta nuevamente.');
       }
@@ -119,7 +118,6 @@ export class UserOrdersComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al confirmar la reserva:', err);
       }
     });
   }
@@ -133,7 +131,6 @@ export class UserOrdersComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al rechazar:', err);
       }
     });
   }
@@ -159,7 +156,6 @@ export class UserOrdersComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al cancelar:', err);
       }
     });
   }
