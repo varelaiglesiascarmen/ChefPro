@@ -146,9 +146,13 @@ public class UserServiceImpl implements UserService {
     userLogin.setLastname(updateProfileDto.getSurname());
     userLogin.setUsername(updateProfileDto.getUsername());
 
-    // Actualizar foto si se proporciona
-    if (updateProfileDto.getPhoto() != null && !updateProfileDto.getPhoto().isBlank()) {
-      userLogin.setPhoto(updateProfileDto.getPhoto());
+    // Update photo: null means "don't change", empty/blank means "delete", otherwise set new value
+    if (updateProfileDto.getPhoto() != null) {
+      if (updateProfileDto.getPhoto().isBlank()) {
+        userLogin.setPhoto(null);
+      } else {
+        userLogin.setPhoto(updateProfileDto.getPhoto());
+      }
     }
 
     // Si es un chef, actualizar información adicional

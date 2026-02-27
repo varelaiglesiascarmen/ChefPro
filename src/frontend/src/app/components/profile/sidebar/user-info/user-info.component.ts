@@ -302,7 +302,7 @@ export class UserInfoComponent implements OnInit {
       name: formVal.name,
       lastname: formVal.lastname,
       userName: formVal.username,
-      photoUrl: formVal.photo || currentUser.photoUrl
+      photoUrl: formVal.photo !== undefined && formVal.photo !== null ? formVal.photo : currentUser.photoUrl
     };
 
     if (this.role === 'CHEF') {
