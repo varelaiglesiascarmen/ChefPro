@@ -79,9 +79,10 @@ public class ReviewServiceImpl implements ReviewService {
       throw new IllegalArgumentException("You can only review a reservation that has already taken place");
     }
 
-    // 7. Verificar que la reserva fue CONFIRMED
-    if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
-      throw new IllegalArgumentException("You can only review a confirmed reservation");
+    // 7. Verificar que la reserva fue CONFIRMED o COMPLETED
+    if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED
+      && reservation.getStatus() != Reservation.ReservationStatus.COMPLETED) {
+      throw new IllegalArgumentException("You can only review a confirmed or completed reservation");
     }
 
     // 8. Verificar que este diner no ha reseñado ya a este chef

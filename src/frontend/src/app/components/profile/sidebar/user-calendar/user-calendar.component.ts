@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReservationService } from '../../../../services/reservation.service';
 import { AuthService } from '../../../../services/auth.service';
 import { ReservationStatusUpdate } from '../../../../models/reservation.model';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
   selector: 'app-user-calendar',
@@ -15,6 +16,7 @@ import { ReservationStatusUpdate } from '../../../../models/reservation.model';
 export class UserCalendarComponent implements OnInit {
   private resService = inject(ReservationService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
   weekDays = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
