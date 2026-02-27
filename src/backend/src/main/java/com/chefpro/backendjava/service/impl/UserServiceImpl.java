@@ -146,9 +146,13 @@ public class UserServiceImpl implements UserService {
     userLogin.setLastname(updateProfileDto.getSurname());
     userLogin.setUsername(updateProfileDto.getUsername());
 
-    // Actualizar foto si se proporciona
-    if (updateProfileDto.getPhoto() != null && !updateProfileDto.getPhoto().isBlank()) {
-      userLogin.setPhoto(updateProfileDto.getPhoto());
+    // Update photo: null means "don't change", empty/blank means "delete", otherwise set new value
+    if (updateProfileDto.getPhoto() != null) {
+      if (updateProfileDto.getPhoto().isBlank()) {
+        userLogin.setPhoto(null);
+      } else {
+        userLogin.setPhoto(updateProfileDto.getPhoto());
+      }
     }
 
     // Si es un chef, actualizar información adicional
@@ -166,6 +170,18 @@ public class UserServiceImpl implements UserService {
           chef.setAddress(updateProfileDto.getAddress());
         }
         chefRepository.save(chef);
+      }
+    }
+
+    // Si es un diner, actualizar dirección
+    if (userLogin.getRole() == UserRoleEnum.DINER) {
+      Optional<Diner> dinerOpt = dinerRepository.findByUser(userLogin);
+      if (dinerOpt.isPresent()) {
+        Diner diner = dinerOpt.get();
+        if (updateProfileDto.getAddress() != null) {
+          diner.setAddress(updateProfileDto.getAddress());
+        }
+        dinerRepository.save(diner);
       }
     }
 

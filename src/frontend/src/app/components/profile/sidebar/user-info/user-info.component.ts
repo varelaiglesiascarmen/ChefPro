@@ -187,6 +187,7 @@ export class UserInfoComponent implements OnInit {
         if (user.role === 'CHEF') {
           const chef = user as Chef;
           patchData.bio = chef.bio || '';
+          patchData.address = chef.address || '';
           if (chef.prizes) {
             this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
           }
@@ -302,7 +303,7 @@ export class UserInfoComponent implements OnInit {
       name: formVal.name,
       lastname: formVal.lastname,
       userName: formVal.username,
-      photoUrl: formVal.photo || currentUser.photoUrl
+      photoUrl: formVal.photo !== undefined && formVal.photo !== null ? formVal.photo : currentUser.photoUrl
     };
 
     if (this.role === 'CHEF') {
@@ -325,6 +326,7 @@ export class UserInfoComponent implements OnInit {
         if (user.role === 'CHEF') {
           const chef = user as Chef;
           patchData.bio = chef.bio || '';
+          patchData.address = chef.address || '';
           if (chef.prizes) {
             this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
           } else {
@@ -358,16 +360,20 @@ export class UserInfoComponent implements OnInit {
   showSuccessNotification(message: string) {
     this.toastMessage = message;
     this.showSuccessToast = true;
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.showSuccessToast = false;
+      this.cdr.detectChanges();
     }, 3000);
   }
 
   showErrorNotification(message: string) {
     this.toastMessage = message;
     this.showErrorToast = true;
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.showErrorToast = false;
+      this.cdr.detectChanges();
     }, 3000);
   }
 
