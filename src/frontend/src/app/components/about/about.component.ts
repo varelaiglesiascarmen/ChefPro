@@ -8,6 +8,11 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent {
+  /**
+   * Team member collection displayed in the about page.
+   * Contains professional information including roles, descriptions, and social links.
+   * Used for rendering team cards with Angular *ngFor directive.
+   */
   team = [
     {
       name: 'Carmen Varela Iglesias',

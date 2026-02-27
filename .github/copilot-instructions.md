@@ -18,6 +18,20 @@
 - When fixing issues, explain the root cause and the solution implemented
 - Include console logs and debugging information when helpful
 
+## Code Comments
+
+- Add concise comments in ENGLISH explaining the functional purpose or business logic
+- Strictly forbidden AI tutorial style: no step-by-step explanations or syntax obviousness
+- Comment only the "why" and "what for", not the "how"
+- Focus on business intent, edge cases, and non-obvious logic
+
+## UI Refactoring Workflow
+
+- Do NOT print large code blocks in chat
+- Provide a brief list of key changes made
+- Apply changes directly to files using replace_string_in_file tool
+- User can review changes directly in VS Code and accept them
+
 ## Git Practices
 
 - Write commit messages in English
