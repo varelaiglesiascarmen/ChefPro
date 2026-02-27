@@ -86,8 +86,24 @@ export class SearchResultsComponent implements OnInit {
     this.router.navigate(['/service-detail', 'chef', chefId]);
   }
 
-  searchByCity(city: string) {
-    this.router.navigate(['/search'], { queryParams: { q: city } });
+  getChefsForCity(city: string): ChefSearchResult[] {
+    return this.chefs.filter(c => c.location === city);
+  }
+
+  /** Chefs not already shown under any city section */
+  get remainingChefs(): ChefSearchResult[] {
+    if (this.cities.length === 0) return this.chefs;
+    const citySet = new Set(this.cities);
+    return this.chefs.filter(c => !citySet.has(c.location ?? ''));
+  }
+
+  /** Menus whose chef is not already shown under any city section */
+  get remainingMenus(): MenuSearchResult[] {
+    if (this.cities.length === 0) return this.menus;
+    const cityChefIds = new Set(
+      this.cities.flatMap(city => this.getChefsForCity(city).map(c => c.id))
+    );
+    return this.menus.filter(m => !cityChefIds.has(m.chefId));
   }
 
   goToMenuDetail(menuId: number) {

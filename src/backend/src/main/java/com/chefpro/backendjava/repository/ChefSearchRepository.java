@@ -43,11 +43,12 @@ public interface ChefSearchRepository extends JpaRepository<Chef, Long> {
     LEFT JOIN menu m ON m.chef_ID = c.user_ID
     LEFT JOIN reviews r ON r.reviewed_user = u.user_ID
     WHERE
-      -- Text search on chef name, lastname, and their combination
+      -- Text search on chef name, lastname, combination, and location
       (:q IS NULL OR :q = '' OR
         LOWER(u.name)      LIKE CONCAT('%', LOWER(:q), '%') OR
         LOWER(u.lastname)  LIKE CONCAT('%', LOWER(:q), '%') OR
-        LOWER(CONCAT(u.name, ' ', u.lastname)) LIKE CONCAT('%', LOWER(:q), '%')
+        LOWER(CONCAT(u.name, ' ', u.lastname)) LIKE CONCAT('%', LOWER(:q), '%') OR
+        LOWER(c.location)  LIKE CONCAT('%', LOWER(:q), '%')
       )
       -- Filtro de disponibilidad: el chef no tiene reserva confirmada en esa fecha
       AND (

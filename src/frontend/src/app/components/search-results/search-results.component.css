@@ -396,21 +396,18 @@
   margin-bottom: 40px;
 }
 
-.cities-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  animation: fadeIn 0.5s ease-out;
+.city-block {
+  margin-bottom: 12px;
 }
 
 .city-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
+  gap: 8px;
+  padding: 12px 22px;
   background: white;
   border: 1px solid rgba(166, 124, 0, 0.2);
-  border-radius: 50px;
+  border-radius: 14px;
   color: var(--dark-brown);
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
@@ -418,18 +415,62 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(78, 36, 10, 0.06);
+  width: 100%;
+  text-align: left;
 }
 
 .city-pill:hover {
-  background: var(--gold-primary);
-  color: white;
+  background: rgba(166, 124, 0, 0.06);
   border-color: var(--gold-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(166, 124, 0, 0.25);
+}
+
+.city-pill.expanded {
+  background: rgba(166, 124, 0, 0.08);
+  border-color: var(--gold-primary);
+  border-radius: 14px 14px 0 0;
 }
 
 .city-icon {
   font-size: 1rem;
+}
+
+.city-name {
+  flex: 1;
+}
+
+.city-count {
+  font-size: 0.8rem;
+  color: var(--gold-primary);
+  font-weight: 500;
+}
+
+.city-arrow {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+  color: var(--gold-primary);
+}
+
+.city-arrow.rotated {
+  transform: rotate(90deg);
+}
+
+.city-chefs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background: rgba(166, 124, 0, 0.03);
+  border: 1px solid rgba(166, 124, 0, 0.15);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.no-chefs-msg {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  padding: 10px 0;
 }
 
 /* chefs & menus sections */
@@ -484,8 +525,8 @@
     grid-template-columns: 1fr;
   }
 
-  .cities-grid {
-    justify-content: center;
+  .city-chefs-grid {
+    grid-template-columns: 1fr;
   }
 
   .section-title {

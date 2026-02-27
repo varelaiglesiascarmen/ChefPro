@@ -30,22 +30,45 @@
 
     <ng-container *ngIf="!isLoading">
 
-      <!-- ===== SECTION 1: CITIES ===== -->
-      <section *ngIf="cities.length > 0" class="section-cities">
-        <h2 class="section-title">Ciudades</h2>
-        <div class="cities-grid">
-          <button *ngFor="let city of cities" class="city-pill" (click)="searchByCity(city)">
-            <span class="city-icon">&#x1F4CD;</span> {{ city }}
-          </button>
-        </div>
-      </section>
+      <!-- ===== SECTION 1: CITIES WITH THEIR CHEFS ===== -->
+      <ng-container *ngFor="let city of cities">
+        <section *ngIf="getChefsForCity(city).length > 0" class="section-city">
+          <h2 class="section-title">
+            <span class="city-icon">&#x1F4CD;</span> Chefs en {{ city }}
+          </h2>
+          <div class="chefs-grid">
+            <div *ngFor="let chef of getChefsForCity(city)" class="chef-card" (click)="goToChefDetail(chef.id)">
+              <div class="card-image-wrapper">
+                <img [src]="chef.photo || '/logos/users.svg'" alt="{{ chef.name }}" class="chef-img"
+                  (error)="chef.photo = '/logos/users.svg'">
+                <div class="rating-badge">★ {{ chef.avgScore ?? '—' }}</div>
+              </div>
+              <div class="card-body">
+                <div class="chef-header">
+                  <h3>{{ chef.name }} {{ chef.lastname }}</h3>
+                </div>
+                <div class="divider"></div>
+                <div class="card-footer">
+                  <div class="price-block">
+                    <span class="label">Desde: </span>
+                    <span class="amount">{{ chef.startingPrice ?? '—' }} €</span>
+                  </div>
+                  <button class="btn-solicitar" (click)="$event.stopPropagation(); onReserveChef(chef)">
+                    Solicitar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </ng-container>
 
-      <!-- ===== SECTION 2: CHEFS ===== -->
-      <section *ngIf="chefs.length > 0" class="section-chefs">
+      <!-- ===== SECTION 2: CHEFS (excluding those already shown in a city) ===== -->
+      <section *ngIf="remainingChefs.length > 0" class="section-chefs">
         <h2 class="section-title">Chefs</h2>
         <div class="chefs-grid">
 
-          <div *ngFor="let chef of chefs" class="chef-card" (click)="goToChefDetail(chef.id)">
+          <div *ngFor="let chef of remainingChefs" class="chef-card" (click)="goToChefDetail(chef.id)">
 
             <div class="card-image-wrapper">
               <img [src]="chef.photo || '/logos/users.svg'" alt="{{ chef.name }}" class="chef-img"
@@ -77,11 +100,11 @@
       </section>
 
       <!-- ===== SECTION 3: FOOD TYPES / MENUS (real results or random suggestions) ===== -->
-      <section *ngIf="menus.length > 0" class="section-menus">
+      <section *ngIf="remainingMenus.length > 0" class="section-menus">
         <h2 class="section-title">{{ noResults ? 'Quizás te interese' : 'Tipos de Comida' }}</h2>
         <div class="chefs-grid">
 
-          <div *ngFor="let menu of menus" class="chef-card" (click)="goToMenuDetail(menu.menuId)">
+          <div *ngFor="let menu of remainingMenus" class="chef-card" (click)="goToMenuDetail(menu.menuId)">
 
             <div class="card-image-wrapper">
               <img [src]="menu.chefPhoto || '/logos/users.svg'" alt="{{ menu.menuTitle }}" class="chef-img"
