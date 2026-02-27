@@ -8,11 +8,12 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 @Component("chefSearchService")
 public class ChefSearchServiceImpl implements ChefSearchService {
+
+  private static final int SUGGESTION_LIMIT = 6;
 
   private final ChefSearchRepository chefSearchRepository;
   private final MenuSearchRepository menuSearchRepository;
@@ -53,12 +54,10 @@ public class ChefSearchServiceImpl implements ChefSearchService {
     // Solo se activa cuando había texto de búsqueda (no tiene sentido en carga inicial)
     if (chefs.isEmpty() && menus.isEmpty() && query != null) {
       List<MenuSearchDto> randomMenus = menuSearchRepository
-        .searchMenus(null, null, null, null, null, null)
+        .findRandomMenuSuggestions(SUGGESTION_LIMIT)
         .stream()
         .map(this::toMenuDto)
-        .collect(java.util.stream.Collectors.toList());
-
-      Collections.shuffle(randomMenus);
+        .toList();
 
       return ChefSearchResultDto.builder()
         .chefs(List.of())
