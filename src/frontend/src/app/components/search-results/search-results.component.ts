@@ -34,16 +34,16 @@ export class SearchResultsComponent implements OnInit {
       this.currentUser = user;
     });
 
-    this.route.queryParams.subscribe(params => {
-      this.searchTerm = params['q'] || '';
+    this.route.queryParamMap.subscribe(paramMap => {
+      this.searchTerm = paramMap.get('q') || '';
 
       const filters: ChefFilter = {
-        q:          params['q']      || '',
-        date:       params['date']   || null,
-        minPrice:   params['min']    ? Number(params['min'])    : null,
-        maxPrice:   params['max']    ? Number(params['max'])    : null,
-        guests:     params['guests'] ? Number(params['guests']) : null,
-        allergens:  params['allergens'] ? params['allergens'].split(',') : []
+        q:          paramMap.get('q')      || '',
+        date:       paramMap.get('date')   || null,
+        minPrice:   paramMap.get('min')    ? Number(paramMap.get('min'))    : null,
+        maxPrice:   paramMap.get('max')    ? Number(paramMap.get('max'))    : null,
+        guests:     paramMap.get('guests') ? Number(paramMap.get('guests')) : null,
+        allergens:  paramMap.getAll('allergens').flatMap(a => a.split(',')).filter(a => a.length > 0)
       };
 
       this.performSearch(filters);
