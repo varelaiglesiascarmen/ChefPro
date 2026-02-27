@@ -11,7 +11,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 60px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(32px, 6vw, 60px);
   background-color: var(--cream-bg);
   box-shadow: 0 4px 10px rgba(166, 124, 0, 0.15);
   border-bottom: 2px solid rgba(166, 124, 0, 0.1);
@@ -29,6 +29,7 @@
 .nav-links {
   display: flex;
   gap: 35px;
+  align-items: center;
 }
 
 /* Navigation link items */
@@ -180,21 +181,59 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Hidden elements on desktop */
-.hamburger-btn, .close-btn, .sidebar-overlay {
+/* Hide mobile-only elements on desktop */
+.hamburger-btn {
   display: none;
 }
 
-/* RESPONSIVE DESIGN */
+.close-btn {
+  display: none;
+}
 
-@media (max-width: 768px) {
+.sidebar-overlay {
+  display: none;
+}
+
+/* Navigation links visible on desktop */
+.nav-links {
+  display: flex;
+  position: static;
+  width: auto;
+  height: auto;
+  background-color: transparent;
+  flex-direction: row;
+  padding: 0;
+  box-shadow: none;
+  z-index: auto;
+}
+
+.nav-links a {
+  display: block;
+}
+
+/* RESPONSIVE DESIGN - Tablets & Mobile (≤1024px) */
+
+@media (max-width: 1024px) {
 
   /* Navbar adjustments */
   .navbar {
-    padding: 10px 20px;
+    padding: clamp(10px, 2vw, 15px) clamp(14px, 3vw, 20px);
+    flex-wrap: wrap;
   }
 
-  /* Sidebar overlay background */
+  /* Show hamburger menu button */
+  .hamburger-btn {
+    display: block;
+    background: none;
+    border: none;
+    font-size: clamp(1.6rem, 4vw, 2rem);
+    color: var(--dark-brown);
+    order: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* Show and style overlay */
   .sidebar-overlay {
     display: block;
     position: fixed;
@@ -204,9 +243,18 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Sidebar navigation links */
+  /* Overlay visible when menu is open */
+  .sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Transform nav-links to sidebar */
   .nav-links {
     position: fixed;
     top: 0;
@@ -228,33 +276,22 @@
     left: 0;
   }
 
-  /* Close button for sidebar */
+  /* Show and style close button */
   .close-btn {
-    display: flex !important;
+    display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: clamp(12px, 3vw, 20px);
+    right: clamp(12px, 3vw, 20px);
     z-index: 3100;
-    width: 40px;
-    height: 40px;
-    color: var(--dark-brown) !important;
-    font-size: 2rem;
-    line-height: 1;
-    background: transparent !important;
-    border: none !important;
-    cursor: pointer;
-  }
-
-  /* Hamburger menu button */
-  .hamburger-btn {
-    display: block;
-    background: none;
-    border: none;
-    font-size: 2rem;
+    width: clamp(36px, 8vw, 40px);
+    height: clamp(36px, 8vw, 40px);
     color: var(--dark-brown);
-    order: 1;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1;
+    background: transparent;
+    border: none;
     cursor: pointer;
   }
 
@@ -267,8 +304,8 @@
 
   /* User button adjustment */
   .user-btn {
-    width: 40px;
-    height: 40px;
+    width: clamp(36px, 8vw, 40px);
+    height: clamp(36px, 8vw, 40px);
   }
 
   /* Ajustamos el padding en móvil para mantener la proporción */
