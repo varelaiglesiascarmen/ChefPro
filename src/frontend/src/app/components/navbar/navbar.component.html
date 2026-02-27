@@ -3,13 +3,18 @@
     <span class="menu-icon">≡</span>
   </button>
 
+  <!-- Overlay to close menu when clicking outside -->
+  <div class="sidebar-overlay" [class.open]="isMenuOpen" (click)="closeMenu()"></div>
+
   <div class="nav-links" [class.open]="isMenuOpen">
     <button class="close-btn" (click)="toggleMenu()">✕</button>
 
     <a routerLink="/index" (click)="isMenuOpen = false">Inicio</a>
     <a [routerLink]="[]" fragment="footer" (click)="isMenuOpen = false">Sobre nosotros</a>
     <a routerLink="/contact" (click)="isMenuOpen = false">Contacto</a>
-    <a routerLink="/signIn" (click)="isMenuOpen = false">Únete</a>
+    <!-- Conditional link: "Únete" for guests, "Mis reservas" for logged-in users -->
+    <a *ngIf="!currentUser" routerLink="/signIn" (click)="isMenuOpen = false">Únete</a>
+    <a *ngIf="currentUser" routerLink="/profile/orders" (click)="isMenuOpen = false">Mis reservas</a>
   </div>
 
   <div class="nav-actions">
