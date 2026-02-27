@@ -1,4 +1,4 @@
-<div class="filter-card" (mouseleave)="close.emit()">
+<div class="filter-card">
 
   <div class="decorative-triangle"></div>
 
@@ -12,11 +12,7 @@
     <div class="filter-group mobile-only-search">
       <label class="group-label">¿Qué buscas hoy?</label>
       <div class="input-with-icon">
-        <input
-          type="text"
-          placeholder="Ej: Paella, Sushi..."
-          [(ngModel)]="searchText"
-          (keyup.enter)="applyFilters()">
+        <input type="text" placeholder="Ej: Paella, Sushi..." [(ngModel)]="searchText" (keyup.enter)="applyFilters()">
 
         <img src="/logos/magnifier.svg" alt="Buscar" class="search-icon-svg">
 
@@ -27,18 +23,18 @@
       <label class="group-label">Preferencias Alimentarias</label>
 
       @if (dietOptions.length === 0) {
-        <p class="loading-text">Cargando opciones...</p>
+      <p class="loading-text">Cargando opciones...</p>
       }
 
       @if (dietOptions.length > 0) {
-        <div class="diet-grid">
-          @for (diet of dietOptions; track diet.id) {
-            <div class="checkbox-item">
-              <input type="checkbox" [id]="'diet-' + diet.id" [(ngModel)]="diet.selected">
-              <label [for]="'diet-' + diet.id">{{ diet.label }}</label>
-            </div>
-          }
+      <div class="diet-grid">
+        @for (diet of dietOptions; track diet.id) {
+        <div class="checkbox-item">
+          <input type="checkbox" [id]="'diet-' + diet.id" [(ngModel)]="diet.selected">
+          <label [for]="'diet-' + diet.id">{{ diet.label }}</label>
         </div>
+        }
+      </div>
       }
     </div>
 
@@ -88,10 +84,7 @@
     <div class="filter-group">
       <label class="group-label">Fecha del Evento</label>
       <div class="input-with-icon">
-        <input type="date"
-               [(ngModel)]="selectedDate"
-               [min]="minDate"
-               placeholder="Selecciona fecha">
+        <input type="date" [(ngModel)]="selectedDate" [min]="minDate" placeholder="Selecciona fecha">
       </div>
       <small class="helper-text">Solo mostraremos chefs disponibles para este día.</small>
     </div>
@@ -102,7 +95,8 @@
         <input type="number" placeholder="¿Cuantos seréis?" [(ngModel)]="guestCount" min="1"
           (keydown)="preventInvalidChars($event)">
       </div>
-      <small class="helper-text">Si nos ofreces el número exacto de comensales podremos recomendarte los mejores servicios disponibles.</small>
+      <small class="helper-text">Si nos ofreces el número exacto de comensales podremos recomendarte los mejores
+        servicios disponibles.</small>
     </div>
 
     <div class="filter-group toggle-group">
