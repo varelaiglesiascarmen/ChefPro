@@ -23,6 +23,7 @@ export class SearchResultsComponent implements OnInit {
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
+  cities: string[] = [];
   chefs: ChefSearchResult[] = [];
   menus: MenuSearchResult[] = [];
   noResults: boolean = false;
@@ -40,12 +41,12 @@ export class SearchResultsComponent implements OnInit {
       this.searchTerm = params['q'] || '';
 
       const filters: ChefFilter = {
-        q:          params['q']      || '',
-        date:       params['date']   || null,
-        minPrice:   params['min']    ? Number(params['min'])    : null,
-        maxPrice:   params['max']    ? Number(params['max'])    : null,
-        guests:     params['guests'] ? Number(params['guests']) : null,
-        allergens:  params['allergens'] ? params['allergens'].split(',') : []
+        q: params['q'] || '',
+        date: params['date'] || null,
+        minPrice: params['min'] ? Number(params['min']) : null,
+        maxPrice: params['max'] ? Number(params['max']) : null,
+        guests: params['guests'] ? Number(params['guests']) : null,
+        allergens: params['allergens'] ? params['allergens'].split(',') : []
       };
 
       this.performSearch(filters);
@@ -58,6 +59,7 @@ export class SearchResultsComponent implements OnInit {
 
     this.chefService.searchChefs(filters).subscribe({
       next: (data) => {
+        this.cities = data.cities || [];
         this.chefs = data.chefs || [];
         this.menus = data.menus || [];
         this.noResults = data.noResults ?? false;
@@ -65,6 +67,7 @@ export class SearchResultsComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
+        this.cities = [];
         this.chefs = [];
         this.menus = [];
         this.noResults = false;
@@ -76,11 +79,31 @@ export class SearchResultsComponent implements OnInit {
   }
 
   get totalResults(): number {
-    return this.chefs.length + this.menus.length;
+    return this.cities.length + this.chefs.length + this.menus.length;
   }
 
   goToChefDetail(chefId: number) {
     this.router.navigate(['/service-detail', 'chef', chefId]);
+  }
+
+  getChefsForCity(city: string): ChefSearchResult[] {
+    return this.chefs.filter(c => c.location === city);
+  }
+
+  /** Chefs not already shown under any city section */
+  get remainingChefs(): ChefSearchResult[] {
+    if (this.cities.length === 0) return this.chefs;
+    const citySet = new Set(this.cities);
+    return this.chefs.filter(c => !citySet.has(c.location ?? ''));
+  }
+
+  /** Menus whose chef is not already shown under any city section */
+  get remainingMenus(): MenuSearchResult[] {
+    if (this.cities.length === 0) return this.menus;
+    const cityChefIds = new Set(
+      this.cities.flatMap(city => this.getChefsForCity(city).map(c => c.id))
+    );
+    return this.menus.filter(m => !cityChefIds.has(m.chefId));
   }
 
   goToMenuDetail(menuId: number) {
