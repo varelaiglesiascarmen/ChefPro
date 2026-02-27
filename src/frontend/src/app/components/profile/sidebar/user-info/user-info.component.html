@@ -48,6 +48,26 @@
       </div>
 
       <ng-container *ngIf="role === 'CHEF'">
+        <div class="form-group full-width cover-photo-group">
+          <label>Foto de Portada</label>
+          <div class="cover-preview-wrapper">
+            <div class="cover-photo-preview" [class.empty-cover]="!chefCoverPhotoUrl">
+              <img *ngIf="chefCoverPhotoUrl" [src]="chefCoverPhotoUrl" (error)="handleCoverImageError()"
+                alt="Foto de portada del chef" class="cover-photo-image">
+              <span *ngIf="!chefCoverPhotoUrl">Sin portada configurada</span>
+            </div>
+
+            <div class="cover-controls" *ngIf="editMode">
+              <input type="file" #coverFileInput accept="image/*" (change)="onCoverPhotoSelected($event)"
+                style="display: none;">
+              <button type="button" class="btn-upload" (click)="coverFileInput.click()" [disabled]="isUploadingCover">
+                {{ isUploadingCover ? 'Subiendo...' : 'Subir portada' }}
+              </button>
+            </div>
+          </div>
+          <small class="info-text">Formato recomendado panorámico. Tamaño máximo 4MB.</small>
+        </div>
+
         <div class="form-group full-width">
           <label>Biografía Culinaria (Máx. 200 caracteres)</label>
           <textarea formControlName="bio" [readonly]="!editMode" maxlength="200"></textarea>
