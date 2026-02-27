@@ -1,9 +1,8 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SearchFilterComponent } from '../search-filter/search-filter.component';
 import { ChefService } from '../../services/search-results.service';
-import { Chef, ChefFilter } from '../../models/search-results.model';
+import { ChefSearchResult, MenuSearchResult, ChefFilter } from '../../models/search-results.model';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/auth.model';
 
@@ -16,42 +15,35 @@ import { User } from '../../models/auth.model';
 })
 export class SearchResultsComponent implements OnInit {
 
-  // DI
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private chefService = inject(ChefService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
-  // variables
-  chefs: Chef[] = [];
+  chefs: ChefSearchResult[] = [];
+  menus: MenuSearchResult[] = [];
+  noResults: boolean = false;
   isLoading = true;
   currentUser: User | null = null;
   showLoginModal = false;
   searchTerm: string = '';
 
   ngOnInit() {
-    console.log('COMPONENTE INICIADO: SearchResults');
-
-    // user subscription
     this.authService.user$.subscribe(user => {
       this.currentUser = user;
     });
 
-    // URL subscription (search + filters)
     this.route.queryParams.subscribe(params => {
-      console.log('URL CAMBIÓ:', params);
-
       this.searchTerm = params['q'] || '';
 
       const filters: ChefFilter = {
-        searchText: params['q'] || '',
-        date: params['date'] || null,
-        minPrice: params['min'] ? Number(params['min']) : null,
-        maxPrice: params['max'] ? Number(params['max']) : null,
-        guestCount: params['guests'] ? Number(params['guests']) : null,
-        dietIds: params['diets'] ? params['diets'].split(',').map(Number) : [],
-        onlyTopRated: params['top'] === 'true'
+        q:          params['q']      || '',
+        date:       params['date']   || null,
+        minPrice:   params['min']    ? Number(params['min'])    : null,
+        maxPrice:   params['max']    ? Number(params['max'])    : null,
+        guests:     params['guests'] ? Number(params['guests']) : null,
+        allergens:  params['allergens'] ? params['allergens'].split(',') : []
       };
 
       this.performSearch(filters);
@@ -62,39 +54,57 @@ export class SearchResultsComponent implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    console.log('BUSCANDO CHEFS...', filters);
-
     this.chefService.searchChefs(filters).subscribe({
-      next: (pageData) => {
-        console.log('DATOS RECIBIDOS:', pageData.content);
-        this.chefs = pageData.content || [];
+      next: (data) => {
+        this.chefs = data.chefs || [];
+        this.menus = data.menus || [];
+        this.noResults = data.noResults ?? false;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('ERROR:', err);
+        console.error('ERROR en búsqueda:', err);
+        this.chefs = [];
+        this.menus = [];
+        this.noResults = false;
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  goToChefDetail(id: number) {
-    this.router.navigate(['/service-detail', 'chef', id]);
+  get totalResults(): number {
+    return this.chefs.length + this.menus.length;
   }
 
-  onReserve(chef: Chef) {
+  goToChefDetail(chefId: number) {
+    this.router.navigate(['/service-detail', 'chef', chefId]);
+  }
+
+  goToMenuDetail(menuId: number) {
+    this.router.navigate(['/service-detail', 'menu', menuId]);
+  }
+
+  onReserveChef(chef: ChefSearchResult) {
     if (!this.currentUser) {
       this.showLoginModal = true;
       return;
     }
-
-    if (confirm(`¿Solicitar comanda a ${chef.name}?`)) {
+    if (confirm(`¿Solicitar comanda a ${chef.name} ${chef.lastname}?`)) {
       alert('¡Solicitud enviada correctamente!');
     }
   }
 
-  // modal methods
+  onReserveMenu(menu: MenuSearchResult) {
+    if (!this.currentUser) {
+      this.showLoginModal = true;
+      return;
+    }
+    if (confirm(`¿Solicitar el menú "${menu.menuTitle}" de ${menu.chefName}?`)) {
+      alert('¡Solicitud enviada correctamente!');
+    }
+  }
+
   closeLoginModal() {
     this.showLoginModal = false;
   }

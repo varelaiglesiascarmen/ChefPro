@@ -1,11 +1,19 @@
 package com.chefpro.backendjava.service;
 
-import com.chefpro.backendjava.common.object.dto.ChefSearchDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.chefpro.backendjava.common.object.dto.ChefSearchResultDto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public interface ChefSearchService {
-  Page<ChefSearchDto> search(String q, LocalDate date, Pageable pageable);
+
+  ChefSearchResultDto search(
+    String q,
+    LocalDate date,
+    BigDecimal minPrice,
+    BigDecimal maxPrice,
+    Integer guests,
+    List<String> allergens
+  );
 }
