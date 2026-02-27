@@ -14,16 +14,12 @@ export class ChefService {
   private router = inject(Router);
   private apiUrl = `${environment.apiUrl}`;
 
-  // ========================================
   // PUBLIC ENDPOINTS (no authentication)
-  // ========================================
 
-  /** Chef public profile */
   getChefPublicProfile(chefId: number): Observable<ChefPublicDetail> {
     return this.http.get<ChefPublicDetail>(`${this.apiUrl}/chef/${chefId}/profile`);
   }
 
-  /** Public menu detail */
   getMenuPublicDetail(menuId: number): Observable<MenuPublicDetail> {
     return this.http.get<MenuPublicDetail>(`${this.apiUrl}/chef/menus/${menuId}/public`);
   }
@@ -32,56 +28,57 @@ export class ChefService {
   // AUTHENTICATED ENDPOINTS — CHEF PROFILE
   // ========================================
 
-  /**
-   * Partially updates the authenticated chef's profile.
-   * PATCH /api/chef/profile — the backend identifies the chef via JWT.
-   */
   updateChefProfile(chefData: ChefProfileUpdate): Observable<ChefPublicDetail> {
     return this.http.patch<ChefPublicDetail>(`${this.apiUrl}/chef/profile`, chefData);
   }
 
-  // ========================================
-  // AUTHENTICATED ENDPOINTS — MENUS
-  // ========================================
+  /**
+   * Sube la foto de perfil del chef.
+   * Recibe un File, construye el FormData y llama a POST /api/chef/profile/photo.
+   * Devuelve { photo: "data:image/jpeg;base64,..." }
+   */
+  uploadChefPhoto(file: File): Observable<{ photo: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ photo: string }>(`${this.apiUrl}/chef/profile/photo`, formData);
+  }
 
-  /** Creates a new menu for the authenticated chef */
+  /**
+   * Sube la foto de portada del chef.
+   * Recibe un File, construye el FormData y llama a POST /api/chef/profile/cover-photo.
+   * Devuelve { coverPhoto: "data:image/jpeg;base64,..." }
+   */
+  uploadChefCoverPhoto(file: File): Observable<{ coverPhoto: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ coverPhoto: string }>(`${this.apiUrl}/chef/profile/cover-photo`, formData);
+  }
+
+
+  // AUTHENTICATED ENDPOINTS — MENUS
+
   createMenu(menuData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/chef/menus`, menuData);
   }
 
-  /**
-   * Deletes a menu owned by the authenticated chef.
-   * DELETE /api/chef/menus/{menuId}
-   */
   deleteMenu(menuId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/chef/menus/${menuId}`);
   }
 
-  // ========================================
-  // AUTHENTICATED ENDPOINTS — DISHES
-  // ========================================
 
-  /** Creates a new dish */
+  // AUTHENTICATED ENDPOINTS — DISHES
+
+
   createDish(dishData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/chef/plato`, dishData);
   }
 
-  // ========================================
   // AUTHENTICATED ENDPOINTS — RESERVATIONS
-  // ========================================
 
-  /**
-   * Retrieves the authenticated chef's reservations.
-   * GET /api/reservations/chef — the backend identifies the chef via JWT.
-   */
   getChefReservations(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/reservations/chef`);
   }
 
-  /**
-   * Updates the status of a reservation.
-   * PATCH /api/reservations/status — the backend expects PATCH, not PUT.
-   */
   updateReservationStatus(payload: ReservationStatusUpdate): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/reservations/status`, payload);
   }
