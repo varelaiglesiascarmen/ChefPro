@@ -8,4 +8,8 @@ public interface CustomUserRepository extends JpaRepository<UserLogin, Long> {
 
     // Para Spring Security: buscar por username
     Optional<UserLogin> findByUsername(String username);
+
+    // Para validaciones de registro
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

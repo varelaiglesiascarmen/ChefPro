@@ -13,4 +13,7 @@ public interface UserService {
 
   UserLoginDto updateProfile(String userEmail, UpdateProfileDto updateProfileDto);
 
+  boolean existsByUsername(String username);
+
+  boolean existsByEmail(String email);
 }
