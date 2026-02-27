@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { ReservationCreateDto } from '../models/reservation.model';
+import { ReservationCreateDto, ReservationStatusUpdate } from '../models/reservation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
@@ -22,7 +22,15 @@ export class ReservationService {
     return this.http.get<any[]>(this.url, { headers: this.getHeaders() });
   }
 
+  getChefReservations(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/chef`, { headers: this.getHeaders() });
+  }
+
   updateStatus(id: number, status: 'ACCEPTED' | 'REJECTED'): Observable<any> {
     return this.http.patch(`${this.url}/${id}`, { status }, { headers: this.getHeaders() });
+  }
+
+  updateReservationStatus(payload: ReservationStatusUpdate): Observable<any> {
+    return this.http.patch(`${this.url}/status`, payload, { headers: this.getHeaders() });
   }
 }
