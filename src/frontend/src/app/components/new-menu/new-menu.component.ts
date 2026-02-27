@@ -2,8 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize, forkJoin, from, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ChefService } from '../../services/chef.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-new-menu',
@@ -16,6 +18,7 @@ export class NewMenuComponent implements OnInit {
   private authService = inject(AuthService);
   private chefService = inject(ChefService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   officialAllergens = [
     { id: 1, name: 'Gluten' }, { id: 2, name: 'Crustáceos' },
@@ -39,6 +42,7 @@ export class NewMenuComponent implements OnInit {
   dishes: any[] = [];
   kitchenTags: string[] = [];
   currentTagInput: string = '';
+  isSaving = false;
 
   ngOnInit() {
     // We verify that only users of the chef type can see this interface. If not, we redirect to login.
@@ -96,7 +100,7 @@ export class NewMenuComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen es demasiado pesada. Máximo 2MB.');
+        this.toastService.error('La imagen es demasiado pesada. Máximo 2MB.');
         event.target.value = '';
         return;
       }
@@ -141,40 +145,69 @@ export class NewMenuComponent implements OnInit {
   }
 
   saveMenu() {
-    if (!this.isFormValid()) return;
+    if (!this.isFormValid() || this.isSaving) {
+      return;
+    }
 
     const chefId = this.authService.currentUserValue?.user_ID;
+    if (!chefId) {
+      this.toastService.error('No se pudo identificar al chef autenticado.');
+      return;
+    }
 
-    // send new menu to back and get the new menu ID back, then send each dish with that menu ID
+    this.isSaving = true;
+
     const menuPayload = { ...this.menuForm, chef_ID: chefId };
 
     this.chefService.createMenu(menuPayload).subscribe({
       next: (resMenu: any) => {
         const newMenuId = resMenu.menu_ID;
 
-        this.dishes.forEach((dish, index) => {
-          // Convertir los IDs de alérgenos a nombres para enviar al backend
+        from(Promise.all(this.dishes.map(async (dish, index) => {
           const allergenNames = dish.allergenIds.map((id: number) => {
             const allergen = this.officialAllergens.find(a => a.id === id);
             return allergen ? allergen.name : null;
           }).filter((name: string | null) => name !== null);
 
-          const dishPayload = {
+          const photoBase64 = dish.photo ? await this.fileToBase64(dish.photo) : null;
+
+          return {
             menu_ID: newMenuId,
             dish_ID: index + 1,
             title: dish.title,
             description: dish.description,
             category: dish.category,
-            allergens: allergenNames
+            allergens: allergenNames,
+            photo: photoBase64
           };
-
-          this.chefService.createDish(dishPayload).subscribe();
+        }))).pipe(
+          switchMap((dishesPayload) => forkJoin(dishesPayload.map(dishPayload => this.chefService.createDish(dishPayload)))),
+          finalize(() => {
+            this.isSaving = false;
+          })
+        ).subscribe({
+          next: () => {
+            this.toastService.success('¡Menú creado con éxito!');
+            this.router.navigate(['/profile']);
+          },
+          error: () => {
+            this.toastService.error('No pudimos crear todos los platos del menú. Intenta nuevamente.');
+          }
         });
-
-        alert('¡Menú creado con éxito!');
-        this.router.navigate(['/profile']);
       },
-      error: (err) => alert('Error al crear el menú base. Revisa la conexión.')
+      error: () => {
+        this.isSaving = false;
+        this.toastService.error('Error al crear el menú base. Revisa tu conexión e inténtalo de nuevo.');
+      }
+    });
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onerror = () => reject(new Error('Error al procesar la imagen'));
+      reader.readAsDataURL(file);
     });
   }
 }

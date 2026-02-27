@@ -31,12 +31,10 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
   }
 
   loadMenus() {
-    console.log('ChefMenus: Cargando menús del chef...');
     this.menuService.getMenusByChef().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (data) => {
-        console.log('ChefMenus: Menús cargados:', data.length);
         this.menus = [...data];
         this.cdr.detectChanges();
       },
@@ -54,12 +52,10 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
   confirmDeleteMenu(): void {
     const id = this.confirmMenuId;
     this.showConfirmDialog = false;
-    console.log('ChefMenus: Eliminando menú con ID:', id);
     this.menuService.deleteMenu(id).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        console.log('ChefMenus: Menú eliminado exitosamente, recargando lista...');
         this.successMessage = 'Menú eliminado exitosamente.';
         this.cdr.detectChanges();
         setTimeout(() => {
