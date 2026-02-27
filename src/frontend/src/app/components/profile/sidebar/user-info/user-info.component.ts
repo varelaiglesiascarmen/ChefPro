@@ -1,10 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { debounceTime, map, first } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
-import { ChefService } from '../../../../services/chef.service';
 import { User, Chef, Diner } from '../../../../models/auth.model';
 
 @Component({
@@ -17,7 +16,7 @@ import { User, Chef, Diner } from '../../../../models/auth.model';
 export class UserInfoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private chefService = inject(ChefService);
+  private cdr = inject(ChangeDetectorRef);
 
   profileForm!: FormGroup;
   editMode = false;
@@ -25,7 +24,6 @@ export class UserInfoComponent implements OnInit {
   showSuccessToast = false;
   showErrorToast = false;
   toastMessage = '';
-  isPhotoUploading = false;
 
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
@@ -54,29 +52,8 @@ export class UserInfoComponent implements OnInit {
         return;
       }
 
-      if (this.role === 'CHEF') {
-        this.uploadChefProfilePhoto(file);
-      } else {
-        this.resizeAndConvertImage(file);
-      }
+      this.resizeAndConvertImage(file);
     }
-  }
-
-  private uploadChefProfilePhoto(file: File): void {
-    if (this.isPhotoUploading) return;
-    this.isPhotoUploading = true;
-
-    this.chefService.uploadChefPhoto(file).subscribe({
-      next: (response) => {
-        this.profileForm.patchValue({ photo: response.photo });
-        this.isPhotoUploading = false;
-        this.showSuccessNotification('Foto de perfil actualizada.');
-      },
-      error: () => {
-        this.isPhotoUploading = false;
-        this.showErrorNotification('No se pudo subir la foto. Inténtalo de nuevo.');
-      }
-    });
   }
 
   resizeAndConvertImage(file: File): void {
@@ -113,6 +90,7 @@ export class UserInfoComponent implements OnInit {
         const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
         this.profileForm.patchValue({ photo: base64Image });
+        this.cdr.detectChanges();
       };
       img.src = e.target.result;
     };
