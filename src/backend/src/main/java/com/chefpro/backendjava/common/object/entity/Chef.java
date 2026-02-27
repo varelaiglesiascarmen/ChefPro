@@ -24,7 +24,7 @@ public class Chef {
   @JoinColumn(name = "user_ID")
   private UserLogin user;
 
-  @Column(name = "photo", length = 255)
+  @Column(columnDefinition = "LONGTEXT")
   private String photo;
 
   @Lob
@@ -44,8 +44,7 @@ public class Chef {
   @Column(name = "languages", length = 255)
   private String languages;
 
-  @Lob
-  @Column(name = "cover_photo")
+  @Column(columnDefinition = "LONGTEXT")
   private String coverPhoto;
 
   // Relación con menus
