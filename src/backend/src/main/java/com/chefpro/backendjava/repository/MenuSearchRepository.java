@@ -80,8 +80,6 @@ public interface MenuSearchRepository extends JpaRepository<Menu, Long> {
     @Param("guests") Integer guests,
     @Param("allergens") List<String> allergens
   );
-<<<<<<< HEAD
-=======
 
   @Query(value = """
     SELECT
@@ -112,5 +110,4 @@ public interface MenuSearchRepository extends JpaRepository<Menu, Long> {
     nativeQuery = true
   )
   List<MenuSearchProjection> findRandomMenuSuggestions(@Param("limit") int limit);
->>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
 }
