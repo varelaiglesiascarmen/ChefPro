@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
 import { ToastService } from '../../../../services/toast.service';
 import { environment } from '../../../../../environments/environment';
@@ -76,16 +77,19 @@ export class UserOrdersComponent implements OnInit {
       ? `${environment.apiUrl}/reservations/chef`
       : `${environment.apiUrl}/reservations/comensal`;
 
-    this.http.get<ReservationApi[]>(url).subscribe({
-      next: (data) => {
-        this.orders = data.map((reservation) => this.toOrder(reservation));
+    this.http.get<ReservationApi[]>(url).pipe(
+      finalize(() => {
         this.isLoading = false;
         this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (data) => {
+        this.orders = data.map((reservation) => this.toOrder(reservation));
       },
       error: (err) => {
         console.error('Error al cargar las reservas:', err);
+        this.orders = [];
         this.toastService.error('No pudimos cargar tus reservas. Intenta nuevamente.');
-        this.isLoading = false;
       }
     });
   }
