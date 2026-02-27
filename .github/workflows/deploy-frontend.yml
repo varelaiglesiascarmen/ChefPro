@@ -84,15 +84,30 @@ jobs:
         working-directory: src/frontend
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build project
+      - name: Build Angular app
         working-directory: src/frontend
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx ng build --configuration production
+
+      - name: Prepare Vercel output
+        working-directory: src/frontend
+        run: |
+          mkdir -p .vercel/output/static
+          cp -r dist/frontend/browser/* .vercel/output/static/
+          cat > .vercel/output/config.json << 'EOF'
+          {
+            "version": 3,
+            "routes": [
+              { "handle": "filesystem" },
+              { "src": "/(.*)", "dest": "/index.html" }
+            ]
+          }
+          EOF
 
       - name: Deploy to production
         working-directory: src/frontend
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "🚀 Deployed to: $DEPLOY_URL"
+          echo "Deployed to: $DEPLOY_URL"
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
   # ─── PREVIEW deploy (pull requests) ──────────────────────
@@ -132,13 +147,28 @@ jobs:
         working-directory: src/frontend
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build project
+      - name: Build Angular app
         working-directory: src/frontend
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx ng build --configuration production
+
+      - name: Prepare Vercel output
+        working-directory: src/frontend
+        run: |
+          mkdir -p .vercel/output/static
+          cp -r dist/frontend/browser/* .vercel/output/static/
+          cat > .vercel/output/config.json << 'EOF'
+          {
+            "version": 3,
+            "routes": [
+              { "handle": "filesystem" },
+              { "src": "/(.*)", "dest": "/index.html" }
+            ]
+          }
+          EOF
 
       - name: Deploy preview
         working-directory: src/frontend
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
-          echo "🔍 Preview URL: $DEPLOY_URL"
+          echo "Preview URL: $DEPLOY_URL"
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
