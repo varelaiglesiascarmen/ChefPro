@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/auth.model';
 
 @Component({
   selector: 'app-index',
@@ -13,6 +14,10 @@ import { AuthService } from '../../services/auth.service';
 export class IndexComponent {
   public authService = inject(AuthService);
   private router = inject(Router);
+
+  shouldShowChefCard(user: User | null): boolean {
+    return !user || user.role === 'CHEF';
+  }
 
   navigateTo(path: 'CHEF' | 'DINER') {
     const user = this.authService.currentUserValue;
