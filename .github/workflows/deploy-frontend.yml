@@ -43,9 +43,9 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
-  # ─── PRODUCTION deploy (push to main) ────────────────────
+  # ─── PRODUCTION deploy (push to main or manual trigger) ──
   deploy-production:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: production
 
