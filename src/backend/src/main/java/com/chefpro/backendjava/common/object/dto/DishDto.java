@@ -20,4 +20,5 @@ public class DishDto {
   private String category;
   private String creator;
   private List<String> allergens;
+  private String photo;
 }
