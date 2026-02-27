@@ -53,7 +53,7 @@ export class SearchFilterComponent implements OnInit {
       next: (data) => {
         this.dietOptions = data.map(d => ({ ...d, selected: false }));
       },
-      error: (err) => console.error('Error loading diets:', err)
+      error: () => { }
     });
   }
 
@@ -82,13 +82,13 @@ export class SearchFilterComponent implements OnInit {
       .map(d => d.value);
 
     const filters: ChefFilter = {
-      searchText:    this.searchText,
-      minPrice:      this.minPrice,
-      maxPrice:      this.maxPrice,
-      guestCount:    this.guestCount,
-      onlyTopRated:  this.onlyTopRated,
-      date:          this.selectedDate,
-      allergens:     selectedAllergens
+      searchText: this.searchText,
+      minPrice: this.minPrice,
+      maxPrice: this.maxPrice,
+      guestCount: this.guestCount,
+      onlyTopRated: this.onlyTopRated,
+      date: this.selectedDate,
+      allergens: selectedAllergens
     };
 
     this.apply.emit(filters);
