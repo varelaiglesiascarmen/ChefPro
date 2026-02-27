@@ -122,20 +122,35 @@ railway up
 
 1. En Railway → clic en el servicio del **backend** (no el de MySQL)
 2. Pestaña **Variables** → **+ New Variable**
-3. Añade estas:
+3. Añade estas (opcion recomendada -- referencias directas a MySQL):
 
 | Variable | Valor | Para qué sirve |
 |----------|-------|-----------------|
-| `SPRING_DATASOURCE_URL` | `jdbc:mysql://${{MySQL.MYSQL_HOST}}:${{MySQL.MYSQL_PORT}}/chef_pro` | Conexión con MySQL |
-| `SPRING_DATASOURCE_USERNAME` | `${{MySQL.MYSQL_USER}}` | Usuario de la BD |
-| `SPRING_DATASOURCE_PASSWORD` | `${{MySQL.MYSQL_PASSWORD}}` | Contraseña de la BD |
+| `MYSQL_HOST` | `${{MySQL.MYSQL_HOST}}` | Host de la BD |
+| `MYSQL_PORT` | `${{MySQL.MYSQL_PORT}}` | Puerto de la BD |
+| `MYSQL_DATABASE` | `chef_pro` | Nombre de la base de datos |
+| `MYSQL_USER` | `${{MySQL.MYSQL_USER}}` | Usuario de la BD |
+| `MYSQL_PASSWORD` | `${{MySQL.MYSQL_PASSWORD}}` | Contraseña de la BD |
 | `SPRING_JPA_SHOW_SQL` | `false` | No imprimir SQL en los logs |
 | `LOG_LEVEL_SQL` | `WARN` | Reducir verbosidad |
 | `LOG_LEVEL_BIND` | `WARN` | Reducir verbosidad |
 
-La sintaxis `${{MySQL.VARIABLE}}` es una referencia entre servicios de Railway. Si la BD cambia de dirección internamente, el backend se actualiza solo.
+`application.yml` construye la URL JDBC automaticamente a partir de `MYSQL_HOST`, `MYSQL_PORT` y `MYSQL_DATABASE`, asi que no necesitas montar la URL a mano.
 
-En local no afecta: `application.yml` tiene valores por defecto después de los `:` (ej: `${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/chef_pro}`), así que sin la variable de entorno usa el valor local.
+<details>
+<summary>Alternativa: usar SPRING_DATASOURCE_* directamente</summary>
+
+| Variable | Valor |
+|----------|-------|
+| `SPRING_DATASOURCE_URL` | `jdbc:mysql://${{MySQL.MYSQL_HOST}}:${{MySQL.MYSQL_PORT}}/chef_pro` |
+| `SPRING_DATASOURCE_USERNAME` | `${{MySQL.MYSQL_USER}}` |
+| `SPRING_DATASOURCE_PASSWORD` | `${{MySQL.MYSQL_PASSWORD}}` |
+
+</details>
+
+La sintaxis `${{MySQL.VARIABLE}}` es una referencia entre servicios de Railway. Si la BD cambia de direccion internamente, el backend se actualiza solo.
+
+En local no afecta: `application.yml` tiene valores por defecto (localhost:3306/chef_pro), asi que sin las variables de entorno usa la configuracion local.
 
 ---
 
