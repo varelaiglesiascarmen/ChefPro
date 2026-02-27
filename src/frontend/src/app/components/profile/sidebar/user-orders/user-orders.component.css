@@ -535,19 +535,6 @@
   }
 }
 
-@media (max-width: 480px) {
-  .orders-wrapper {
-    padding-bottom: 60px;
-  }
-
-  .orders-header {
-    padding: 40px 12px 30px;
-  }
-
-  .orders-header h1 {
-    font-size: 1.5rem;
-  }
-
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -694,6 +681,19 @@
     opacity: 1;
   }
 }
+
+@media (max-width: 480px) {
+  .orders-wrapper {
+    padding-bottom: 60px;
+  }
+
+  .orders-header {
+    padding: 40px 12px 30px;
+  }
+
+  .orders-header h1 {
+    font-size: 1.5rem;
+  }
 
   .orders-header::before {
     width: 200px;
