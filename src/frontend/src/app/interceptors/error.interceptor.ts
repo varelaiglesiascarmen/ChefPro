@@ -9,8 +9,15 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const toastService = inject(ToastService);
 
+  // Auth endpoints (login, signup) handle their own errors in the component
+  const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/auth/signup');
+
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (isAuthRequest) {
+        return throwError(() => error);
+      }
+
       let errorMessage = 'Algo salió mal. Intenta de nuevo.';
 
       if (error.status === 401) {

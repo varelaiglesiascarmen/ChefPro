@@ -153,4 +153,18 @@ public class LoginController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
+
+  @DeleteMapping("/account")
+  public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal UserDetails user) {
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    try {
+      userService.deleteAccount(user.getUsername());
+      return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+  }
 }

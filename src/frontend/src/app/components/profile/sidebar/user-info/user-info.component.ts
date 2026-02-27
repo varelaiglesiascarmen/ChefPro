@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Router } from '@angular/router';
 import { debounceTime, map, first, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
@@ -19,6 +20,7 @@ export class UserInfoComponent implements OnInit {
   private authService = inject(AuthService);
   private chefService = inject(ChefService);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   profileForm!: FormGroup;
   editMode = false;
@@ -32,8 +34,8 @@ export class UserInfoComponent implements OnInit {
   isSaving = false;
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
-  private deleteConfirmTimeout?: ReturnType<typeof setTimeout>;
-  private isDeletePending = false;
+  showDeleteModal = false;
+  isDeleting = false;
 
   get profilePhotoUrl(): string {
     const photoValue = this.profileForm?.get('photo')?.value;
@@ -378,22 +380,32 @@ export class UserInfoComponent implements OnInit {
   }
 
   deleteAccount() {
-    if (!this.isDeletePending) {
-      this.isDeletePending = true;
-      this.showErrorNotification('Pulsa de nuevo en eliminar cuenta para confirmar. Esta acción es irreversible.');
-      this.deleteConfirmTimeout = setTimeout(() => {
-        this.isDeletePending = false;
-      }, 5000);
-      return;
-    }
+    this.showDeleteModal = true;
+    this.cdr.detectChanges();
+  }
 
-    if (this.deleteConfirmTimeout) {
-      clearTimeout(this.deleteConfirmTimeout);
-      this.deleteConfirmTimeout = undefined;
-    }
-    this.isDeletePending = false;
-    this.showSuccessNotification('Cuenta eliminada. Redirigiendo...');
-    this.authService.logout();
+  cancelDelete() {
+    this.showDeleteModal = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    this.isDeleting = true;
+    this.cdr.detectChanges();
+
+    this.authService.deleteAccount().subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.isDeleting = false;
+        this.router.navigate(['/index']);
+      },
+      error: (error) => {
+        console.error('Error deleting account:', error);
+        this.isDeleting = false;
+        this.showDeleteModal = false;
+        this.showErrorNotification('No se pudo eliminar la cuenta. Inténtalo de nuevo.');
+      }
+    });
   }
 
   addPrizeTag(event: any): void {

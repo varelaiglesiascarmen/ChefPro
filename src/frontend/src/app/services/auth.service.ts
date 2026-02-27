@@ -219,4 +219,19 @@ export class AuthService {
       catchError(this.handleError)
     );
   }
+
+  // Delete user account permanently
+  deleteAccount(): Observable<void> {
+    const token = localStorage.getItem('chefpro_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.delete<void>(`${this.authUrl}/account`, { headers }).pipe(
+      tap(() => {
+        localStorage.removeItem('chefpro_user');
+        localStorage.removeItem('chefpro_token');
+        this.currentUserSubject.next(null);
+      }),
+      catchError(this.handleError)
+    );
+  }
 }
