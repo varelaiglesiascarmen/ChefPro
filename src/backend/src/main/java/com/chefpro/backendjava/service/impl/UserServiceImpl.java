@@ -173,6 +173,18 @@ public class UserServiceImpl implements UserService {
       }
     }
 
+    // Si es un diner, actualizar dirección
+    if (userLogin.getRole() == UserRoleEnum.DINER) {
+      Optional<Diner> dinerOpt = dinerRepository.findByUser(userLogin);
+      if (dinerOpt.isPresent()) {
+        Diner diner = dinerOpt.get();
+        if (updateProfileDto.getAddress() != null) {
+          diner.setAddress(updateProfileDto.getAddress());
+        }
+        dinerRepository.save(diner);
+      }
+    }
+
     // Guardar usuario actualizado
     UserLogin savedUser = customUserRepository.save(userLogin);
 

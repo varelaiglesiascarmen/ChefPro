@@ -187,6 +187,7 @@ export class UserInfoComponent implements OnInit {
         if (user.role === 'CHEF') {
           const chef = user as Chef;
           patchData.bio = chef.bio || '';
+          patchData.address = chef.address || '';
           if (chef.prizes) {
             this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
           }
@@ -325,6 +326,7 @@ export class UserInfoComponent implements OnInit {
         if (user.role === 'CHEF') {
           const chef = user as Chef;
           patchData.bio = chef.bio || '';
+          patchData.address = chef.address || '';
           if (chef.prizes) {
             this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
           } else {
