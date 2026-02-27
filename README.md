@@ -106,9 +106,9 @@ La persistencia se gestiona en MySQL.
 *Nota:* La seguridad está implementada mediante Tokens JWT.
 
 #### Frontend (Angular)
-- Abrir la carpeta del frontend en Visual Studio Code.
-- Instalar dependencias: npm install.
-- Lanzar el servidor de desarrollo: ng serve.
+- Abrir la carpeta `src/frontend` en Visual Studio Code (o ejecutar los comandos desde esa ruta).
+- Instalar dependencias: `npm install` (dentro de `src/frontend`).
+- Lanzar el servidor de desarrollo: `ng serve` (dentro de `src/frontend`).
 - Acceder a través de http://localhost:4200. La interfaz es completamente responsive
 
 ## Funciones Principales
