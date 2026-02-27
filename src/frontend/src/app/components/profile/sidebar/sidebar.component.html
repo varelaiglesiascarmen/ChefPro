@@ -5,18 +5,21 @@
         class="chef-avatar">
     </div>
     <div class="chef-meta">
-      <h3>{{ user?.name || 'Chef' }} {{ user?.lastname || '' }}</h3>
-      <span class="badge">{{ role === 'CHEF' ? 'Chef Profesional' : 'Comensal Gourmet' }}</span>
+      <h3>{{ user?.name || 'Usuario' }} {{ user?.lastname || '' }}</h3>
+      <span class="badge">{{ role === 'CHEF' ? 'Chef Profesional' : role === 'ADMIN' ? 'Administrador' : 'Comensal Gourmet' }}</span>
     </div>
   </div>
 
   <hr class="divider">
 
   <nav class="nav-menu">
+    <a routerLink="/index" routerLinkActive="active" class="nav-item nav-item-home">Inicio
+    </a>
+
     <a routerLink="info" routerLinkActive="active" class="nav-item">Mi Perfil
     </a>
 
-    <ng-container *ngIf="role === 'CHEF'">
+    <ng-container *ngIf="role === 'CHEF' || role === 'ADMIN'">
       <a routerLink="calendar" routerLinkActive="active" class="nav-item">Mi Calendario
       </a>
       <a routerLink="menus" routerLinkActive="active" class="nav-item">Mis Menús
@@ -25,7 +28,7 @@
       </a>
     </ng-container>
 
-    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' ? 'Solicitudes de reservas' : 'Mis
+    <a routerLink="orders" routerLinkActive="active" class="nav-item">{{ role === 'CHEF' || role === 'ADMIN' ? 'Solicitudes de reservas' : 'Mis
       Reservas' }}
     </a>
   </nav>

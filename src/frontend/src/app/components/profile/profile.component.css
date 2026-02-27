@@ -4,6 +4,7 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
 .fixed-sidebar {
@@ -35,12 +36,179 @@
   }
 }
 
-/* Responsive design */
+/* Hamburger button (hidden by default) */
+.hamburger-btn {
+  display: none;
+}
+
+.close-sidebar-btn {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* ============================= */
+/* RESPONSIVE DESIGN - TABLET */
+/* ============================= */
+@media (max-width: 1024px) {
+  .main-viewport {
+    padding: 30px;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE DESIGN - MOBILE */
+/* ============================= */
 @media (max-width: 768px) {
   .profile-layout {
     grid-template-columns: 1fr;
+    overflow: visible;
+    height: auto;
   }
+
+  .main-viewport {
+    padding: 20px;
+    height: auto;
+    padding-top: 60px;
+  }
+
+  /* Hamburger button visible on mobile */
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background: #2C1810;
+    border: none;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .hamburger-btn span {
+    width: 24px;
+    height: 2.5px;
+    background: #C5A059;
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  .hamburger-btn:hover {
+    background: #3a1f16;
+  }
+
+  /* Sidebar overlay when open */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99;
+    animation: fadeOverlay 0.3s ease-in;
+  }
+
+  /* Sidebar as modal drawer on mobile */
   .fixed-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 101;
+    overflow-y: auto;
+  }
+
+  .fixed-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Close button */
+  .close-sidebar-btn {
+    display: flex;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 102;
+    background: rgba(197, 160, 89, 0.1);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    color: #C5A059;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+  }
+
+  .close-sidebar-btn:hover {
+    background: rgba(197, 160, 89, 0.2);
+    border-color: #C5A059;
+  }
+}
+
+@keyframes fadeOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE DESIGN - SMALL MOBILE */
+/* ============================= */
+@media (max-width: 480px) {
+  .main-viewport {
+    padding: 15px;
+  }
+
+  .hamburger-btn {
+    width: 36px;
+    height: 36px;
+    top: 12px;
+    left: 12px;
+  }
+
+  .hamburger-btn span {
+    width: 20px;
+    height: 2px;
+  }
+
+  .close-sidebar-btn {
+    width: 36px;
+    height: 36px;
+    top: 12px;
+    right: 12px;
+    font-size: 1rem;
+  }
+
+  .fixed-sidebar {
+    width: 280px;
+  }
+}
+
+/* ============================= */
+/* HIDE NAVBAR IN PROFILE MOBILE */
+/* ============================= */
+@media (max-width: 768px) {
+  ::ng-deep app-navbar {
     display: none;
   }
 }

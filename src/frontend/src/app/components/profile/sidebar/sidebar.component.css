@@ -3,16 +3,16 @@
 }
 
 .sidebar-container {
-  background-color: #2C1810; /* Chocolate ChefPro */
+  background-color: #2C1810;
   color: #FDF7F0;
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 40px 20px;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
-/* --- SECCIÓN PERFIL --- */
 .profile-summary {
   text-align: center;
   margin-bottom: 25px;
@@ -23,7 +23,7 @@
   height: 100px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  border: 3px solid #C5A059; /* Borde Dorado */
+  border: 3px solid #C5A059;
   padding: 4px;
   overflow: hidden;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
@@ -60,7 +60,6 @@
   margin: 20px 0;
 }
 
-/* --- MENÚ DE NAVEGACIÓN --- */
 .nav-menu {
   display: flex;
   flex-direction: column;
@@ -85,12 +84,16 @@
 }
 
 .nav-item.active {
-  background-color: #C5A059 !important; /* Dorado ChefPro */
+  background-color: #C5A059 !important;
   color: white !important;
   box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
 }
 
-/* --- FOOTER / LOGOUT --- */
+/* Show "Inicio" only in mobile hamburger mode */
+.nav-item-home {
+  display: none;
+}
+
 .sidebar-footer {
   margin-top: auto;
   padding-top: 20px;
@@ -116,4 +119,229 @@
   background: rgb(91, 21, 13, 0.65);
   color: white;
   border-color: transparent;
+}
+
+/* Responsive breakpoints */
+
+@media (max-width: 1024px) {
+  .sidebar-container {
+    padding: 30px 15px;
+  }
+
+  .chef-meta h3 {
+    font-size: 1.1rem;
+  }
+
+  .nav-item {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-container {
+    padding: 25px 12px;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-item-home {
+    display: flex;
+  }
+
+  .avatar-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 12px;
+  }
+
+  .chef-meta h3 {
+    font-size: 1rem;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 3px 10px;
+  }
+
+  .nav-menu {
+    gap: 8px;
+  }
+
+  .nav-item {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
+  .sidebar-footer {
+    padding-top: 15px;
+  }
+
+  .logout-btn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 599px) and (min-width: 481px) {
+  .sidebar-container {
+    padding: 20px 12px;
+  }
+
+  .profile-summary {
+    margin-bottom: 20px;
+  }
+
+  .avatar-wrapper {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 12px;
+    border-width: 2px;
+  }
+
+  .chef-meta h3 {
+    font-size: 0.95rem;
+    margin: 0 0 4px 0;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    padding: 2px 8px;
+  }
+
+  .divider {
+    margin: 15px 0;
+  }
+
+  .nav-menu {
+    gap: 6px;
+  }
+
+  .nav-item {
+    padding: 10px 13px;
+    font-size: 0.87rem;
+    border-radius: 6px;
+  }
+
+  .logout-btn {
+    padding: 10px;
+    font-size: 0.87rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-container {
+    padding: 18px 10px;
+  }
+
+  .profile-summary {
+    margin-bottom: 18px;
+  }
+
+  .avatar-wrapper {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 10px;
+    border-width: 2px;
+  }
+
+  .chef-meta h3 {
+    font-size: 0.9rem;
+    margin: 0 0 3px 0;
+  }
+
+  .badge {
+    font-size: 0.55rem;
+    padding: 2px 6px;
+  }
+
+  .divider {
+    margin: 12px 0;
+  }
+
+  .nav-menu {
+    gap: 5px;
+  }
+
+  .nav-item {
+    padding: 8px 11px;
+    font-size: 0.82rem;
+    border-radius: 5px;
+  }
+
+  .nav-item:hover {
+    transform: translateX(2px);
+  }
+
+  .sidebar-footer {
+    padding-top: 12px;
+  }
+
+  .logout-btn {
+    padding: 8px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 374px) {
+  .sidebar-container {
+    padding: 16px 8px;
+  }
+
+  .profile-summary {
+    margin-bottom: 16px;
+  }
+
+  .avatar-wrapper {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 8px;
+    border-width: 2px;
+    padding: 2px;
+  }
+
+  .chef-meta h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    margin: 0 0 2px 0;
+    font-weight: 600;
+  }
+
+  .badge {
+    font-size: 0.5rem;
+    padding: 1px 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .divider {
+    margin: 10px 0;
+  }
+
+  .nav-menu {
+    gap: 4px;
+  }
+
+  .nav-item {
+    padding: 7px 10px;
+    font-size: 0.78rem;
+    border-radius: 4px;
+  }
+
+  .nav-item:hover {
+    transform: translateX(1px);
+  }
+
+  .sidebar-footer {
+    padding-top: 10px;
+  }
+
+  .logout-btn {
+    padding: 7px;
+    font-size: 0.78rem;
+    gap: 6px;
+  }
 }
