@@ -14,6 +14,10 @@
         Reservas Confirmadas
         <span class="badge" *ngIf="confirmedOrders.length > 0">{{ confirmedOrders.length }}</span>
       </button>
+      <button class="tab-btn" [class.active]="activeTab === 'COMPLETED'" (click)="setTab('COMPLETED')">
+        Completadas
+        <span class="badge" *ngIf="completedOrders.length > 0">{{ completedOrders.length }}</span>
+      </button>
     </div>
 
     <div class="loading-state" *ngIf="isLoading">
@@ -92,6 +96,43 @@
           <div class="card-actions single-action">
             <button class="btn-cancel" (click)="showCancelConfirmation(order)" title="Cancelar esta reserva confirmada">
               Cancelar Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" *ngIf="!isLoading && activeTab === 'COMPLETED'">
+
+      <div class="empty-state" *ngIf="completedOrders.length === 0">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <h3>Aun no tienes reservas completadas</h3>
+        <p>Cuando finalices un servicio, aparecera aqui para que puedas hacer seguimiento.</p>
+      </div>
+
+      <div class="orders-grid">
+        <div class="order-card confirmed-card" *ngFor="let order of completedOrders">
+          <div class="card-top">
+            <span class="order-id">{{ order.id }}</span>
+            <span class="status-badge success">Completada</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="diner-name">{{ order.dinerName }}</h3>
+            <p class="menu-name">{{ order.menuName }}</p>
+
+            <div class="order-details">
+              <div class="detail"><i class="fa-regular fa-calendar"></i> {{ order.date }}</div>
+              <div class="detail"><i class="fa-solid fa-user-group"></i> {{ order.guests }} pax</div>
+              <div class="detail"><i class="fa-solid fa-location-dot"></i> {{ order.location }}</div>
+            </div>
+
+            <div class="price-tag">{{ order.price }}</div>
+          </div>
+
+          <div class="card-actions single-action" *ngIf="userRole === 'DINER'">
+            <button class="btn-accept" (click)="openReviewModal(order)">
+              <i class="fa-solid fa-star"></i> Valorar servicio
             </button>
           </div>
         </div>

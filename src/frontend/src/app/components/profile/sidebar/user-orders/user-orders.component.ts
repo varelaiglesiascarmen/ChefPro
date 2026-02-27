@@ -45,7 +45,7 @@ export class UserOrdersComponent implements OnInit {
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
-  activeTab: 'PENDING' | 'CONFIRMED' = 'PENDING';
+  activeTab: 'PENDING' | 'CONFIRMED' | 'COMPLETED' = 'PENDING';
   isLoading = true;
   orders: Order[] = [];
   userRole: string | null = null;
@@ -83,6 +83,7 @@ export class UserOrdersComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar las reservas:', err);
+        this.toastService.error('No pudimos cargar tus reservas. Intenta nuevamente.');
         this.isLoading = false;
       }
     });
@@ -100,7 +101,7 @@ export class UserOrdersComponent implements OnInit {
     return this.orders.filter(o => o.status === 'COMPLETED');
   }
 
-  setTab(tab: 'PENDING' | 'CONFIRMED') {
+  setTab(tab: 'PENDING' | 'CONFIRMED' | 'COMPLETED') {
     this.activeTab = tab;
   }
 
