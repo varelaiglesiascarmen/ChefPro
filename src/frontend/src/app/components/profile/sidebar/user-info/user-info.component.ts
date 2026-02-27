@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { debounceTime, map, first } from 'rxjs/operators';
@@ -16,6 +16,7 @@ import { User, Chef, Diner } from '../../../../models/auth.model';
 export class UserInfoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   profileForm!: FormGroup;
   editMode = false;
@@ -89,6 +90,7 @@ export class UserInfoComponent implements OnInit {
         const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
         this.profileForm.patchValue({ photo: base64Image });
+        this.cdr.detectChanges();
       };
       img.src = e.target.result;
     };

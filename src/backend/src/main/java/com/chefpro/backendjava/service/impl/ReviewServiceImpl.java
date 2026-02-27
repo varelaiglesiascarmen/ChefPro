@@ -1,14 +1,23 @@
 package com.chefpro.backendjava.service.impl;
 
-import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
-import com.chefpro.backendjava.common.object.entity.*;
-import com.chefpro.backendjava.repository.*;
-import com.chefpro.backendjava.service.ReviewService;
+import java.time.LocalDate;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
+import com.chefpro.backendjava.common.object.entity.Chef;
+import com.chefpro.backendjava.common.object.entity.Diner;
+import com.chefpro.backendjava.common.object.entity.Reservation;
+import com.chefpro.backendjava.common.object.entity.Review;
+import com.chefpro.backendjava.common.object.entity.UserLogin;
+import com.chefpro.backendjava.repository.ChefRepository;
+import com.chefpro.backendjava.repository.CustomUserRepository;
+import com.chefpro.backendjava.repository.DinerRepository;
+import com.chefpro.backendjava.repository.ReservaRepository;
+import com.chefpro.backendjava.repository.ReviewRepository;
+import com.chefpro.backendjava.service.ReviewService;
 
 @Component("reviewService")
 public class ReviewServiceImpl implements ReviewService {
@@ -36,7 +45,6 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   @Transactional
   public void createReview(ReviewCReqDto dto, Authentication authentication) {
-
     // 1. Validar campos obligatorios
     if (dto.getChefId() == null) {
       throw new IllegalArgumentException("chefId is required");
@@ -64,8 +72,10 @@ public class ReviewServiceImpl implements ReviewService {
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
     // 4. Buscar la reserva por clave compuesta (chefId + date)
-    // Sirve para validar que existió una relación real entre este diner y este chef
-    Reservation.ReservationId reservationId = new Reservation.ReservationId(dto.getChefId(), dto.getReservationDate());
+    Reservation.ReservationId reservationId = new Reservation.ReservationId(
+      dto.getChefId(),
+      dto.getReservationDate()
+    );
     Reservation reservation = reservaRepository.findById(reservationId)
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
@@ -79,16 +89,10 @@ public class ReviewServiceImpl implements ReviewService {
       throw new IllegalArgumentException("You can only review a reservation that has already taken place");
     }
 
-<<<<<<< HEAD
-    // 7. Verificar que la reserva fue CONFIRMED
-    if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
-      throw new IllegalArgumentException("You can only review a confirmed reservation");
-=======
     // 7. Verificar que la reserva fue CONFIRMED o COMPLETED
     if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED
       && reservation.getStatus() != Reservation.ReservationStatus.COMPLETED) {
       throw new IllegalArgumentException("You can only review a confirmed or completed reservation");
->>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
     }
 
     // 8. Verificar que este diner no ha reseñado ya a este chef
