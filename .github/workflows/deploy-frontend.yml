@@ -81,7 +81,6 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel configuration
-        working-directory: src/frontend
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Angular app
@@ -89,10 +88,9 @@ jobs:
         run: npx ng build --configuration production
 
       - name: Prepare Vercel output
-        working-directory: src/frontend
         run: |
           mkdir -p .vercel/output/static
-          cp -r dist/frontend/browser/* .vercel/output/static/
+          cp -r src/frontend/dist/frontend/browser/* .vercel/output/static/
           cat > .vercel/output/config.json << 'EOF'
           {
             "version": 3,
@@ -104,7 +102,6 @@ jobs:
           EOF
 
       - name: Deploy to production
-        working-directory: src/frontend
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "Deployed to: $DEPLOY_URL"
@@ -144,7 +141,6 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel configuration
-        working-directory: src/frontend
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Angular app
@@ -152,10 +148,9 @@ jobs:
         run: npx ng build --configuration production
 
       - name: Prepare Vercel output
-        working-directory: src/frontend
         run: |
           mkdir -p .vercel/output/static
-          cp -r dist/frontend/browser/* .vercel/output/static/
+          cp -r src/frontend/dist/frontend/browser/* .vercel/output/static/
           cat > .vercel/output/config.json << 'EOF'
           {
             "version": 3,
@@ -167,7 +162,6 @@ jobs:
           EOF
 
       - name: Deploy preview
-        working-directory: src/frontend
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "Preview URL: $DEPLOY_URL"
