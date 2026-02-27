@@ -219,6 +219,26 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
+  public void deleteAccount(String userEmail) {
+    Optional<UserLogin> foundUser = customUserRepository.findByUsername(userEmail);
+    if (foundUser.isEmpty()) {
+      throw new RuntimeException("Usuario no encontrado");
+    }
+
+    UserLogin userLogin = foundUser.get();
+
+    // Delete role-specific data first (cascades handle related entities like menus, reservations)
+    if (userLogin.getRole() == UserRoleEnum.CHEF) {
+      chefRepository.findByUser(userLogin).ifPresent(chefRepository::delete);
+    } else if (userLogin.getRole() == UserRoleEnum.DINER) {
+      dinerRepository.findByUser(userLogin).ifPresent(dinerRepository::delete);
+    }
+
+    customUserRepository.delete(userLogin);
+  }
+
+  @Override
   public boolean existsByUsername(String username) {
     return customUserRepository.existsByUsername(username);
   }

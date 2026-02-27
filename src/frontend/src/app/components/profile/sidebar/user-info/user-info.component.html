@@ -143,4 +143,18 @@
     <div class="toast-icon">⚠</div>
     <span>{{ toastMessage }}</span>
   </div>
+
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Eliminar cuenta</h3>
+      <p class="modal-message">Esta acción es irreversible. Se borrarán todos tus datos, menús y reservas. ¿Estás
+        seguro?</p>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" (click)="cancelDelete()" [disabled]="isDeleting">Cancelar</button>
+        <button class="btn-modal-confirm" (click)="confirmDelete()" [disabled]="isDeleting">
+          {{ isDeleting ? 'Eliminando...' : 'Sí, eliminar mi cuenta' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
