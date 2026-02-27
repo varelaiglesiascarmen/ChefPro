@@ -4,7 +4,7 @@
       <h2>Mi Perfil {{ role === 'CHEF' ? 'Profesional' : 'Gourmet' }}</h2>
       <button class="btn-config" (click)="editMode ? saveChanges() : toggleEdit()"
         [disabled]="isSaving || (editMode && profileForm.invalid)">
-        {{ isSaving ? 'Guardando...' : (editMode ? 'Guardar Cambios' : 'Configuración') }}
+        {{ isSaving ? 'Guardando...' : (editMode ? 'Guardar Cambios' : 'Modificar') }}
       </button>
     </div>
 
