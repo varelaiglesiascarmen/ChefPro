@@ -13,9 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ChefSearchResultDto {
 
+  private List<String> cities;
   private List<ChefSearchDto> chefs;
   private List<MenuSearchDto> menus;
 
-  // true cuando no hubo resultados reales y los menús son sugerencias aleatorias
+  // true when there were no real results and menus are random suggestions
   private boolean noResults;
 }

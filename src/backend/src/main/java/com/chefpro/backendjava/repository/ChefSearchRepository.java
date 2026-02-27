@@ -11,6 +11,21 @@ import java.util.List;
 
 public interface ChefSearchRepository extends JpaRepository<Chef, Long> {
 
+  /**
+   * Returns distinct chef locations (cities) matching the search text.
+   */
+  @Query(value = """
+    SELECT DISTINCT c.location
+    FROM chefs c
+    WHERE c.location IS NOT NULL
+      AND c.location <> ''
+      AND (:q IS NULL OR :q = '' OR LOWER(c.location) LIKE CONCAT('%', LOWER(:q), '%'))
+    ORDER BY c.location
+    """,
+    nativeQuery = true
+  )
+  List<String> findMatchingCities(@Param("q") String q);
+
   @Query(value = """
     SELECT
       u.user_ID               AS userId,
@@ -28,11 +43,11 @@ public interface ChefSearchRepository extends JpaRepository<Chef, Long> {
     LEFT JOIN menu m ON m.chef_ID = c.user_ID
     LEFT JOIN reviews r ON r.reviewed_user = u.user_ID
     WHERE
-      -- Búsqueda por texto libre sobre nombre, apellido y username del chef
+      -- Text search on chef name, lastname, and their combination
       (:q IS NULL OR :q = '' OR
         LOWER(u.name)      LIKE CONCAT('%', LOWER(:q), '%') OR
         LOWER(u.lastname)  LIKE CONCAT('%', LOWER(:q), '%') OR
-        LOWER(u.username)  LIKE CONCAT('%', LOWER(:q), '%')
+        LOWER(CONCAT(u.name, ' ', u.lastname)) LIKE CONCAT('%', LOWER(:q), '%')
       )
       -- Filtro de disponibilidad: el chef no tiene reserva confirmada en esa fecha
       AND (

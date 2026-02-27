@@ -29,11 +29,12 @@ export interface MenuSearchResult {
   reviewsCount?: number;
 }
 
-// Respuesta completa del endpoint /api/chef/search
+// Full response from /api/chef/search
 export interface ChefSearchResponse {
+  cities: string[];
   chefs: ChefSearchResult[];
   menus: MenuSearchResult[];
-  noResults: boolean; // true cuando los menús son sugerencias aleatorias por falta de resultados
+  noResults: boolean; // true when menus are random suggestions due to no matches
 }
 
 // Filtros
