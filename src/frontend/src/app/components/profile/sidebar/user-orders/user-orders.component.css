@@ -608,17 +608,21 @@
 }
 
 .modal-body .warning-text {
-  background: #fef3c7;
-  border-left: 4px solid #f59e0b;
-  padding: 12px;
+  background: #fbbf24;
+  border-left: 4px solid #d97706;
+  padding: 14px;
   border-radius: 6px;
-  color: #92400e;
-  font-size: 0.9rem;
+  color: #1f2937;
+  font-size: 0.95rem;
+  font-weight: 600;
   margin-top: 12px;
+  line-height: 1.5;
 }
 
 .modal-body .warning-text i {
   margin-right: 8px;
+  color: #d97706;
+  font-weight: 700;
 }
 
 .modal-actions {
