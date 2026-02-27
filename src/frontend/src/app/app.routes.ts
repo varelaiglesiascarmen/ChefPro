@@ -18,6 +18,7 @@ import { UserCalendarComponent } from './components/profile/sidebar/user-calenda
 import { UserOrdersComponent } from './components/profile/sidebar/user-orders/user-orders.component';
 import { CancellationPoliciesComponent } from './components/cancellation-policies/cancellation-policies.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
+import { authRedirectGuard } from './guards/auth-redirect.guard';
 
 export const routes: Routes = [
 
@@ -43,10 +44,10 @@ export const routes: Routes = [
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
 
-  // login root
-  { path: 'login', component: LoginComponent },
-  // signin root
-  { path: 'signIn', component: SignInComponent },
+  // login root (redirect to profile if already authenticated)
+  { path: 'login', component: LoginComponent, canActivate: [authRedirectGuard] },
+  // signin root (redirect to profile if already authenticated)
+  { path: 'signIn', component: SignInComponent, canActivate: [authRedirectGuard] },
 
   //profile root
   {
