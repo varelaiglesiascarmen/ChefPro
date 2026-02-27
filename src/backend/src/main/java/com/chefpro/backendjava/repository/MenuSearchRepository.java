@@ -80,4 +80,37 @@ public interface MenuSearchRepository extends JpaRepository<Menu, Long> {
     @Param("guests") Integer guests,
     @Param("allergens") List<String> allergens
   );
+<<<<<<< HEAD
+=======
+
+  @Query(value = """
+    SELECT
+      m.menu_ID                   AS menuId,
+      m.title                     AS menuTitle,
+      m.description               AS menuDescription,
+      m.price_per_person          AS pricePerPerson,
+      m.min_number_diners         AS minDiners,
+      m.max_number_diners         AS maxDiners,
+      c.user_ID                   AS chefId,
+      u.name                      AS chefName,
+      u.lastname                  AS chefLastname,
+      c.photo                     AS chefPhoto,
+      c.location                  AS chefLocation,
+      AVG(r.score)                AS avgScore,
+      COUNT(DISTINCT r.review_ID) AS reviewsCount
+    FROM menu m
+    JOIN chefs c ON c.user_ID = m.chef_ID
+    JOIN users u ON u.user_ID = c.user_ID
+    LEFT JOIN reviews r ON r.reviewed_user = u.user_ID
+    GROUP BY
+      m.menu_ID, m.title, m.description, m.price_per_person,
+      m.min_number_diners, m.max_number_diners,
+      c.user_ID, u.name, u.lastname, c.photo, c.location
+    ORDER BY RAND()
+    LIMIT :limit
+    """,
+    nativeQuery = true
+  )
+  List<MenuSearchProjection> findRandomMenuSuggestions(@Param("limit") int limit);
+>>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
 }

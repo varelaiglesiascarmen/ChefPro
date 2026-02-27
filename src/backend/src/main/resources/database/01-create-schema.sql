@@ -138,7 +138,7 @@ CREATE TABLE `reservations` (
   `menu_ID` int(11) NOT NULL,
   `n_diners` int(11) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
-  `status` enum('PENDING','CONFIRMED','REJECTED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+  `status` enum('PENDING','CONFIRMED','REJECTED','CANCELLED','COMPLETED') NOT NULL DEFAULT 'PENDING',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`chef_ID`,`date`),
   KEY `diner_ID` (`diner_ID`),

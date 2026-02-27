@@ -89,6 +89,14 @@ UNLOCK TABLES;
 LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
 INSERT INTO `reservations` VALUES (2,'2026-03-15',4,1,4,'Calle Gran Vía 23, Madrid','CONFIRMED','2026-02-04 12:41:55'),(2,'2026-05-01',5,1,2,'Calle Falsa 123','CANCELLED','2026-02-04 12:44:14'),(3,'2026-03-20',5,2,6,'Casa de Ana, Salón principal','PENDING','2026-02-04 12:41:55');
+-- MOCK DATA (TEMPORARY): remove before pushing to GitHub
+INSERT INTO `reservations` VALUES
+(2,'2026-02-12',4,1,2,'Calle Gran Vía 23, Madrid','PENDING','2026-02-10 10:10:00'),
+(2,'2026-02-18',5,1,4,'Avenida Diagonal 45, Barcelona','CONFIRMED','2026-02-11 09:20:00'),
+(2,'2026-02-05',4,1,3,'Calle Gran Vía 23, Madrid','COMPLETED','2026-02-01 18:00:00'),
+(3,'2026-02-14',5,2,6,'Casa de Ana, Salón principal','PENDING','2026-02-11 12:30:00'),
+(3,'2026-02-22',4,2,2,'Calle Falsa 123','CONFIRMED','2026-02-12 14:00:00'),
+(3,'2026-02-03',5,2,4,'Avenida Diagonal 45, Barcelona','COMPLETED','2026-01-31 20:10:00');
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
 UNLOCK TABLES;
 
