@@ -13,7 +13,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   // Hace fetch del reviewer para poder acceder a nombre/apellido sin lazy load adicional
   @Query("SELECT r FROM Review r " +
     "JOIN FETCH r.reviewerUser " +
-    "WHERE r.reviewedUser.id = :reviewedUserId")
+    "WHERE r.reviewedUser.id = :reviewedUserId " +
+    "ORDER BY r.date DESC")
   List<Review> findByReviewedUserIdWithReviewer(@Param("reviewedUserId") Long reviewedUserId);
 
   // Usado en ChefProfileServiceImpl para calcular la media de puntuación
