@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -115,10 +115,6 @@ export class NavbarComponent implements OnInit {
     this.showFilterMenu = false;
   }
 
-  toggleFilterMenu() {
-    this.showFilterMenu = !this.showFilterMenu;
-  }
-
   onFilterApplied(filtros: any) {
     this.showFilterMenu = false;
     this.hasFilterActive = true;
@@ -173,5 +169,14 @@ export class NavbarComponent implements OnInit {
 
   closeUserMenu() {
     this.isUserMenuOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const insideSearchBox = target.closest('.search-box');
+    if (!insideSearchBox) {
+      this.showFilterMenu = false;
+    }
   }
 }

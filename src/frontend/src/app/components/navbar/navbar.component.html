@@ -19,44 +19,33 @@
 
   <div class="nav-actions">
     <div class="search-box" [class.expanded]="isSearchOpen">
-      <button class="filter-menu-btn" (click)="$event.stopPropagation(); toggleFilterMenu()">
-        <span class="menu-icon" [style.color]="hasFilterActive ? '#A67C00' : 'inherit'">
-          {{ showFilterMenu ? '▽' : '▷' }}
-        </span>
-      </button>
-
       <input type="text" placeholder="Buscar..." [(ngModel)]="searchText" (keyup.enter)="performSearch()"
-        class="search-input" appFocusOnInit>
+        (focus)="showFilterMenu = true" (click)="$event.stopPropagation(); showFilterMenu = true" class="search-input"
+        appFocusOnInit>
 
       <button class="search-submit-btn" (click)="toggleSearch()">
         <img src="/logos/magnifier.svg" alt="Buscar" class="search-icon-svg">
       </button>
 
       @if (showFilterMenu) {
-        <div class="filter-dropdown-container" @fadeInOut>
+      <div class="filter-dropdown-container" @fadeInOut (click)="$event.stopPropagation()">
 
-          <app-search-filter
-            (close)="showFilterMenu = false"
-            (apply)="onFilterApplied($event)">
-          </app-search-filter>
+        <app-search-filter (close)="showFilterMenu = false" (apply)="onFilterApplied($event)">
+        </app-search-filter>
 
-        </div>
+      </div>
       }
 
     </div>
 
     <button class="user-btn" (click)="handleUserClick()" id="user-img-btn">
-      <img [src]="userProfileImage"
-           (error)="handleImageError($event)"
-           alt="Usuario"
-           class="user-svg"
-           [class.default-icon]="userProfileImage.includes('users.svg')"
-           style="border-radius: 50%;">
+      <img [src]="userProfileImage" (error)="handleImageError($event)" alt="Usuario" class="user-svg"
+        [class.default-icon]="userProfileImage.includes('users.svg')" style="border-radius: 50%;">
     </button>
   </div>
 
   @if (currentUser && isUserMenuOpen) {
-    <app-user-menu (closeMenu)="closeUserMenu()"></app-user-menu>
+  <app-user-menu (closeMenu)="closeUserMenu()"></app-user-menu>
   }
 
 </nav>
