@@ -38,7 +38,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       toastService.error(errorMessage);
-      console.error('HTTP Error:', { status: error.status, message: errorMessage });
 
       return throwError(() => error);
     })

@@ -39,7 +39,6 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('ChefMenus: Error cargando menús:', err);
       }
     });
   }
@@ -64,7 +63,6 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
         }, 1000);
       },
       error: (err) => {
-        console.error('ChefMenus: Error al eliminar menú:', err);
 
         // Verificar status HTTP 403 (Forbidden) que indica que hay restricciones (reservas)
         if (err.status === 403) {
