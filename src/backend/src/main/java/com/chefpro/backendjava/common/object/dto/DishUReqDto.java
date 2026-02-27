@@ -19,4 +19,5 @@ public class DishUReqDto {
   private String description;
   private String category;
   private List<String> allergens;
+  private String photo;
 }

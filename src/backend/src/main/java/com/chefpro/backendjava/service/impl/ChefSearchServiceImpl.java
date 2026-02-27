@@ -17,6 +17,7 @@ public class ChefSearchServiceImpl implements ChefSearchService {
 
   private final ChefSearchRepository chefSearchRepository;
   private final MenuSearchRepository menuSearchRepository;
+
   public ChefSearchServiceImpl(
     ChefSearchRepository chefSearchRepository,
     MenuSearchRepository menuSearchRepository
@@ -49,8 +50,7 @@ public class ChefSearchServiceImpl implements ChefSearchService {
       .map(this::toMenuDto)
       .toList();
 
-    // Si no hay ningún resultado, devolver menús aleatorios como sugerencias
-    // Solo se activa cuando había texto de búsqueda (no tiene sentido en carga inicial)
+    // Si no hay resultados y había texto de búsqueda, devolvemos sugerencias aleatorias
     if (chefs.isEmpty() && menus.isEmpty() && query != null) {
       List<MenuSearchDto> randomMenus = menuSearchRepository
         .findRandomMenuSuggestions(SUGGESTION_LIMIT)
