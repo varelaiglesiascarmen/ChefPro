@@ -48,10 +48,10 @@ export class ChefService {
   // Las 4 opciones del panel de filtros mapeadas a sus nombres exactos en official_allergens_list
   getDietOptions(): Observable<DietOption[]> {
     return of([
-      { id: 1, label: 'Vegano',      value: 'Vegano' },
-      { id: 2, label: 'Sin Gluten',  value: 'Gluten' },
-      { id: 3, label: 'Halal',       value: 'Halal' },
-      { id: 4, label: 'Keto',        value: 'Keto' }
+      { id: 1, label: 'Sin gluten',        value: 'Gluten' },
+      { id: 2, label: 'Sin lácteos',       value: 'Lácteos' },
+      { id: 3, label: 'Sin pescado',       value: 'Pescado' },
+      { id: 4, label: 'Sin frutos secos',  value: 'Frutos Secos' }
     ]);
   }
 }
