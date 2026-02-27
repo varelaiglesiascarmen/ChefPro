@@ -136,8 +136,8 @@
             [style.pointer-events]="selectedMenuId ? 'auto' : 'none'">
             <label style="font-weight: 600; display:block; margin-bottom:5px;">Selecciona la fecha</label>
 
-            <calendar [busyDates]="data.busyDates || []" (dateSelected)="updateDate($event)">
-            </calendar>
+            <app-calendar [busyDates]="data.busyDates || []" (dateSelected)="updateDate($event)">
+            </app-calendar>
 
             <p *ngIf="reservationDate" class="selected-date-text" style="margin-top: 5px; font-weight: bold;">
               Fecha: {{ reservationDate | date:'mediumDate' }}
@@ -257,8 +257,8 @@
             <div class="form-group">
               <label class="label-bold">1. Selecciona fecha</label>
               <div class="calendar-sidebar-wrapper">
-                <calendar [busyDates]="data.busyDates || []" (dateSelected)="updateDate($event)">
-                </calendar>
+                <app-calendar [busyDates]="data.busyDates || []" (dateSelected)="updateDate($event)">
+                </app-calendar>
               </div>
             </div>
 
