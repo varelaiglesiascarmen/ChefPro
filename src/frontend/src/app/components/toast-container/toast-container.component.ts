@@ -145,7 +145,7 @@ import { ToastService } from '../../services/toast.service';
 })
 export class ToastContainerComponent {
   toastService = inject(ToastService);
-  private timeoutMap = new Map<string, NodeJS.Timeout>();
+  private timeoutMap = new Map<string, ReturnType<typeof setTimeout>>();
 
   getIconClass(type: string): string {
     const icons: Record<string, string> = {
