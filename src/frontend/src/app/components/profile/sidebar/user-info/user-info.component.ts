@@ -358,16 +358,20 @@ export class UserInfoComponent implements OnInit {
   showSuccessNotification(message: string) {
     this.toastMessage = message;
     this.showSuccessToast = true;
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.showSuccessToast = false;
+      this.cdr.detectChanges();
     }, 3000);
   }
 
   showErrorNotification(message: string) {
     this.toastMessage = message;
     this.showErrorToast = true;
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.showErrorToast = false;
+      this.cdr.detectChanges();
     }, 3000);
   }
 
