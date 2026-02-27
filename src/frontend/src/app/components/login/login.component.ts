@@ -32,7 +32,7 @@ export class LoginComponent {
   onLogin() {
     this.errorMessage = '';
     if (!this.loginData.username || !this.loginData.password) {
-      this.errorMessage = 'Username or password required.';
+      this.errorMessage = 'Introduce tu usuario y contraseña para continuar.';
       return;
     }
 
@@ -50,9 +50,11 @@ export class LoginComponent {
       error: (err) => {
         this.isLoading = false;
         if (err.status === 401 || err.status === 403) {
-          this.errorMessage = 'Credenciales inválidas.';
+          this.errorMessage = 'Usuario o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.';
+        } else if (err.status === 0) {
+          this.errorMessage = 'No se pudo conectar con el servidor. Comprueba tu conexión a internet.';
         } else {
-          this.errorMessage = 'Error de conexión con el servidor.';
+          this.errorMessage = 'Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.';
         }
         this.cdr.detectChanges();
         console.error('Login error:', err);
