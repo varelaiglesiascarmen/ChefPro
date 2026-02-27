@@ -5,13 +5,16 @@
 
       <h1>
         <span *ngIf="searchTerm">Resultados para "<em>{{ searchTerm }}</em>"</span>
-        <span *ngIf="!searchTerm">Explora nuestros Chefs</span>
+        <span *ngIf="!searchTerm">Explora nuestros Chefs y Menús</span>
       </h1>
 
       <p class="subtitle">
         <span *ngIf="isLoading">Buscando...</span>
-        <span *ngIf="!isLoading">
-          {{ chefs.length }} {{ chefs.length === 1 ? 'experiencia encontrada' : 'experiencias encontradas' }}
+        <span *ngIf="!isLoading && !noResults">
+          {{ totalResults }} {{ totalResults === 1 ? 'resultado encontrado' : 'resultados encontrados' }}
+        </span>
+        <span *ngIf="!isLoading && noResults">
+          No encontramos resultados para "<em>{{ searchTerm }}</em>", pero quizás te interese...
         </span>
       </p>
 
@@ -25,49 +28,93 @@
       <p>Encendiendo fogones...</p>
     </div>
 
-    <div *ngIf="!isLoading && chefs.length > 0" class="chefs-grid">
+    <ng-container *ngIf="!isLoading">
 
-      <div *ngFor="let chef of chefs" class="chef-card" (click)="goToChefDetail(chef.id)">
+      <!-- ===== SECCIÓN CHEFS ===== -->
+      <section *ngIf="chefs.length > 0" class="section-chefs">
+        <h2 class="section-title">Chefs</h2>
+        <div class="chefs-grid">
 
-        <div class="card-image-wrapper">
-          <img [src]="chef.photoUrl || '/logos/users.svg'" alt="{{ chef.name }}" class="chef-img"
-            (error)="chef.photoUrl = '/logos/users.svg'">
+          <div *ngFor="let chef of chefs" class="chef-card" (click)="goToChefDetail(chef.id)">
 
-          <div class="rating-badge">★ {{ chef.rating }}</div>
-        </div>
-
-        <div class="card-body">
-          <div class="chef-header">
-            <h3>{{ chef.name }}</h3>
-            <span class="location-pill">📍 {{ chef.location }}</span>
-          </div>
-
-          <div class="specialties-container">
-            <span *ngFor="let spec of chef.specialties | slice:0:3" class="tag">{{ spec }}</span>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="card-footer">
-            <div class="price-block">
-              <span class="label">Precio por persona: </span>
-              <span class="amount"> {{ chef.pricePerPerson }} €</span>
+            <div class="card-image-wrapper">
+              <img [src]="chef.photo || '/logos/users.svg'" alt="{{ chef.name }}"
+                   class="chef-img" (error)="chef.photo = '/logos/users.svg'">
+              <div class="rating-badge">★ {{ chef.avgScore ?? '—' }}</div>
             </div>
 
-            <button class="btn-solicitar" (click)="$event.stopPropagation(); onReserve(chef)">Solicitar</button>
+            <div class="card-body">
+              <div class="chef-header">
+                <h3>{{ chef.name }} {{ chef.lastname }}</h3>
+                <span *ngIf="chef.location" class="location-pill">📍 {{ chef.location }}</span>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="card-footer">
+                <div class="price-block">
+                  <span class="label">Desde: </span>
+                  <span class="amount">{{ chef.startingPrice ?? '—' }} €</span>
+                </div>
+                <button class="btn-solicitar" (click)="$event.stopPropagation(); onReserveChef(chef)">
+                  Solicitar
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
+      </section>
 
+      <!-- ===== SECCIÓN MENÚS (resultados reales o sugerencias aleatorias) ===== -->
+      <section *ngIf="menus.length > 0" class="section-menus">
+        <h2 class="section-title">{{ noResults ? 'Quizás te interese' : 'Menús' }}</h2>
+        <div class="chefs-grid">
+
+          <div *ngFor="let menu of menus" class="chef-card" (click)="goToMenuDetail(menu.menuId)">
+
+            <div class="card-image-wrapper">
+              <img [src]="menu.chefPhoto || '/logos/users.svg'" alt="{{ menu.menuTitle }}"
+                   class="chef-img" (error)="menu.chefPhoto = '/logos/users.svg'">
+              <div class="rating-badge">★ {{ menu.avgScore ?? '—' }}</div>
+            </div>
+
+            <div class="card-body">
+              <div class="chef-header">
+                <h3>{{ menu.menuTitle }}</h3>
+                <span *ngIf="menu.chefLocation" class="location-pill">📍 {{ menu.chefLocation }}</span>
+              </div>
+
+              <p class="menu-chef-name">por {{ menu.chefName }} {{ menu.chefLastname }}</p>
+
+              <div class="divider"></div>
+
+              <div class="card-footer">
+                <div class="price-block">
+                  <span class="label">Precio por persona: </span>
+                  <span class="amount">{{ menu.pricePerPerson }} €</span>
+                </div>
+                <button class="btn-solicitar" (click)="$event.stopPropagation(); onReserveMenu(menu)">
+                  Solicitar
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SIN RESULTADOS Y SIN MENÚS EN BD ===== -->
+      <div *ngIf="chefs.length === 0 && menus.length === 0" class="empty-state">
+        <p>No se encontraron resultados.</p>
       </div>
-    </div>
 
-    <div *ngIf="!isLoading && chefs.length === 0" class="empty-state">
-      <p>No se encontraron chefs.</p>
-    </div>
+    </ng-container>
 
   </div>
 </div>
 
+<!-- Modal login -->
 <div *ngIf="showLoginModal" class="modal-overlay" (click)="closeLoginModal()">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">

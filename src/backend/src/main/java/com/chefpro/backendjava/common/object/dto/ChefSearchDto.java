@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,9 +17,10 @@ public class ChefSearchDto {
   private String name;
   private String lastname;
   private String username;
-  private String email;
-  private String phoneNumber;
   private String photo;
   private String bio;
-  private String prizes;
+  private String location;
+  private Double avgScore;
+  private Long reviewsCount;
+  private BigDecimal startingPrice;
 }
