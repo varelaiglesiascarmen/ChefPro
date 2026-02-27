@@ -122,20 +122,28 @@ railway up
 
 1. En Railway → clic en el servicio del **backend** (no el de MySQL)
 2. Pestaña **Variables** → **+ New Variable**
-3. Añade estas:
+3. Railway inyecta automaticamente las variables `MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER` y `MYSQLPASSWORD` desde el servicio MySQL. `application.yml` las lee directamente, asi que **no necesitas anadir variables de conexion manualmente**. Solo anade estas opcionales:
 
 | Variable | Valor | Para qué sirve |
 |----------|-------|-----------------|
-| `SPRING_DATASOURCE_URL` | `jdbc:mysql://${{MySQL.MYSQL_HOST}}:${{MySQL.MYSQL_PORT}}/chef_pro` | Conexión con MySQL |
-| `SPRING_DATASOURCE_USERNAME` | `${{MySQL.MYSQL_USER}}` | Usuario de la BD |
-| `SPRING_DATASOURCE_PASSWORD` | `${{MySQL.MYSQL_PASSWORD}}` | Contraseña de la BD |
 | `SPRING_JPA_SHOW_SQL` | `false` | No imprimir SQL en los logs |
 | `LOG_LEVEL_SQL` | `WARN` | Reducir verbosidad |
 | `LOG_LEVEL_BIND` | `WARN` | Reducir verbosidad |
 
-La sintaxis `${{MySQL.VARIABLE}}` es una referencia entre servicios de Railway. Si la BD cambia de dirección internamente, el backend se actualiza solo.
+<details>
+<summary>Alternativa: usar SPRING_DATASOURCE_* para sobreescribir</summary>
 
-En local no afecta: `application.yml` tiene valores por defecto después de los `:` (ej: `${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/chef_pro}`), así que sin la variable de entorno usa el valor local.
+Si necesitas sobreescribir la URL JDBC (por ejemplo, para anadir parametros de conexion):
+
+| Variable | Valor |
+|----------|-------|
+| `SPRING_DATASOURCE_URL` | `jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/chef_pro` |
+| `SPRING_DATASOURCE_USERNAME` | `${{MySQL.MYSQLUSER}}` |
+| `SPRING_DATASOURCE_PASSWORD` | `${{MySQL.MYSQLPASSWORD}}` |
+
+</details>
+
+En local no afecta: `application.yml` tiene valores por defecto (localhost:3306/chef_pro), asi que sin las variables de entorno usa la configuracion local.
 
 ---
 
