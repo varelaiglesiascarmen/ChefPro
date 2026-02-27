@@ -1,7 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil, filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { signupRequest } from '../../models/auth.model';
 
@@ -12,9 +14,14 @@ import { signupRequest } from '../../models/auth.model';
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css']
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  // Subjects for debounced validation
+  private username$ = new Subject<string>();
+  private email$ = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   // DATA INITIALIZATION
   // We use ‘null as any’ in the role so that it starts empty and forces the user to choose.
@@ -46,58 +53,79 @@ export class SignInComponent {
   isLoading = false;
   errorMessage = '';
 
+  ngOnInit() {
+    // Debounced username check (300ms after user stops typing)
+    this.username$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(val => val.trim().length > 0),
+      switchMap(username => {
+        this.usernameStatus = 'PENDING';
+        return this.authService.checkUsernameAvailability(username);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (isAvailable) => {
+        this.usernameStatus = isAvailable ? 'AVAILABLE' : 'TAKEN';
+      },
+      error: () => {
+        this.usernameStatus = null;
+      }
+    });
+
+    // Debounced email check (300ms after user stops typing)
+    this.email$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(val => val.trim().length > 0),
+      switchMap(email => {
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(email)) {
+          this.emailStatus = 'INVALID_FORMAT';
+          return [];
+        }
+        this.emailStatus = 'PENDING';
+        return this.authService.checkEmailAvailability(email);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (isAvailable) => {
+        this.emailStatus = isAvailable ? 'AVAILABLE' : 'TAKEN';
+      },
+      error: () => {
+        this.emailStatus = null;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   // ROLE SELECTION LOGIC (CHEF vs DINER)
   selectRole(role: 'DINER' | 'CHEF') {
     this.signupData.role = role;
     this.roleError = false;
   }
 
-  // userbar validatioon methods
-  checkUsername() {
-    if (!this.signupData.username.trim()) {
+  // Reactive validation methods – push values into subjects
+  onUsernameInput() {
+    const val = this.signupData.username;
+    if (!val.trim()) {
       this.usernameStatus = null;
       return;
     }
-
-    this.usernameStatus = 'PENDING';
-
-    this.authService.checkUsernameAvailability(this.signupData.username)
-      .subscribe({
-        next: (isAvailable) => {
-          this.usernameStatus = isAvailable ? 'AVAILABLE' : 'TAKEN';
-        },
-        error: () => {
-          this.usernameStatus = null;
-        }
-      });
+    this.username$.next(val);
   }
 
-  checkEmail() {
-    const email = this.signupData.email;
-
-    if (!email.trim()) {
+  onEmailInput() {
+    const val = this.signupData.email;
+    if (!val.trim()) {
       this.emailStatus = null;
       return;
     }
-
-    // Simple regex for email format validation
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(email)) {
-      this.emailStatus = 'INVALID_FORMAT';
-      return;
-    }
-
-    this.emailStatus = 'PENDING';
-
-    this.authService.checkEmailAvailability(email)
-      .subscribe({
-        next: (isAvailable) => {
-          this.emailStatus = isAvailable ? 'AVAILABLE' : 'TAKEN';
-        },
-        error: () => {
-          this.emailStatus = null;
-        }
-      });
+    this.email$.next(val);
   }
 
   // calculate password strength
@@ -127,9 +155,9 @@ export class SignInComponent {
     else this.passwordStrengthText = 'Muy débil';
 
     if (score < 3) {
-       this.passwordFeedback = 'Usa 8 caracteres, números y símbolos.';
+      this.passwordFeedback = 'Usa 8 caracteres, números y símbolos.';
     } else {
-       this.passwordFeedback = '';
+      this.passwordFeedback = '';
     }
   }
 
@@ -181,9 +209,9 @@ export class SignInComponent {
         this.isLoading = false;
         // Handle specific error messages
         if (err.message === 'USER_EXISTS') {
-           this.errorMessage = 'El usuario o correo ya existen.';
+          this.errorMessage = 'El usuario o correo ya existen.';
         } else {
-           this.errorMessage = 'Error en el registro. Inténtalo de nuevo.';
+          this.errorMessage = 'Error en el registro. Inténtalo de nuevo.';
         }
       }
     });
