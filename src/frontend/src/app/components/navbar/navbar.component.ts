@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -38,6 +38,7 @@ export class NavbarComponent implements OnInit {
 
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   isMenuOpen = false;
   isSearchOpen = false;
@@ -54,7 +55,10 @@ export class NavbarComponent implements OnInit {
     // We subscribe to the service. Every time the user changes (log in/log out),
     // this variable will update itself.
     this.authService.user$.subscribe(user => {
-      this.currentUser = user;
+      setTimeout(() => {
+        this.currentUser = user;
+        this.cdr.detectChanges();
+      });
     });
   }
 

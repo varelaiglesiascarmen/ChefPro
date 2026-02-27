@@ -11,7 +11,6 @@ import { ToastService } from '../../services/toast.service';
       <div
         *ngFor="let toast of toasts"
         [class]="'toast toast-' + toast.type"
-        [@slideIn]
         (mouseenter)="pauseTimeout(toast.id)"
         (mouseleave)="resumeTimeout(toast.id)"
       >
