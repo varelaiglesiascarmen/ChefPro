@@ -4,9 +4,11 @@ import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
 import com.chefpro.backendjava.common.object.entity.*;
 import com.chefpro.backendjava.repository.*;
 import com.chefpro.backendjava.service.ReviewService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 
@@ -39,49 +41,49 @@ public class ReviewServiceImpl implements ReviewService {
 
     // 1. Validar campos obligatorios
     if (dto.getChefId() == null) {
-      throw new IllegalArgumentException("chefId is required");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "chefId is required");
     }
     if (dto.getReservationDate() == null) {
-      throw new IllegalArgumentException("reservationDate is required");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "reservationDate is required");
     }
     if (dto.getScore() == null) {
-      throw new IllegalArgumentException("score is required");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "score is required");
     }
     if (dto.getScore() < 1 || dto.getScore() > 5) {
-      throw new IllegalArgumentException("score must be between 1 and 5");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "score must be between 1 and 5");
     }
 
     // 2. Obtener el usuario autenticado y verificar que es un Diner
     UserLogin authUser = userRepository
       .findByUsername(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("User not found"));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
     Diner diner = dinerRepository.findById(authUser.getId())
-      .orElseThrow(() -> new RuntimeException("Only diners can submit reviews"));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Only diners can submit reviews"));
 
     // 3. Obtener el Chef
     Chef chef = chefRepository.findById(dto.getChefId())
-      .orElseThrow(() -> new RuntimeException("Chef not found"));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found"));
 
     // 4. Buscar la reserva por clave compuesta (chefId + date)
     // Sirve para validar que existió una relación real entre este diner y este chef
     Reservation.ReservationId reservationId = new Reservation.ReservationId(dto.getChefId(), dto.getReservationDate());
     Reservation reservation = reservaRepository.findById(reservationId)
-      .orElseThrow(() -> new RuntimeException("Reservation not found"));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
 
     // 5. Verificar que la reserva pertenece al diner autenticado
     if (!reservation.getDiner().getId().equals(diner.getId())) {
-      throw new RuntimeException("This reservation does not belong to you");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This reservation does not belong to you");
     }
 
     // 6. Verificar que la reserva ya ocurrió (fecha anterior a hoy)
     if (!reservation.getDate().isBefore(LocalDate.now())) {
-      throw new IllegalArgumentException("You can only review a reservation that has already taken place");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can only review a reservation that has already taken place");
     }
 
     // 7. Verificar que la reserva fue CONFIRMED
     if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
-      throw new IllegalArgumentException("You can only review a confirmed reservation");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can only review a confirmed reservation");
     }
 
     // 8. Verificar que este diner no ha reseñado ya a este chef
@@ -90,7 +92,7 @@ public class ReviewServiceImpl implements ReviewService {
       diner.getId()
     );
     if (alreadyReviewed) {
-      throw new IllegalArgumentException("You have already submitted a review for this chef");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "You have already submitted a review for this chef");
     }
 
     // 9. Crear y persistir la review usando los user_ID de ambos, como indica la tabla
