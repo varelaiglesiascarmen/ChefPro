@@ -1,43 +1,62 @@
-// Generic interface for Spring Boot PAGINATION
-export interface Page<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-// Chef Model (What the list returns)
-export interface Chef {
+// Resultado de búsqueda de chef (viene en chefs[])
+export interface ChefSearchResult {
   id: number;
   name: string;
-  photoUrl?: string;
-  rating: number;
+  lastname: string;
+  username: string;
+  photo?: string;
+  bio?: string;
+  location?: string;
+  avgScore?: number;
+  reviewsCount?: number;
+  startingPrice?: number;
+}
+
+// Resultado de búsqueda de menú (viene en menus[])
+export interface MenuSearchResult {
+  menuId: number;
+  menuTitle: string;
+  menuDescription?: string;
   pricePerPerson: number;
-  location: string;
-  specialties: string[];
+  minDiners?: number;
+  maxDiners?: number;
+  chefId: number;
+  chefName: string;
+  chefLastname: string;
+  chefPhoto?: string;
+  chefLocation?: string;
+  avgScore?: number;
+  reviewsCount?: number;
 }
 
-// Diet Options (For the checkboxes)
-export interface DietOption {
-  id: number;
-  label: string;
-  value: string; // "VEGAN", "KETO"...
-  selected?: boolean; // Solo para el front
+// Respuesta completa del endpoint /api/chef/search
+export interface ChefSearchResponse {
+  chefs: ChefSearchResult[];
+  menus: MenuSearchResult[];
+  noResults: boolean; // true cuando los menús son sugerencias aleatorias por falta de resultados
 }
 
-// Filter we send to the Backend (POST Payload)
+// Filtros
 export interface ChefFilter {
   searchText?: string;
   dietIds?: number[];
-  minPrice?: number | null;
-  maxPrice?: number | null;
   guestCount?: number | null;
   onlyTopRated?: boolean;
+  q?: string;
   date?: string | null;
-
-  // Pagination
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  guests?: number | null;
+  allergens?: string[];
   page?: number;
   size?: number;
   sort?: string;
+}
+
+// Diet Options
+export interface DietOption {
+  id: number;
+  label: string;
+  value: string;
+  selected?: boolean;
 }

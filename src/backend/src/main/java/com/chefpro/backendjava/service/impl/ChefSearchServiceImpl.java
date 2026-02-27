@@ -1,69 +1,109 @@
 package com.chefpro.backendjava.service.impl;
 
-import com.chefpro.backendjava.common.object.dto.ChefSearchDto;
-import com.chefpro.backendjava.common.object.entity.Chef;
-import com.chefpro.backendjava.repository.ChefRepository;
+import com.chefpro.backendjava.common.object.dto.*;
+import com.chefpro.backendjava.repository.ChefSearchRepository;
+import com.chefpro.backendjava.repository.MenuSearchRepository;
 import com.chefpro.backendjava.service.ChefSearchService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 
 @Component("chefSearchService")
 public class ChefSearchServiceImpl implements ChefSearchService {
 
-  private final ChefRepository chefRepository;
+  private final ChefSearchRepository chefSearchRepository;
+  private final MenuSearchRepository menuSearchRepository;
 
-  public ChefSearchServiceImpl(ChefRepository chefRepository) {
-    this.chefRepository = chefRepository;
+  public ChefSearchServiceImpl(
+    ChefSearchRepository chefSearchRepository,
+    MenuSearchRepository menuSearchRepository
+  ) {
+    this.chefSearchRepository = chefSearchRepository;
+    this.menuSearchRepository = menuSearchRepository;
   }
 
-  /**
-   * Busca chefs con filtros opcionales
-   *
-   * @param name Nombre del chef (opcional)
-   * @param date Fecha para verificar disponibilidad (opcional)
-   * @param pageable Parámetros de paginación
-   * @return Página de DTOs de chefs
-   */
   @Override
-  public Page<ChefSearchDto> search(String name, LocalDate date, Pageable pageable) {
-    Page<Chef> chefs;
+  public ChefSearchResultDto search(
+    String q,
+    LocalDate date,
+    BigDecimal minPrice,
+    BigDecimal maxPrice,
+    Integer guests,
+    List<String> allergens
+  ) {
+    String query = (q != null && !q.isBlank()) ? q.trim() : null;
+    List<String> allergenFilter = (allergens != null && !allergens.isEmpty()) ? allergens : null;
 
-    // Aplicar filtros según los parámetros recibidos
-    if (name != null && !name.isBlank() && date != null) {
-      // Filtrar por nombre Y disponibilidad
-      chefs = chefRepository.findByNameAndAvailableOnDate(name.trim(), date, pageable);
-    } else if (name != null && !name.isBlank()) {
-      // Solo filtrar por nombre
-      chefs = chefRepository.findByNameContaining(name.trim(), pageable);
-    } else if (date != null) {
-      // Solo filtrar por disponibilidad
-      chefs = chefRepository.findAvailableOnDate(date, pageable);
-    } else {
-      // Sin filtros, devolver todos
-      chefs = chefRepository.findAll(pageable);
+    List<ChefSearchDto> chefs = chefSearchRepository
+      .searchChefs(query, date)
+      .stream()
+      .map(this::toChefDto)
+      .toList();
+
+    List<MenuSearchDto> menus = menuSearchRepository
+      .searchMenus(query, date, minPrice, maxPrice, guests, allergenFilter)
+      .stream()
+      .map(this::toMenuDto)
+      .toList();
+
+    // Si no hay ningún resultado, devolver menús aleatorios como sugerencias
+    // Solo se activa cuando había texto de búsqueda (no tiene sentido en carga inicial)
+    if (chefs.isEmpty() && menus.isEmpty() && query != null) {
+      List<MenuSearchDto> randomMenus = menuSearchRepository
+        .searchMenus(null, null, null, null, null, null)
+        .stream()
+        .map(this::toMenuDto)
+        .collect(java.util.stream.Collectors.toList());
+
+      Collections.shuffle(randomMenus);
+
+      return ChefSearchResultDto.builder()
+        .chefs(List.of())
+        .menus(randomMenus)
+        .noResults(true)
+        .build();
     }
 
-    // Convertir entidades a DTOs
-    return chefs.map(this::toDto);
+    return ChefSearchResultDto.builder()
+      .chefs(chefs)
+      .menus(menus)
+      .noResults(false)
+      .build();
   }
 
-  /**
-   * Convierte una entidad Chef a ChefSearchDto
-   */
-  private ChefSearchDto toDto(Chef chef) {
+  private ChefSearchDto toChefDto(ChefSearchProjection p) {
     return ChefSearchDto.builder()
-      .id(chef.getId())
-      .name(chef.getUser().getName())
-      .lastname(chef.getUser().getLastname())
-      .username(chef.getUser().getUsername())
-      .email(chef.getUser().getEmail())
-      .phoneNumber(chef.getUser().getPhoneNumber())
-      .photo(chef.getPhoto())
-      .bio(chef.getBio())
-      .prizes(chef.getPrizes())
+      .id(p.getUserId())
+      .username(p.getUsername())
+      .name(p.getName())
+      .lastname(p.getLastname())
+      .photo(p.getPhoto())
+      .bio(p.getBio())
+      .location(p.getLocation())
+      .avgScore(p.getAvgScore())
+      .reviewsCount(p.getReviewsCount())
+      .startingPrice(p.getStartingPrice())
+      .build();
+  }
+
+  private MenuSearchDto toMenuDto(MenuSearchProjection p) {
+    return MenuSearchDto.builder()
+      .menuId(p.getMenuId())
+      .menuTitle(p.getMenuTitle())
+      .menuDescription(p.getMenuDescription())
+      .pricePerPerson(p.getPricePerPerson())
+      .minDiners(p.getMinDiners())
+      .maxDiners(p.getMaxDiners())
+      .chefId(p.getChefId())
+      .chefName(p.getChefName())
+      .chefLastname(p.getChefLastname())
+      .chefPhoto(p.getChefPhoto())
+      .chefLocation(p.getChefLocation())
+      .avgScore(p.getAvgScore())
+      .reviewsCount(p.getReviewsCount())
       .build();
   }
 }

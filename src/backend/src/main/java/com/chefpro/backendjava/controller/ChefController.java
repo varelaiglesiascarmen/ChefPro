@@ -1,12 +1,10 @@
 package com.chefpro.backendjava.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chefpro.backendjava.common.object.dto.ChefPublicDetailDto;
-import com.chefpro.backendjava.common.object.dto.ChefSearchDto;
+import com.chefpro.backendjava.common.object.dto.ChefSearchResultDto;
 import com.chefpro.backendjava.common.object.dto.ChefUReqDto;
 import com.chefpro.backendjava.common.object.dto.DishCReqDto;
 import com.chefpro.backendjava.common.object.dto.DishDto;
@@ -76,7 +74,7 @@ public class ChefController {
     @PathVariable Long id
   ) {
     menuService.deleteMenu(authentication, id);
-    return ResponseEntity.noContent().build(); // 204
+    return ResponseEntity.noContent().build();
   }
 
   @PatchMapping("/menus")
@@ -111,7 +109,7 @@ public class ChefController {
     @RequestParam Long dishId
   ) {
     dishService.deleteDish(authentication, menuId, dishId);
-    return ResponseEntity.noContent().build(); // 204
+    return ResponseEntity.noContent().build();
   }
 
   @PatchMapping("/plato")
@@ -130,19 +128,19 @@ public class ChefController {
   }
 
   @GetMapping("/search")
-  public ResponseEntity<Page<ChefSearchDto>> searchChefs(
-    @RequestParam(required = false) String name,
+  public ResponseEntity<ChefSearchResultDto> searchChefs(
+    @RequestParam(required = false) String q,
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-
-    Page<ChefSearchDto> result = chefSearchService.search(name, date, pageable);
-
+    @RequestParam(required = false) BigDecimal minPrice,
+    @RequestParam(required = false) BigDecimal maxPrice,
+    @RequestParam(required = false) Integer guests,
+    @RequestParam(required = false) List<String> allergens
+  ) {
+    ChefSearchResultDto result = chefSearchService.search(
+      q, date, minPrice, maxPrice, guests, allergens
+    );
     return ResponseEntity.ok(result);
   }
-
-  // ========================================
-  // ENDPOINTS PÚBLICOS - Perfil de Chef y Menú
-  // ========================================
 
   @GetMapping("/{chefId}/profile")
   public ResponseEntity<ChefPublicDetailDto> getChefPublicProfile(@PathVariable Long chefId) {
@@ -163,10 +161,6 @@ public class ChefController {
       return ResponseEntity.notFound().build();
     }
   }
-
-  // ========================================
-  // AUTHENTICATED ENDPOINT - Update Chef Profile
-  // ========================================
 
   @PatchMapping("/profile")
   public ResponseEntity<ChefPublicDetailDto> updateChefProfile(
