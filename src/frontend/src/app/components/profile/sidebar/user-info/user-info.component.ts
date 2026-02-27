@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { debounceTime, map, first } from 'rxjs/operators';
+import { debounceTime, map, first, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
 import { ChefService } from '../../../../services/chef.service';
@@ -29,6 +29,7 @@ export class UserInfoComponent implements OnInit {
   chefCoverPhotoUrl = '';
   isUploadingCover = false;
 
+  isSaving = false;
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
   private deleteConfirmTimeout?: ReturnType<typeof setTimeout>;
@@ -172,6 +173,10 @@ export class UserInfoComponent implements OnInit {
       if (user) {
         this.role = user.role;
 
+        // Skip form patching during edit mode to avoid overwriting user edits
+        // and re-triggering async validators
+        if (this.editMode) return;
+
         const patchData: any = {
           name: user.name,
           lastname: user.lastname,
@@ -194,9 +199,9 @@ export class UserInfoComponent implements OnInit {
           patchData.address = diner.address || '';
         }
 
-        this.profileForm.patchValue(patchData);
-        this.profileForm.get('emailGroup.email')?.setValue(user.email);
-        this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email);
+        this.profileForm.patchValue(patchData, { emitEvent: false });
+        this.profileForm.get('emailGroup.email')?.setValue(user.email, { emitEvent: false });
+        this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email, { emitEvent: false });
       }
     });
   }
@@ -238,6 +243,7 @@ export class UserInfoComponent implements OnInit {
     return this.authService.checkUsernameAvailability(control.value).pipe(
       debounceTime(500),
       map(isAvailable => (isAvailable ? null : { alreadyExists: true })),
+      catchError(() => of(null)),
       first()
     );
   }
@@ -257,6 +263,7 @@ export class UserInfoComponent implements OnInit {
     return this.authService.checkEmailAvailability(control.value).pipe(
       debounceTime(500),
       map(isAvailable => (isAvailable ? null : { alreadyExists: true })),
+      catchError(() => of(null)),
       first()
     );
   }
@@ -282,67 +289,70 @@ export class UserInfoComponent implements OnInit {
     const currentUser = this.authService.currentUserValue;
     if (!currentUser || currentUser.user_ID === undefined) return;
 
-    if (this.profileForm.valid) {
-      const formVal = this.profileForm.value;
-      let updatedUser: any = {
-        ...currentUser,
-        name: formVal.name,
-        lastname: formVal.lastname,
-        userName: formVal.username,
-        photoUrl: formVal.photo || currentUser.photoUrl
-      };
-
-      if (this.role === 'CHEF') {
-        updatedUser.bio = formVal.bio;
-        updatedUser.prizes = this.prizesTags.join(', ');
-        updatedUser.address = formVal.address;
-      } else if (this.role === 'DINER') {
-        updatedUser.address = formVal.address;
-      }
-
-      this.authService.updateUser(updatedUser).subscribe({
-        next: (user) => {
-          const patchData: any = {
-            name: user.name,
-            lastname: user.lastname,
-            username: user.userName,
-            photo: user.photoUrl
-          };
-
-          if (user.role === 'CHEF') {
-            const chef = user as Chef;
-            patchData.bio = chef.bio || '';
-            if (chef.prizes) {
-              this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
-            } else {
-              this.prizesTags = [];
-            }
-          } else if (user.role === 'DINER') {
-            const diner = user as Diner;
-            patchData.address = diner.address || '';
-          }
-
-          this.profileForm.patchValue(patchData);
-
-          this.profileForm.get('emailGroup.email')?.setValue(user.email);
-          this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email);
-          this.profileForm.get('passGroup.password')?.setValue('');
-          this.profileForm.get('passGroup.confirmPassword')?.setValue('');
-
-          // Cambiar modo de edición en el siguiente ciclo para evitar error de detección de cambios
-          setTimeout(() => {
-            this.editMode = false;
-            this.showSuccessNotification('Perfil actualizado con éxito');
-          }, 0);
-        },
-        error: (error) => {
-          console.error('Error updating profile:', error);
-          this.showErrorNotification('Error al actualizar el perfil. Por favor, intenta de nuevo.');
-        }
-      });
-    } else {
+    // Block if form has actual validation errors (not just PENDING async validators)
+    if (this.profileForm.invalid) {
       this.showErrorNotification('Por favor, corrige los errores en el formulario antes de guardar.');
+      return;
     }
+
+    this.isSaving = true;
+    const formVal = this.profileForm.value;
+    let updatedUser: any = {
+      ...currentUser,
+      name: formVal.name,
+      lastname: formVal.lastname,
+      userName: formVal.username,
+      photoUrl: formVal.photo || currentUser.photoUrl
+    };
+
+    if (this.role === 'CHEF') {
+      updatedUser.bio = formVal.bio;
+      updatedUser.prizes = this.prizesTags.join(', ');
+      updatedUser.address = formVal.address;
+    } else if (this.role === 'DINER') {
+      updatedUser.address = formVal.address;
+    }
+
+    this.authService.updateUser(updatedUser).subscribe({
+      next: (user) => {
+        const patchData: any = {
+          name: user.name,
+          lastname: user.lastname,
+          username: user.userName,
+          photo: user.photoUrl
+        };
+
+        if (user.role === 'CHEF') {
+          const chef = user as Chef;
+          patchData.bio = chef.bio || '';
+          if (chef.prizes) {
+            this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
+          } else {
+            this.prizesTags = [];
+          }
+        } else if (user.role === 'DINER') {
+          const diner = user as Diner;
+          patchData.address = diner.address || '';
+        }
+
+        // Use emitEvent: false to avoid re-triggering async validators
+        this.profileForm.patchValue(patchData, { emitEvent: false });
+        this.profileForm.get('emailGroup.email')?.setValue(user.email, { emitEvent: false });
+        this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email, { emitEvent: false });
+        this.profileForm.get('passGroup.password')?.setValue('', { emitEvent: false });
+        this.profileForm.get('passGroup.confirmPassword')?.setValue('', { emitEvent: false });
+
+        this.isSaving = false;
+        this.editMode = false;
+        this.showSuccessNotification('Perfil actualizado con éxito');
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error updating profile:', error);
+        this.isSaving = false;
+        this.showErrorNotification('Error al actualizar el perfil. Por favor, intenta de nuevo.');
+      }
+    });
   }
 
   showSuccessNotification(message: string) {
