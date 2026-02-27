@@ -37,3 +37,8 @@
 - Write commit messages in English
 - Use conventional commits format: `type: description`
 - Include detailed description of changes in multi-line commits
+
+# Additional Copilot Instructions
+
+- Do not use `alert()` or `confirm()` to notify or ask users. Use a styled modal window aligned with the project design system.
+- User-facing text must be human, natural, and friendly (avoid machine-like wording).
