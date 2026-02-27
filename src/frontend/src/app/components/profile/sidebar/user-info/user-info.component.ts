@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { debounceTime, map, first } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
+import { ChefService } from '../../../../services/chef.service';
 import { User, Chef, Diner } from '../../../../models/auth.model';
 
 @Component({
@@ -16,6 +17,8 @@ import { User, Chef, Diner } from '../../../../models/auth.model';
 export class UserInfoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private chefService = inject(ChefService);
+  private cdr = inject(ChangeDetectorRef);
 
   profileForm!: FormGroup;
   editMode = false;
@@ -23,6 +26,8 @@ export class UserInfoComponent implements OnInit {
   showSuccessToast = false;
   showErrorToast = false;
   toastMessage = '';
+  chefCoverPhotoUrl = '';
+  isUploadingCover = false;
 
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
@@ -36,6 +41,10 @@ export class UserInfoComponent implements OnInit {
 
   handleImageError(event: any) {
     event.target.src = '/logos/users.svg';
+  }
+
+  handleCoverImageError(): void {
+    this.chefCoverPhotoUrl = '';
   }
 
   onFileSelected(event: any): void {
@@ -89,6 +98,7 @@ export class UserInfoComponent implements OnInit {
         const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
         this.profileForm.patchValue({ photo: base64Image });
+        this.cdr.detectChanges();
       };
       img.src = e.target.result;
     };
@@ -97,6 +107,53 @@ export class UserInfoComponent implements OnInit {
 
   removePhoto(): void {
     this.profileForm.patchValue({ photo: '' });
+  }
+
+  onCoverPhotoSelected(event: any): void {
+    const file: File = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.showErrorNotification('Por favor, selecciona un archivo de imagen válido para la portada.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      this.showErrorNotification('La portada es demasiado grande. El tamaño máximo es 4MB.');
+      event.target.value = '';
+      return;
+    }
+
+    this.isUploadingCover = true;
+    this.chefService.uploadChefCoverPhoto(file).subscribe({
+      next: (response) => {
+        this.chefCoverPhotoUrl = response.coverPhoto || '';
+        this.isUploadingCover = false;
+        event.target.value = '';
+        this.showSuccessNotification('Foto de portada actualizada con éxito.');
+      },
+      error: (error) => {
+        console.error('Error uploading cover photo:', error);
+        this.isUploadingCover = false;
+        event.target.value = '';
+        this.showErrorNotification('No se pudo actualizar la portada. Inténtalo de nuevo.');
+      }
+    });
+  }
+
+  private loadChefCoverPhoto(chefId: number): void {
+    this.chefService.getChefPublicProfile(chefId).subscribe({
+      next: (chef) => {
+        this.chefCoverPhotoUrl = chef.coverPhoto || '';
+      },
+      error: (error) => {
+        console.error('Error loading chef cover photo:', error);
+        this.chefCoverPhotoUrl = '';
+      }
+    });
   }
 
   urlValidator(control: AbstractControl): ValidationErrors | null {
@@ -127,6 +184,10 @@ export class UserInfoComponent implements OnInit {
           patchData.bio = chef.bio || '';
           if (chef.prizes) {
             this.prizesTags = chef.prizes.split(',').map(p => p.trim()).filter(p => p !== '');
+          }
+
+          if (user.user_ID !== undefined) {
+            this.loadChefCoverPhoto(user.user_ID);
           }
         } else if (user.role === 'DINER') {
           const diner = user as Diner;

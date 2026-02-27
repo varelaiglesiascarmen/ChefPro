@@ -102,6 +102,42 @@
   flex: 1;
 }
 
+.cover-photo-group .cover-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cover-photo-preview {
+  width: 100%;
+  min-height: 180px;
+  border-radius: 18px;
+  border: 2px solid #EAE0D5;
+  overflow: hidden;
+  background: #FDF7F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-photo-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-photo-preview.empty-cover {
+  border-style: dashed;
+  color: #A69080;
+  font-weight: 600;
+}
+
+.cover-controls {
+  display: flex;
+  justify-content: center;
+}
+
 .btn-config {
   background: #C5A059;
   color: white;
