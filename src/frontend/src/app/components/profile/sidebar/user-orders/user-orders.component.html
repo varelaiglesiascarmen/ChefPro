@@ -12,6 +12,7 @@
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'CONFIRMED'" (click)="setTab('CONFIRMED')">
         Reservas Confirmadas
+        <span class="badge" *ngIf="confirmedOrders.length > 0">{{ confirmedOrders.length }}</span>
       </button>
     </div>
 
@@ -49,7 +50,7 @@
           </div>
 
           <div class="card-actions">
-            <button class="btn-reject" (click)="rejectOrder(order)">
+            <button class="btn-reject" (click)="showRejectConfirmation(order)" title="Rechazar esta solicitud">
               <i class="fa-solid fa-xmark"></i> Rechazar
             </button>
             <button class="btn-accept" (click)="acceptOrder(order)">
@@ -89,7 +90,7 @@
           </div>
 
           <div class="card-actions single-action">
-            <button class="btn-cancel" (click)="cancelOrder(order)">
+            <button class="btn-cancel" (click)="showCancelConfirmation(order)" title="Cancelar esta reserva confirmada">
               Cancelar Reserva
             </button>
           </div>
@@ -100,3 +101,46 @@
   </div>
 </div>
 
+<!-- Confirmation Modal for Rejection -->
+<div class="modal-overlay" *ngIf="confirmActionType === 'reject'" (click)="closeConfirmation()">
+  <div class="modal-content small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fa-solid fa-circle-exclamation"></i> Confirmar rechazo</h2>
+    </div>
+    <div class="modal-body">
+      <p>¿Estás seguro de que deseas rechazar esta solicitud?</p>
+      <p class="secondary-text">El comensal será notificado y podrá buscar otro chef.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="closeConfirmation()">Cancelar</button>
+      <button class="btn-danger" (click)="confirmReject()">Sí, rechazar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal for Cancellation -->
+<div class="modal-overlay" *ngIf="confirmActionType === 'cancel'" (click)="closeConfirmation()">
+  <div class="modal-content small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fa-solid fa-warning"></i> Advertencia: Cancelación</h2>
+    </div>
+    <div class="modal-body">
+      <p><strong>Atención:</strong> Cancelar una reserva confirmada afecta tu reputación en Chef Pro.</p>
+      <p class="secondary-text">El comensal será notificado del cambio y recibirá un reembolso.</p>
+      <p class="warning-text"><i class="fa-solid fa-triangle-exclamation"></i> Esta acción es irreversible</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="closeConfirmation()">No, mantener reserva</button>
+      <button class="btn-danger" (click)="confirmCancel()">Sí, cancelar de todas formas</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review Form Modal (for diners to rate chefs) -->
+<app-review-form
+  *ngIf="selectedReservationForReview && userRole === 'DINER'"
+  [isOpen]="reviewModalOpen"
+  [chefId]="selectedReservationForReview.chefId"
+  [reservationDate]="selectedReservationForReview.dateRaw"
+  (closed)="reviewModalOpen = false">
+</app-review-form>
