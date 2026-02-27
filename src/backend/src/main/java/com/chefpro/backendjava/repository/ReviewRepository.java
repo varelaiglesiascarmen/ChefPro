@@ -17,7 +17,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   List<Review> findByReviewedUserIdWithReviewer(@Param("reviewedUserId") Long reviewedUserId);
 
   // Usado en ChefProfileServiceImpl para calcular la media de puntuación
-  @Query("SELECT AVG(r.score) FROM Review r WHERE r.reviewedUser.id = :reviewedUserId")
+  @Query("SELECT COALESCE(AVG(r.score), 0) FROM Review r WHERE r.reviewedUser.id = :reviewedUserId")
   Double findAverageScoreByReviewedUserId(@Param("reviewedUserId") Long reviewedUserId);
 
   // Usado en ChefProfileServiceImpl para contar el número de reseñas
