@@ -8,6 +8,11 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./cancellation-policies.component.css']
 })
 export class CancellationPoliciesComponent {
+  /**
+   * Policy rules structure defines cancellation charges and conditions across three tiers:
+   * administrative management, critical notice period, and professional commitment protection.
+   * Protects both diners and chefs while maintaining platform transparency.
+   */
   policyRules = [
     {
       type: 'Gestión Administrativa',
