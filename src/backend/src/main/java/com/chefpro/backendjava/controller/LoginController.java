@@ -119,6 +119,19 @@ public class LoginController {
     return ResponseEntity.status(400).build();
   }
 
+  @GetMapping("/check-username")
+  public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
+    boolean exists = userService.existsByUsername(username);
+    // Return true if available (not taken), false if taken
+    return ResponseEntity.ok(!exists);
+  }
+
+  @GetMapping("/check-email")
+  public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+    boolean exists = userService.existsByEmail(email);
+    return ResponseEntity.ok(!exists);
+  }
+
   @PostMapping("/logout")
   public ResponseEntity<Void> logout() {
     return ResponseEntity.ok().build();
