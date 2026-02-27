@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, A
 import { debounceTime, map, first } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
+import { ChefService } from '../../../../services/chef.service';
 import { User, Chef, Diner } from '../../../../models/auth.model';
 
 @Component({
@@ -16,6 +17,7 @@ import { User, Chef, Diner } from '../../../../models/auth.model';
 export class UserInfoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private chefService = inject(ChefService);
 
   profileForm!: FormGroup;
   editMode = false;
@@ -23,6 +25,7 @@ export class UserInfoComponent implements OnInit {
   showSuccessToast = false;
   showErrorToast = false;
   toastMessage = '';
+  isPhotoUploading = false;
 
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
@@ -51,8 +54,29 @@ export class UserInfoComponent implements OnInit {
         return;
       }
 
-      this.resizeAndConvertImage(file);
+      if (this.role === 'CHEF') {
+        this.uploadChefProfilePhoto(file);
+      } else {
+        this.resizeAndConvertImage(file);
+      }
     }
+  }
+
+  private uploadChefProfilePhoto(file: File): void {
+    if (this.isPhotoUploading) return;
+    this.isPhotoUploading = true;
+
+    this.chefService.uploadChefPhoto(file).subscribe({
+      next: (response) => {
+        this.profileForm.patchValue({ photo: response.photo });
+        this.isPhotoUploading = false;
+        this.showSuccessNotification('Foto de perfil actualizada.');
+      },
+      error: () => {
+        this.isPhotoUploading = false;
+        this.showErrorNotification('No se pudo subir la foto. Inténtalo de nuevo.');
+      }
+    });
   }
 
   resizeAndConvertImage(file: File): void {
