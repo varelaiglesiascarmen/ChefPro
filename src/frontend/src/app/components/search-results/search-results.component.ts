@@ -5,6 +5,7 @@ import { ChefService } from '../../services/search-results.service';
 import { ChefSearchResult, MenuSearchResult, ChefFilter } from '../../models/search-results.model';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/auth.model';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-search-results',
@@ -19,6 +20,7 @@ export class SearchResultsComponent implements OnInit {
   private router = inject(Router);
   private chefService = inject(ChefService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
   chefs: ChefSearchResult[] = [];
@@ -62,12 +64,12 @@ export class SearchResultsComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('ERROR en búsqueda:', err);
+      error: () => {
         this.chefs = [];
         this.menus = [];
         this.noResults = false;
         this.isLoading = false;
+        this.toastService.error('No pudimos completar la búsqueda. Intenta nuevamente.');
         this.cdr.detectChanges();
       }
     });
@@ -90,9 +92,8 @@ export class SearchResultsComponent implements OnInit {
       this.showLoginModal = true;
       return;
     }
-    if (confirm(`¿Solicitar comanda a ${chef.name} ${chef.lastname}?`)) {
-      alert('¡Solicitud enviada correctamente!');
-    }
+    this.toastService.info('Selecciona fecha y detalles en la ficha del chef para completar la reserva.');
+    this.goToChefDetail(chef.id);
   }
 
   onReserveMenu(menu: MenuSearchResult) {
@@ -100,9 +101,8 @@ export class SearchResultsComponent implements OnInit {
       this.showLoginModal = true;
       return;
     }
-    if (confirm(`¿Solicitar el menú "${menu.menuTitle}" de ${menu.chefName}?`)) {
-      alert('¡Solicitud enviada correctamente!');
-    }
+    this.toastService.info('Selecciona fecha y comensales en el detalle del menú para reservar.');
+    this.goToMenuDetail(menu.menuId);
   }
 
   closeLoginModal() {

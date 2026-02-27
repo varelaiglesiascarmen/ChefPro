@@ -26,7 +26,6 @@ export class ProfileComponent implements OnInit {
       if (currentUser) {
         this.user = currentUser;
         this.role = currentUser.role;
-        console.log('Rol activo en perfil:', this.role);
       }
     });
   }

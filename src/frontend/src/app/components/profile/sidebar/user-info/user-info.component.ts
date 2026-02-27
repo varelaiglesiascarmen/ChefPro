@@ -26,6 +26,8 @@ export class UserInfoComponent implements OnInit {
 
   prizesTags: string[] = [];
   currentPrizeInput: string = '';
+  private deleteConfirmTimeout?: ReturnType<typeof setTimeout>;
+  private isDeletePending = false;
 
   get profilePhotoUrl(): string {
     const photoValue = this.profileForm?.get('photo')?.value;
@@ -40,12 +42,12 @@ export class UserInfoComponent implements OnInit {
     const file: File = event.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        alert('Por favor, selecciona un archivo de imagen válido.');
+        this.showErrorNotification('Por favor, selecciona un archivo de imagen válido.');
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen es demasiado grande. El tamaño máximo es 2MB.');
+        this.showErrorNotification('La imagen es demasiado grande. El tamaño máximo es 2MB.');
         return;
       }
 
@@ -87,9 +89,6 @@ export class UserInfoComponent implements OnInit {
         const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
         this.profileForm.patchValue({ photo: base64Image });
-
-        console.log('Imagen redimensionada y convertida. Tamaño aproximado:',
-          Math.round(base64Image.length * 0.75 / 1024), 'KB');
       };
       img.src = e.target.result;
     };
@@ -113,11 +112,8 @@ export class UserInfoComponent implements OnInit {
     this.initForm();
 
     this.authService.user$.subscribe(user => {
-      console.log('User data received in user-info component:', user);
-
       if (user) {
         this.role = user.role;
-        console.log('User role:', this.role);
 
         const patchData: any = {
           name: user.name,
@@ -125,8 +121,6 @@ export class UserInfoComponent implements OnInit {
           username: user.userName,
           photo: user.photoUrl
         };
-
-        console.log('Patch data prepared:', patchData);
 
         if (user.role === 'CHEF') {
           const chef = user as Chef;
@@ -142,8 +136,6 @@ export class UserInfoComponent implements OnInit {
         this.profileForm.patchValue(patchData);
         this.profileForm.get('emailGroup.email')?.setValue(user.email);
         this.profileForm.get('emailGroup.confirmEmail')?.setValue(user.email);
-
-        console.log('Form patched with values:', this.profileForm.value);
       }
     });
   }
@@ -309,12 +301,22 @@ export class UserInfoComponent implements OnInit {
   }
 
   deleteAccount() {
-    const confirmacion = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.');
-    if (confirmacion) {
-      console.log('Eliminando cuenta del usuario ID:', this.authService.currentUserValue?.user_ID);
-      alert('Cuenta eliminada. Redirigiendo...');
-      this.authService.logout();
+    if (!this.isDeletePending) {
+      this.isDeletePending = true;
+      this.showErrorNotification('Pulsa de nuevo en eliminar cuenta para confirmar. Esta acción es irreversible.');
+      this.deleteConfirmTimeout = setTimeout(() => {
+        this.isDeletePending = false;
+      }, 5000);
+      return;
     }
+
+    if (this.deleteConfirmTimeout) {
+      clearTimeout(this.deleteConfirmTimeout);
+      this.deleteConfirmTimeout = undefined;
+    }
+    this.isDeletePending = false;
+    this.showSuccessNotification('Cuenta eliminada. Redirigiendo...');
+    this.authService.logout();
   }
 
   addPrizeTag(event: any): void {
