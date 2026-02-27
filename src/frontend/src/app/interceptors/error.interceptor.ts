@@ -24,7 +24,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         errorMessage = 'Tu sesión ha expirado. Inicia sesión nuevamente.';
         router.navigate(['/login']);
       } else if (error.status === 403) {
-        errorMessage = 'No tienes permiso para realizar esta acción.';
+        // 403 errors are handled individually by each component
+        return throwError(() => error);
       } else if (error.status === 404) {
         errorMessage = 'El recurso que buscas no existe.';
       } else if (error.status === 409) {

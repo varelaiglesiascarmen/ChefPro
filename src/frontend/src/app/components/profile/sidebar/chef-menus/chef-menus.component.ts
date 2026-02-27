@@ -38,7 +38,9 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
         this.menus = [...data];
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
+        this.errorMessage = 'No pudimos cargar tus menús. Revisa tu conexión e inténtalo de nuevo.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -71,8 +73,8 @@ export class ChefMenusComponent implements OnInit, OnDestroy {
           // Verificar si el mensaje contiene información sobre reservas
           const errorMsg = err.error?.message || err.error || err.message || '';
           if (errorMsg.includes('reservas confirmadas') ||
-              errorMsg.includes('reservations') ||
-              errorMsg.includes('foreign key constraint')) {
+            errorMsg.includes('reservations') ||
+            errorMsg.includes('foreign key constraint')) {
             this.errorMessage = 'No se puede eliminar este menú porque tiene reservas confirmadas. Por favor, espera a que finalicen todas las reservas antes de eliminar el menú.';
           } else {
             this.errorMessage = 'No se pudo eliminar el menú. Inténtalo de nuevo.';

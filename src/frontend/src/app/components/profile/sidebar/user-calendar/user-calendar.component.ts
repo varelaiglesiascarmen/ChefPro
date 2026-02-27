@@ -48,18 +48,25 @@ export class UserCalendarComponent implements OnInit {
       return;
     }
 
-    this.resService.getChefReservations().subscribe((data: ReservationEvent[]) => {
-      this.confirmedReservations = data
-        .filter(res => res.status === 'CONFIRMED' || res.status === 'ACCEPTED')
-        .map(res => ({
-          ...res,
-          isPaid: true
-        }))
-        .sort((a, b) => a.date.localeCompare(b.date));
+    this.resService.getChefReservations().subscribe({
+      next: (data: ReservationEvent[]) => {
+        this.confirmedReservations = data
+          .filter(res => res.status === 'CONFIRMED' || res.status === 'ACCEPTED')
+          .map(res => ({
+            ...res,
+            isPaid: true
+          }))
+          .sort((a, b) => a.date.localeCompare(b.date));
 
-      this.nextReservation = this.confirmedReservations.find(res => new Date(res.date) >= new Date()) || null;
-      this.buildCalendar();
-      this.deferViewUpdate(() => this.cdr.detectChanges());
+        this.nextReservation = this.confirmedReservations.find(res => new Date(res.date) >= new Date()) || null;
+        this.buildCalendar();
+        this.deferViewUpdate(() => this.cdr.detectChanges());
+      },
+      error: () => {
+        this.confirmedReservations = [];
+        this.buildCalendar();
+        this.cdr.detectChanges();
+      }
     });
   }
 

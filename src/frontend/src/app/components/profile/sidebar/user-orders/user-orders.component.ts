@@ -117,7 +117,8 @@ export class UserOrdersComponent implements OnInit {
         this.toastService.success('Reserva aceptada correctamente');
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
+        this.toastService.error('No se pudo aceptar la reserva. Inténtalo de nuevo.');
       }
     });
   }
@@ -130,7 +131,8 @@ export class UserOrdersComponent implements OnInit {
         this.toastService.success('Reserva rechazada');
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
+        this.toastService.error('No se pudo rechazar la reserva. Inténtalo de nuevo.');
       }
     });
   }
@@ -155,7 +157,8 @@ export class UserOrdersComponent implements OnInit {
         this.toastService.success('Reserva cancelada');
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
+        this.toastService.error('No se pudo cancelar la reserva. Inténtalo de nuevo.');
       }
     });
   }

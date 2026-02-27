@@ -239,6 +239,8 @@ export class ServiceDetailPageComponent implements OnInit {
       error: (err) => {
         if (err.status === 404) {
           this.errorMessage = 'Chef no encontrado.';
+        } else if (err.status === 403) {
+          this.errorMessage = 'No se pudo acceder al perfil del chef. Recarga la pagina o inicia sesion de nuevo.';
         } else {
           this.errorMessage = 'Error al cargar los datos del chef.';
         }
@@ -275,6 +277,8 @@ export class ServiceDetailPageComponent implements OnInit {
       error: (err) => {
         if (err.status === 404) {
           this.errorMessage = 'Menú no encontrado.';
+        } else if (err.status === 403) {
+          this.errorMessage = 'No se pudo acceder al menu. Recarga la pagina o inicia sesion de nuevo.';
         } else {
           this.errorMessage = 'Error al cargar los datos del menú.';
         }

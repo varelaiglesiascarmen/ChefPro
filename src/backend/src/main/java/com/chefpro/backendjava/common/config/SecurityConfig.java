@@ -77,8 +77,8 @@ public class SecurityConfig {
         // ========================================
         .requestMatchers(HttpMethod.GET, "/api/chef/menus/public").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/chef/search").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/chef/*/profile").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/chef/menus/*/public").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/chef/{chefId}/profile").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/chef/menus/{menuId}/public").permitAll()
 
         // ========================================
         // RUTAS PROTEGIDAS POR ROL - CHEF
