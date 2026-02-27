@@ -396,12 +396,16 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       .filter((name): name is string => typeof name === 'string');
   }
 
-  private saveDishes(): void {
+  private async saveDishes(): Promise<void> {
     const requests: Observable<any>[] = [];
     let nextDishId = this.getMaxDishId();
 
-    this.dishes.forEach(dish => {
+    // Process dishes sequentially to handle async photo conversion
+    for (const dish of this.dishes) {
       const allergens = this.mapAllergenIdsToNames(dish.allergenIds);
+
+      // Convert photo to Base64 if exists
+      const photoBase64 = dish.photo ? await this.fileToBase64(dish.photo) : null;
 
       if (dish.dishId) {
         requests.push(this.menuService.updateDish({
@@ -410,7 +414,8 @@ export class EditMenuComponent implements OnInit, OnDestroy {
           title: dish.title.trim(),
           description: dish.description.trim(),
           category: dish.category,
-          allergens
+          allergens,
+          photo: photoBase64
         }));
       } else {
         nextDishId += 1;
@@ -421,10 +426,11 @@ export class EditMenuComponent implements OnInit, OnDestroy {
           title: dish.title.trim(),
           description: dish.description.trim(),
           category: dish.category,
-          allergens
+          allergens,
+          photo: photoBase64
         }));
       }
-    });
+    }
 
     if (requests.length === 0) {
       this.isSaving = false;
@@ -445,6 +451,15 @@ export class EditMenuComponent implements OnInit, OnDestroy {
         this.errorMessage = 'No se pudieron guardar los platos. Intentalo de nuevo.';
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onerror = () => reject(new Error('Error al procesar la imagen'));
+      reader.readAsDataURL(file);
     });
   }
 
