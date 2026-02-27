@@ -269,6 +269,7 @@ export class ReviewFormComponent implements OnInit {
   @Input() chefId!: number;
   @Input() reservationDate!: string;
   @Output() closed = new EventEmitter<void>();
+  @Output() submitted = new EventEmitter<{ chefId: number; reservationDate: string }>();
 
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
@@ -310,6 +311,7 @@ export class ReviewFormComponent implements OnInit {
     this.http.post(`${environment.apiUrl}/reservations/review`, payload).subscribe({
       next: () => {
         this.toastService.success('Valoración enviada correctamente');
+        this.submitted.emit({ chefId: this.chefId, reservationDate: this.reservationDate });
         this.close();
         this.isSubmitting = false;
       },

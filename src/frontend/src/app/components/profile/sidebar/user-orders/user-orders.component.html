@@ -131,8 +131,14 @@
           </div>
 
           <div class="card-actions single-action" *ngIf="userRole === 'DINER'">
-            <button class="btn-accept" (click)="openReviewModal(order)">
-              <i class="fa-solid fa-star"></i> Valorar servicio
+            <button
+              class="btn-accept"
+              (click)="openReviewModal(order)"
+              [disabled]="reviewedReservationIds.has(order.id)"
+              [title]="reviewedReservationIds.has(order.id) ? 'Ya valoraste esta reserva' : 'Valorar servicio'"
+            >
+              <i class="fa-solid fa-star"></i>
+              {{ reviewedReservationIds.has(order.id) ? 'Valorado' : 'Valorar servicio' }}
             </button>
           </div>
         </div>
@@ -183,5 +189,6 @@
   [isOpen]="reviewModalOpen"
   [chefId]="selectedReservationForReview.chefId"
   [reservationDate]="selectedReservationForReview.dateRaw"
-  (closed)="reviewModalOpen = false">
+  (closed)="handleReviewClosed()"
+  (submitted)="handleReviewSubmitted($event)">
 </app-review-form>

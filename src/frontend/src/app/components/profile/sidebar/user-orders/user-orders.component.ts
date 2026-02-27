@@ -53,6 +53,7 @@ export class UserOrdersComponent implements OnInit {
   // Para reviews
   reviewModalOpen = false;
   selectedReservationForReview: Order | null = null;
+  reviewedReservationIds = new Set<string>();
 
   // Para confirmaciones
   confirmActionType: 'reject' | 'cancel' | null = null;
@@ -185,8 +186,27 @@ export class UserOrdersComponent implements OnInit {
       this.toastService.warning('Solo puedes valorar reservas completadas');
       return;
     }
+    if (this.reviewedReservationIds.has(order.id)) {
+      this.toastService.info('Ya valoraste esta reserva');
+      return;
+    }
     this.selectedReservationForReview = order;
     this.reviewModalOpen = true;
+  }
+
+  handleReviewClosed() {
+    this.reviewModalOpen = false;
+    this.selectedReservationForReview = null;
+  }
+
+  handleReviewSubmitted(payload: { chefId: number; reservationDate: string }) {
+    const matched = this.orders.find(
+      order => order.chefId === payload.chefId && order.dateRaw === payload.reservationDate
+    );
+    if (matched) {
+      this.reviewedReservationIds.add(matched.id);
+    }
+    this.handleReviewClosed();
   }
 
   getStatusLabel(status: string): string {
