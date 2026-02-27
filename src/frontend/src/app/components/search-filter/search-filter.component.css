@@ -377,7 +377,8 @@ input:checked+.slider:before {
   flex-shrink: 0;
 }
 
-.btn-clear, .btn-apply {
+.btn-clear,
+.btn-apply {
   flex: 1;
   padding: 12px;
   border-radius: 10px;
@@ -476,14 +477,24 @@ input[type="date"]:invalid::-webkit-datetime-edit {
     opacity: 0;
     transform: scale(0.95) translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
 
+/* Search field only visible on mobile — on desktop the navbar search bar is used */
+.mobile-only-search {
+  display: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
+  .mobile-only-search {
+    display: block;
+  }
+
   .filter-card {
     width: 100%;
     height: 100vh;
