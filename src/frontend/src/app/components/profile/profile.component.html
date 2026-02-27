@@ -1,5 +1,21 @@
 <div class="profile-layout">
-  <app-sidebar class="fixed-sidebar"></app-sidebar>
+  <!-- Hamburger toggle for mobile -->
+  <button class="hamburger-btn" (click)="toggleSidebar()" *ngIf="isSidebarOpen === false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <app-sidebar class="fixed-sidebar" [class.mobile-open]="isSidebarOpen"></app-sidebar>
+
+  <!-- Close button inside sidebar for mobile -->
+  <button class="close-sidebar-btn" *ngIf="isSidebarOpen" (click)="closeSidebar()">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
 
   <main class="main-viewport">
     <div class="fadeIn">

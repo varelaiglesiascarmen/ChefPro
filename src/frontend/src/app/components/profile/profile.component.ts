@@ -20,6 +20,7 @@ export class ProfileComponent implements OnInit {
 
   user: any;
   role: 'CHEF' | 'DINER' | 'ADMIN' | null = null;
+  isSidebarOpen = false;
 
   ngOnInit(): void {
     this.authService.user$.subscribe(currentUser => {
@@ -28,5 +29,13 @@ export class ProfileComponent implements OnInit {
         this.role = currentUser.role;
       }
     });
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
   }
 }
