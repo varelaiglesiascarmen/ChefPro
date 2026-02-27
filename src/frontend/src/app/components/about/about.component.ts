@@ -8,6 +8,11 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent {
+  /**
+   * Team member collection displayed in the about page.
+   * Contains professional information including roles, descriptions, and social links.
+   * Used for rendering team cards with Angular *ngFor directive.
+   */
   team = [
     {
       name: 'Carmen Varela Iglesias',
@@ -20,7 +25,7 @@ export class AboutComponent {
     {
       name: 'María Reyes Artacho Carrero',
       role: 'Backend Developer & API Engineer',
-      desc: 'Responsable del desarrollo completo del backend con Spring Boot, implementando la lógica de negocio y creando APIs propias definiendo los contratos en OpenAPI para la comunicación con el frontend. Gestionó el acceso y consumo de la base de datos SQL con Spring Data, asegurando la integridad de los datos, el rendimiento y la escalabilidad del sistema mediante JWT.',
+      desc: 'Responsable del desarrollo del backend con Spring Boot, implementando la lógica de negocio y creando APIs propias definiendo los contratos en OpenAPI para la comunicación con el frontend. Gestionó el acceso y consumo de la base de datos SQL con Spring Data, asegurando la integridad de los datos, el rendimiento y la escalabilidad del sistema mediante JWT.',
       photo: 'team/reyes-team.png',
       github: 'https://github.com/reyes-art-car',
       linkedin: 'https://www.linkedin.com/in/maria-reyes-a-carrero/'
