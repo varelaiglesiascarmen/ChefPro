@@ -202,4 +202,14 @@ public class UserServiceImpl implements UserService {
     return userLoginDto;
   }
 
+  @Override
+  public boolean existsByUsername(String username) {
+    return customUserRepository.existsByUsername(username);
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    return customUserRepository.existsByEmail(email);
+  }
+
 }

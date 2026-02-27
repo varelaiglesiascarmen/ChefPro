@@ -1,23 +1,14 @@
 package com.chefpro.backendjava.service.impl;
 
-import java.time.LocalDate;
-
+import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
+import com.chefpro.backendjava.common.object.entity.*;
+import com.chefpro.backendjava.repository.*;
+import com.chefpro.backendjava.service.ReviewService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
-import com.chefpro.backendjava.common.object.entity.Chef;
-import com.chefpro.backendjava.common.object.entity.Diner;
-import com.chefpro.backendjava.common.object.entity.Reservation;
-import com.chefpro.backendjava.common.object.entity.Review;
-import com.chefpro.backendjava.common.object.entity.UserLogin;
-import com.chefpro.backendjava.repository.ChefRepository;
-import com.chefpro.backendjava.repository.CustomUserRepository;
-import com.chefpro.backendjava.repository.DinerRepository;
-import com.chefpro.backendjava.repository.ReservaRepository;
-import com.chefpro.backendjava.repository.ReviewRepository;
-import com.chefpro.backendjava.service.ReviewService;
+import java.time.LocalDate;
 
 @Component("reviewService")
 public class ReviewServiceImpl implements ReviewService {
@@ -45,6 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   @Transactional
   public void createReview(ReviewCReqDto dto, Authentication authentication) {
+
     // 1. Validar campos obligatorios
     if (dto.getChefId() == null) {
       throw new IllegalArgumentException("chefId is required");
@@ -72,10 +64,9 @@ public class ReviewServiceImpl implements ReviewService {
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
     // 4. Buscar la reserva por clave compuesta (chefId + date)
-    Reservation.ReservationId reservationId = new Reservation.ReservationId(
-      dto.getChefId(),
-      dto.getReservationDate()
-    );
+    Reservation.ReservationId reservationId =
+      new Reservation.ReservationId(dto.getChefId(), dto.getReservationDate());
+
     Reservation reservation = reservaRepository.findById(reservationId)
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
