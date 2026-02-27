@@ -5,22 +5,22 @@
       <div class="hero-content">
         <h1 class="logo-text">Chef<span>Pro</span></h1>
         <p class="tagline">La alta cocina, servida en la intimidad de tu hogar.</p>
-
-        <div class="search-bar" *ngIf="!(authService.user$ | async)">
-          <button class="btn-primary" routerLink="/signup">Únete a la élite culinaria</button>
-        </div>
       </div>
     </div>
   </header>
 
-  <section class="roles-container">
-    <div class="role-card chef-path" (click)="navigateTo('CHEF')">
+  <section class="roles-container" role="region" aria-label="Chef and diner access paths">
+    <div class="role-card chef-path" *ngIf="shouldShowChefCard(authService.user$ | async)" (click)="navigateTo('CHEF')"
+      role="button" tabindex="0" aria-label="Acceder al flujo de chef" (keydown.enter)="navigateTo('CHEF')"
+      (keydown.space)="navigateTo('CHEF')">
       <h3>¿Eres Chef?</h3>
       <p>Gestiona tus menús, tu agenda y ofrece experiencias gastronómicas únicas.</p>
       <span class="cta-link">Empezar a cocinar →</span>
     </div>
 
-    <div class="role-card diner-path" (click)="navigateTo('DINER')">
+    <div class="role-card diner-path" (click)="navigateTo('DINER')" role="button" tabindex="0"
+      aria-label="Acceder al flujo de comensal" (keydown.enter)="navigateTo('DINER')"
+      (keydown.space)="navigateTo('DINER')">
       <h3>¿Buscas un Chef?</h3>
       <p>Encuentra al profesional ideal para tu evento y disfruta de un servicio gourmet.</p>
       <span class="cta-link">Explorar cartas →</span>
@@ -29,8 +29,8 @@
 
   <section class="quick-features">
     <div class="feature">
-      <h4>Calidad Michelin</h4>
-      <p>Chefs verificados con trayectoria profesional.</p>
+      <h4>Sabor sin etiquetas</h4>
+      <p>Grandes chefs y aficionados brillantes unidos por la cocina.</p>
     </div>
     <div class="feature">
       <h4>Reserva Fácil</h4>

@@ -5,46 +5,54 @@
 
 /* HERO SECTION */
 .hero {
-  height: 70vh;
+  min-height: clamp(420px, 70vh, 760px);
   background: url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
   position: relative;
 }
 
 .hero-overlay {
-  background: rgba(44, 24, 16, 0.6); /* Capa chocolate transparente */
-  height: 100%;
+  background: rgba(44, 24, 16, 0.6); 
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding: clamp(24px, 4vw, 40px) clamp(16px, 5vw, 32px);
 }
 
 .hero-content {
   color: #FDF7F0;
-  max-width: 800px;
-  padding: 0 20px;
+  max-width: min(100%, 800px);
+  padding: 0 clamp(8px, 2vw, 20px);
 }
 
-.logo-text { font-size: 4rem; margin-bottom: 10px; }
+.logo-text { font-size: clamp(2.3rem, 9vw, 4rem); margin-bottom: clamp(8px, 1.8vw, 12px); }
 .logo-text span { color: #C5A059; }
-.tagline { font-size: 1.5rem; font-style: italic; margin-bottom: 30px; opacity: 0.9; }
+.tagline {
+  font-size: clamp(1rem, 3.6vw, 1.5rem);
+  font-style: italic;
+  margin-bottom: clamp(20px, 4vw, 30px);
+  opacity: 0.9;
+  line-height: 1.5;
+}
 
 /* ROLES CONTAINER */
 .roles-container {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: -60px; /* Solapamiento visual moderno */
-  padding: 0 20px 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  max-width: 1100px;
+  margin: clamp(-50px, -6vw, -35px) auto 0;
+  gap: clamp(16px, 3vw, 30px);
+  padding: 0 clamp(14px, 4vw, 20px) clamp(40px, 7vw, 60px);
   position: relative;
   z-index: 10;
 }
 
 .role-card {
   background: white;
-  padding: 40px;
-  border-radius: 20px;
-  width: 350px;
+  padding: clamp(24px, 5vw, 40px);
+  border-radius: clamp(14px, 2vw, 20px);
   text-align: center;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
@@ -57,31 +65,104 @@
   border-color: #C5A059;
 }
 
+.role-card:focus-visible {
+  outline: 3px solid #C5A059;
+  outline-offset: 3px;
+}
+
+.role-card h3 {
+  font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+  margin-bottom: clamp(10px, 2vw, 14px);
+}
+
+.role-card p {
+  font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+  line-height: 1.6;
+}
+
 .card-icon { font-size: 3rem; margin-bottom: 20px; }
-.cta-link { display: block; margin-top: 20px; color: #C5A059; font-weight: bold; }
+.cta-link {
+  display: block;
+  margin-top: clamp(14px, 2.8vw, 20px);
+  color: #C5A059;
+  font-weight: bold;
+  font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+}
 
 /* QUICK FEATURES */
 .quick-features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: clamp(20px, 4vw, 40px);
   max-width: 1100px;
-  margin: 60px auto;
+  margin: clamp(20px, 4vw, 60px) auto;
+  padding: 0 clamp(14px, 4vw, 20px) clamp(24px, 5vw, 32px);
   text-align: center;
 }
 
-.feature h4 { color: #C5A059; margin: 15px 0; text-transform: uppercase; letter-spacing: 1px; }
+.feature {
+  background: #fff;
+  border: 1px solid #EAE0D5;
+  border-radius: clamp(12px, 1.8vw, 16px);
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.feature h4 {
+  color: #C5A059;
+  margin: clamp(8px, 1.6vw, 15px) 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+}
+
+.feature p {
+  font-size: clamp(0.9rem, 2.1vw, 1rem);
+  line-height: 1.5;
+}
 
 .btn-primary {
   background: #C5A059;
   color: white;
   border: none;
-  padding: 15px 35px;
+  padding: clamp(12px, 2.4vw, 15px) clamp(22px, 4.8vw, 35px);
   border-radius: 50px;
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 2.4vw, 1.1rem);
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
 }
 
 .btn-primary:hover { background: #B48F48; }
+
+@media (max-width: 767px) {
+  .hero {
+    min-height: clamp(460px, 78vh, 620px);
+  }
+
+  .roles-container {
+    margin-top: clamp(-36px, -5vw, -24px);
+  }
+
+  .role-card:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 374px) {
+  .hero-overlay {
+    padding-inline: 12px;
+  }
+
+  .tagline {
+    line-height: 1.45;
+  }
+
+  .btn-primary {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .quick-features {
+    gap: 14px;
+  }
+}
