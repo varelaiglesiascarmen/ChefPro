@@ -84,6 +84,7 @@ CREATE TABLE `dishes` (
   `title` varchar(150) NOT NULL,
   `description` text DEFAULT NULL,
   `category` varchar(50) DEFAULT NULL,
+  `photo` text DEFAULT NULL,
   PRIMARY KEY (`menu_ID`,`dish_ID`),
   CONSTRAINT `dishes_ibfk_1` FOREIGN KEY (`menu_ID`) REFERENCES `menu` (`menu_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

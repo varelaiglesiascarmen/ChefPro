@@ -315,8 +315,9 @@ export class ReviewFormComponent implements OnInit {
         this.close();
         this.isSubmitting = false;
       },
-      error: (err) => {
+      error: () => {
         this.isSubmitting = false;
+        this.toastService.error('No se pudo enviar tu valoración. Inténtalo de nuevo.');
       }
     });
   }
