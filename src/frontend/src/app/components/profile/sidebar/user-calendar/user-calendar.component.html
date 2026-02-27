@@ -1,1 +1,130 @@
-<p>user-calendar.component works!</p>
+<section class="calendar-shell fadeIn">
+	<header class="calendar-hero">
+		<div class="calendar-hero-text">
+			<p class="eyebrow">Agenda Gourmet</p>
+			<h1>Calendario de <span>Reservas</span></h1>
+			<p class="subtitle">Visualiza tus servicios confirmados y organiza tu semana con claridad.</p>
+		</div>
+		<div class="calendar-hero-card">
+			<div class="hero-stat">
+				<span class="stat-label">Servicios confirmados</span>
+				<span class="stat-value">{{ confirmedReservations.length }}</span>
+			</div>
+			<div class="hero-stat" *ngIf="nextReservation">
+				<span class="stat-label">Próximo servicio</span>
+				<span class="stat-value">{{ nextReservation.date | date: 'dd MMM' }}</span>
+				<span class="stat-sub">{{ nextReservation.menuTitle }}</span>
+			</div>
+		</div>
+	</header>
+
+	<div class="calendar-layout">
+		<section class="calendar-card">
+			<div class="calendar-header">
+				<button type="button" class="nav-btn" (click)="goToPreviousMonth()">‹</button>
+				<div class="calendar-title">
+					<h2>{{ monthLabel }}</h2>
+					<span>{{ currentYear }}</span>
+				</div>
+				<button type="button" class="nav-btn" (click)="goToNextMonth()">›</button>
+				<button type="button" class="today-btn" title="Volver al presente" (click)="goToCurrentMonth()" *ngIf="!isCurrentMonth()">
+					<i class="fa-solid fa-calendar-days"></i>
+				</button>
+			</div>
+
+			<div class="weekdays">
+				<span *ngFor="let day of weekDays">{{ day }}</span>
+			</div>
+
+			<div class="calendar-grid">
+				<button
+					type="button"
+					class="day-cell"
+					*ngFor="let day of calendarDays"
+					[class.is-muted]="!day.isCurrentMonth"
+					[class.is-today]="day.isToday"
+					[class.is-selected]="day.dateKey === selectedDateKey"
+					[class.has-events]="day.events.length > 0"
+					(click)="selectDay(day)"
+				>
+					<span class="day-number">{{ day.label }}</span>
+					<span class="day-dot" *ngIf="day.events.length > 0">{{ day.events.length }}</span>
+				</button>
+			</div>
+		</section>
+
+		<aside class="agenda-card">
+			<div class="agenda-header">
+				<h2>Detalle del día</h2>
+				<p *ngIf="selectedDateKey">{{ selectedDateKey | date: 'fullDate' }}</p>
+			</div>
+
+			<div class="agenda-empty" *ngIf="selectedEvents.length === 0">
+				<i class="fa-solid fa-calendar-xmark"></i>
+				<h3>Sin reservas</h3>
+				<p>No hay servicios confirmados para esta fecha.</p>
+			</div>
+
+			<div class="agenda-warning" *ngIf="selectedEvents.length > 0">
+				<p>
+					Cancelaciones con menos de 72 horas: 100% de retencion. Se aplica un 10% por gastos administrativos.
+				</p>
+			</div>
+
+			<div class="agenda-list" *ngIf="selectedEvents.length > 0">
+				<article class="agenda-item" *ngFor="let event of selectedEvents">
+					<div class="agenda-badge" [class.is-paid]="event.isPaid">
+					{{ event.isPaid ? 'Pagada' : 'Confirmada' }}
+					</div>
+					<h3>{{ event.menuTitle }}</h3>
+					<p class="agenda-meta">{{ event.dinerName }} · {{ event.numberOfDiners }} comensales</p>
+					<p class="agenda-address">{{ event.address || 'Dirección pendiente de confirmar' }}</p>
+					<div class="agenda-actions">
+						<button
+							type="button"
+							class="agenda-cancel"
+							(click)="openCancelModal(event)"
+							*ngIf="event.status === 'CONFIRMED' || event.status === 'ACCEPTED'"
+						>
+							Cancelar reserva
+						</button>
+					</div>
+				</article>
+			</div>
+		</aside>
+	</div>
+
+	<div class="modal-overlay" *ngIf="cancelModalOpen" (click)="closeCancelModal()">
+		<div class="modal-content" (click)="$event.stopPropagation()">
+			<div class="modal-icon">
+				<i class="fa-solid fa-exclamation-circle"></i>
+			</div>
+			<h3 *ngIf="cancelModalMode === 'confirm'">Cancelar reserva</h3>
+			<h3 *ngIf="cancelModalMode === 'error'">No se pudo cancelar</h3>
+
+			<p *ngIf="cancelModalMode === 'confirm' && pendingCancellation">
+				Vas a cancelar el servicio de
+				<strong>{{ pendingCancellation.menuTitle }}</strong>
+				para el
+				<strong>{{ pendingCancellation.date | date: 'fullDate' }}</strong>.
+				Si faltan menos de 72 horas se retiene el 100% y se aplica un 10% de gastos administrativos.
+			</p>
+			<p *ngIf="cancelModalMode === 'error'">{{ cancelModalMessage }}</p>
+
+			<div class="modal-buttons" *ngIf="cancelModalMode === 'confirm'">
+				<button class="btn-secondary" type="button" (click)="closeCancelModal()" [disabled]="isCancelling">
+					Volver
+				</button>
+				<button class="btn-danger" type="button" (click)="confirmCancelReservation()" [disabled]="isCancelling">
+					{{ isCancelling ? 'Cancelando...' : 'Confirmar cancelación' }}
+				</button>
+			</div>
+
+			<div class="modal-buttons" *ngIf="cancelModalMode === 'error'">
+				<button class="btn-secondary" type="button" (click)="closeCancelModal()">
+					Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
+</section>

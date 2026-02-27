@@ -29,6 +29,10 @@ public class MenuDTO {
 
     private BigDecimal pricePerPerson;
 
+    private Integer minNumberDiners;
+    private Integer maxNumberDiners;
+    private String kitchenRequirements;
+
     private boolean deliveryAvailable;
     private boolean cookAtClientHome;
     private boolean pickupAvailable;
