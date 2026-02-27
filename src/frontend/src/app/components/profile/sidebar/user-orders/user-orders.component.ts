@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../../services/auth.service';
 import { ToastService } from '../../../../services/toast.service';
 import { environment } from '../../../../../environments/environment';
-import { ReviewFormComponent } from '../../review-form/review-form.component';
+import { ReviewFormComponent } from '../../../review-form/review-form.component';
 
 export interface Order {
   id: string;
