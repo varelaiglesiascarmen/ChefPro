@@ -39,6 +39,10 @@ public class Dish {
   @Column(name = "category", length = 50)
   private String category;
 
+  @Lob
+  @Column(name = "photo")
+  private String photo;
+
   @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private List<AllergenDish> allergenDishes = new ArrayList<>();

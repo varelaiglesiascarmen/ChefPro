@@ -80,9 +80,6 @@ public interface MenuSearchRepository extends JpaRepository<Menu, Long> {
     @Param("guests") Integer guests,
     @Param("allergens") List<String> allergens
   );
-<<<<<<< HEAD
-=======
-
   @Query(value = """
     SELECT
       m.menu_ID                   AS menuId,

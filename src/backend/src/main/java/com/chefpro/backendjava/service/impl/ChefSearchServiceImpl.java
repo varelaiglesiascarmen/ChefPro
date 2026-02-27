@@ -8,26 +8,16 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-<<<<<<< HEAD
-import java.util.Collections;
-=======
->>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
 import java.util.List;
 
 @Component("chefSearchService")
 public class ChefSearchServiceImpl implements ChefSearchService {
 
-<<<<<<< HEAD
-  private final ChefSearchRepository chefSearchRepository;
-  private final MenuSearchRepository menuSearchRepository;
-
-=======
   private static final int SUGGESTION_LIMIT = 6;
 
   private final ChefSearchRepository chefSearchRepository;
   private final MenuSearchRepository menuSearchRepository;
 
->>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
   public ChefSearchServiceImpl(
     ChefSearchRepository chefSearchRepository,
     MenuSearchRepository menuSearchRepository
@@ -60,23 +50,13 @@ public class ChefSearchServiceImpl implements ChefSearchService {
       .map(this::toMenuDto)
       .toList();
 
-    // Si no hay ningún resultado, devolver menús aleatorios como sugerencias
-    // Solo se activa cuando había texto de búsqueda (no tiene sentido en carga inicial)
+    // Si no hay resultados y había texto de búsqueda, devolvemos sugerencias aleatorias
     if (chefs.isEmpty() && menus.isEmpty() && query != null) {
       List<MenuSearchDto> randomMenus = menuSearchRepository
-<<<<<<< HEAD
-        .searchMenus(null, null, null, null, null, null)
-        .stream()
-        .map(this::toMenuDto)
-        .collect(java.util.stream.Collectors.toList());
-
-      Collections.shuffle(randomMenus);
-=======
         .findRandomMenuSuggestions(SUGGESTION_LIMIT)
         .stream()
         .map(this::toMenuDto)
         .toList();
->>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
 
       return ChefSearchResultDto.builder()
         .chefs(List.of())

@@ -64,8 +64,9 @@ public class ReviewServiceImpl implements ReviewService {
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
     // 4. Buscar la reserva por clave compuesta (chefId + date)
-    // Sirve para validar que existió una relación real entre este diner y este chef
-    Reservation.ReservationId reservationId = new Reservation.ReservationId(dto.getChefId(), dto.getReservationDate());
+    Reservation.ReservationId reservationId =
+      new Reservation.ReservationId(dto.getChefId(), dto.getReservationDate());
+
     Reservation reservation = reservaRepository.findById(reservationId)
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
@@ -79,16 +80,10 @@ public class ReviewServiceImpl implements ReviewService {
       throw new IllegalArgumentException("You can only review a reservation that has already taken place");
     }
 
-<<<<<<< HEAD
-    // 7. Verificar que la reserva fue CONFIRMED
-    if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
-      throw new IllegalArgumentException("You can only review a confirmed reservation");
-=======
     // 7. Verificar que la reserva fue CONFIRMED o COMPLETED
     if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED
       && reservation.getStatus() != Reservation.ReservationStatus.COMPLETED) {
       throw new IllegalArgumentException("You can only review a confirmed or completed reservation");
->>>>>>> 92e126861fcf8bdb5428abe2ca3b3b2043c4af64
     }
 
     // 8. Verificar que este diner no ha reseñado ya a este chef

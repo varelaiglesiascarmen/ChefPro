@@ -65,6 +65,7 @@ public class DishServiceImpl implements DishService {
       .title(cReq.getTitle())
       .description(cReq.getDescription())
       .category(cReq.getCategory())
+      .photo(cReq.getPhoto())
       .menu(menu)
       .allergenDishes(new ArrayList<>())
       .build();
@@ -133,6 +134,7 @@ public class DishServiceImpl implements DishService {
       .title(dish.getTitle())
       .description(dish.getDescription())
       .category(dish.getCategory())
+      .photo(dish.getPhoto())
       .creator(creatorName)
       .allergens(allergens)
       .build();
@@ -194,6 +196,10 @@ public class DishServiceImpl implements DishService {
 
     if (uReq.getCategory() != null) {
       dish.setCategory(uReq.getCategory());
+    }
+
+    if (uReq.getPhoto() != null) {
+      dish.setPhoto(uReq.getPhoto());
     }
 
     // 6. Actualizar alérgenos si se proporcionan
