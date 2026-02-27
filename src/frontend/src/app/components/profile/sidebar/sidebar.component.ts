@@ -37,6 +37,5 @@ export class SidebarComponent implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/index']);
-    console.log('Sesión cerrada correctamente');
   }
 }

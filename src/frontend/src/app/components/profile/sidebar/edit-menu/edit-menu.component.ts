@@ -113,12 +113,10 @@ export class EditMenuComponent implements OnInit, OnDestroy {
   loadMenu(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    console.log('EditMenu: Cargando menú con ID:', this.menuId);
     this.menuService.getMenusByChef().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (menus) => {
-        console.log('EditMenu: Menús obtenidos del servidor:', menus);
         const found = menus.find(menu => menu.menu_ID === this.menuId || menu.id === this.menuId);
 
         if (!found) {
@@ -129,7 +127,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
           return;
         }
 
-        console.log('EditMenu: Menú encontrado:', found);
         this.menuForm = {
           title: found.title || '',
           description: found.description || '',
@@ -155,7 +152,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
           allergenIds: this.mapAllergenNamesToIds(dish.allergens || [])
         }));
 
-        console.log('EditMenu: Platos cargados:', this.dishes.length);
         if (this.dishes.length === 0) {
           this.addDish();
         }
@@ -195,7 +191,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
     if (!this.isFormValid()) return;
 
     this.isSaving = true;
-    console.log('EditMenu: Guardando menú con ID:', this.menuId);
 
     this.syncKitchenRequirements();
 
@@ -216,7 +211,6 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        console.log('EditMenu: Menú actualizado exitosamente, guardando platos...');
         this.saveDishes();
       },
       error: (err) => {
@@ -235,12 +229,10 @@ export class EditMenuComponent implements OnInit, OnDestroy {
 
   confirmDeleteMenu(): void {
     this.showConfirmDialog = false;
-    console.log('EditMenu: Eliminando menú con ID:', this.menuId);
     this.menuService.deleteMenu(this.menuId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        console.log('EditMenu: Menú eliminado exitosamente, redirigiendo a /profile/menus');
         this.successMessage = 'Menú eliminado exitosamente.';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/profile/menus']), 1500);
@@ -335,12 +327,10 @@ export class EditMenuComponent implements OnInit, OnDestroy {
     const index = this.confirmDishIndex;
     const dish = this.dishes[index];
 
-    console.log('EditMenu: Eliminando plato con ID:', dish.dishId);
     this.menuService.deleteDish(this.menuId, dish.dishId!).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        console.log('EditMenu: Plato eliminado exitosamente');
         this.dishes.splice(index, 1);
         this.errorMessage = '';
         this.cdr.detectChanges();
@@ -368,7 +358,8 @@ export class EditMenuComponent implements OnInit, OnDestroy {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen es demasiado pesada. Maximo 2MB.');
+      this.errorMessage = 'La imagen es demasiado pesada. Máximo 2MB.';
+      this.cdr.detectChanges();
       if (input) input.value = '';
       return;
     }
@@ -436,18 +427,15 @@ export class EditMenuComponent implements OnInit, OnDestroy {
     });
 
     if (requests.length === 0) {
-      console.log('EditMenu: No hay platos para guardar, redirigiendo...');
       this.isSaving = false;
       this.router.navigate(['/profile/menus']);
       return;
     }
 
-    console.log('EditMenu: Guardando', requests.length, 'platos...');
     forkJoin(requests).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        console.log('EditMenu: Todos los platos guardados exitosamente, redirigiendo...');
         this.isSaving = false;
         this.router.navigate(['/profile/menus']);
       },

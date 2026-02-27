@@ -148,8 +148,6 @@ export class NavbarComponent implements OnInit {
       return;
     }
 
-    console.log('Navegando a /search-results con:', queryParams);
-
     this.router.navigate(['/search-results'], { queryParams });
 
     this.showFilterMenu = false;
