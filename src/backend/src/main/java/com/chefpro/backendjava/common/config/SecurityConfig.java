@@ -58,7 +58,9 @@ public class SecurityConfig {
           "/api/auth/login",
           "/api/auth/signup",
           "/api/auth/health",
-          "/api/auth/logout"
+          "/api/auth/logout",
+          "/api/auth/check-username",
+          "/api/auth/check-email"
         ).permitAll()
 
         // ========================================
