@@ -315,9 +315,15 @@ export class ReviewFormComponent implements OnInit {
         this.close();
         this.isSubmitting = false;
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
-        this.toastService.error('No se pudo enviar tu valoración. Inténtalo de nuevo.');
+        const msg = err?.error?.error || '';
+        if (msg.includes('already submitted')) {
+          this.toastService.warning('Ya has valorado a este chef anteriormente.');
+          this.close();
+        } else {
+          this.toastService.error('Vaya, algo no ha ido bien al enviar tu valoraci\u00f3n. \u00bfPuedes intentarlo de nuevo?');
+        }
       }
     });
   }

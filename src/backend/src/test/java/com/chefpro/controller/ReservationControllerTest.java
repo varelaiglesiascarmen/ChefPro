@@ -158,19 +158,21 @@ class ReservationControllerTest {
         ReviewCReqDto req = mock(ReviewCReqDto.class);
         doNothing().when(reviewService).createReview(req, authentication);
 
-        ResponseEntity<Void> response = controller.createReview(authentication, req);
+        ResponseEntity<?> response = controller.createReview(authentication, req);
 
         assertEquals(201, response.getStatusCode().value());
         verify(reviewService).createReview(req, authentication);
     }
 
     @Test
-    void createReview_serviceThrows_propagatesException() {
+    void createReview_serviceThrows_returns400() {
         ReviewCReqDto req = mock(ReviewCReqDto.class);
-        doThrow(new IllegalStateException("Review not allowed"))
+        doThrow(new IllegalArgumentException("You have already submitted a review for this chef"))
             .when(reviewService).createReview(req, authentication);
 
-        assertThrows(IllegalStateException.class, () -> controller.createReview(authentication, req));
+        ResponseEntity<?> response = controller.createReview(authentication, req);
+
+        assertEquals(400, response.getStatusCode().value());
         verify(reviewService).createReview(req, authentication);
     }
 }
