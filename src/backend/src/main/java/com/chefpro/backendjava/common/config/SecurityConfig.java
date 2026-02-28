@@ -91,6 +91,9 @@ public class SecurityConfig {
         // Crear reserva - solo DINER
         .requestMatchers(HttpMethod.POST, "/api/reservations").hasAuthority("ROLE_DINER")
 
+        // Enviar valoracion - solo DINER
+        .requestMatchers(HttpMethod.POST, "/api/reservations/review").hasAuthority("ROLE_DINER")
+
         // Actualizar estado de reserva - chef (aceptar/rechazar) o diner (cancelar)
         .requestMatchers(HttpMethod.PATCH, "/api/reservations/status").authenticated()
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -67,11 +68,15 @@ public class ReservationController {
   }
 
   @PostMapping("/review")
-  public ResponseEntity<Void> createReview(
+  public ResponseEntity<?> createReview(
     Authentication authentication,
     @RequestBody ReviewCReqDto reviewDto
   ) {
-    reviewService.createReview(reviewDto, authentication);
-    return ResponseEntity.status(201).build();
+    try {
+      reviewService.createReview(reviewDto, authentication);
+      return ResponseEntity.status(201).build();
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
   }
 }
