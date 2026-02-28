@@ -58,7 +58,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `dishes` WRITE;
 /*!40000 ALTER TABLE `dishes` DISABLE KEYS */;
-INSERT INTO `dishes` VALUES (1,1,'Bruschetta al Pomodoro','Pan de cristal con tomate y albahaca.','Entrante'),(1,2,'Risotto Funghi','Arroz carnaroli con boletus.','Principal'),(1,3,'Panna Cotta','Con frutos rojos silvestres.','Postre'),(2,1,'Salmorejo Cordobés','Con virutas de jamón ibérico.','Entrante'),(2,2,'Urta a la Roteña','Pescado de roca típico de Cádiz.','Principal'),(2,3,'Pulpo a la Gallega','Con pimentón de la Vera y cachelos.','Entrante');
+INSERT INTO `dishes` VALUES (1,1,'Bruschetta al Pomodoro','Pan de cristal con tomate y albahaca.','Entrante',NULL),(1,2,'Risotto Funghi','Arroz carnaroli con boletus.','Principal',NULL),(1,3,'Panna Cotta','Con frutos rojos silvestres.','Postre',NULL),(2,1,'Salmorejo Cordobés','Con virutas de jamón ibérico.','Entrante',NULL),(2,2,'Urta a la Roteña','Pescado de roca típico de Cádiz.','Principal',NULL),(2,3,'Pulpo a la Gallega','Con pimentón de la Vera y cachelos.','Entrante',NULL);
 /*!40000 ALTER TABLE `dishes` ENABLE KEYS */;
 UNLOCK TABLES;
 
