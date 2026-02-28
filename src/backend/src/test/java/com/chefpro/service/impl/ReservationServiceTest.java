@@ -224,8 +224,13 @@ class ReservationServiceTest {
 
         when(chefRepository.findById(1L)).thenReturn(Optional.of(chef));
 
+        // Reservation's diner has a different ID so the service takes the chef path
+        Diner otherDiner = mock(Diner.class);
+        when(otherDiner.getId()).thenReturn(99L);
+
         Reservation reservation = mock(Reservation.class);
         when(reservation.getChef()).thenReturn(chef);
+        when(reservation.getDiner()).thenReturn(otherDiner);
         when(reservaRepository.findById(any(Reservation.ReservationId.class)))
             .thenReturn(Optional.of(reservation));
 
