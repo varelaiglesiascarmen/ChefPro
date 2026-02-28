@@ -39,16 +39,16 @@ import { ToastService } from '../../services/toast.service';
 
     .toast {
       padding: 14px 16px;
-      border-radius: 8px;
+      border-radius: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-size: 14px;
       font-weight: 500;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 16px rgba(81, 33, 9, 0.1);
       pointer-events: auto;
-      backdrop-filter: blur(4px);
+      font-family: 'Inter', sans-serif;
     }
 
     .toast-content {
@@ -68,44 +68,48 @@ import { ToastService } from '../../services/toast.service';
     }
 
     .toast-success {
-      background: rgba(16, 185, 129, 0.95);
-      color: white;
-      border-left: 4px solid #10b981;
+      background: rgba(250, 247, 240, 0.97);
+      color: #3d2e0a;
+      border-left: 4px solid #9C7710;
+      box-shadow: 0 4px 16px rgba(156, 119, 16, 0.15);
     }
 
     .toast-error {
-      background: rgba(239, 68, 68, 0.95);
-      color: white;
-      border-left: 4px solid #ef4444;
+      background: rgba(250, 247, 240, 0.97);
+      color: #512109;
+      border-left: 4px solid #512109;
+      box-shadow: 0 4px 16px rgba(81, 33, 9, 0.15);
     }
 
     .toast-info {
-      background: rgba(59, 130, 246, 0.95);
-      color: white;
-      border-left: 4px solid #3b82f6;
+      background: rgba(250, 247, 240, 0.97);
+      color: #3d2e0a;
+      border-left: 4px solid #b8960e;
+      box-shadow: 0 4px 16px rgba(156, 119, 16, 0.12);
     }
 
     .toast-warning {
-      background: rgba(245, 158, 11, 0.95);
-      color: white;
-      border-left: 4px solid #f59e0b;
+      background: rgba(250, 247, 240, 0.97);
+      color: #5a3a07;
+      border-left: 4px solid #c4920a;
+      box-shadow: 0 4px 16px rgba(196, 146, 10, 0.15);
     }
 
     .toast-close {
       background: none;
       border: none;
-      color: inherit;
+      color: #512109;
       font-size: 24px;
       cursor: pointer;
       margin-left: 12px;
       padding: 0;
       flex-shrink: 0;
-      opacity: 0.8;
+      opacity: 0.5;
       transition: opacity 0.2s;
     }
 
     .toast-close:hover {
-      opacity: 1;
+      opacity: 0.9;
     }
 
     @keyframes slideIn {

@@ -137,7 +137,8 @@
   text-align: center;
 }
 
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   text-align: center;
   padding: 100px 20px;
   color: var(--text-muted);
@@ -158,8 +159,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state i {
@@ -424,6 +430,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -621,6 +628,23 @@
   margin-right: 8px;
 }
 
+.modal-body .policy-list {
+  margin: 12px 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.modal-body .policy-list li {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: var(--text-dark);
+}
+
+.modal-body .policy-list li:last-child {
+  margin-bottom: 0;
+}
+
 .modal-actions {
   display: flex;
   gap: 12px;
@@ -666,6 +690,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -676,6 +701,7 @@
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

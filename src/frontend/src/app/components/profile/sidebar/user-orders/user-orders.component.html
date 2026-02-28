@@ -131,12 +131,9 @@
           </div>
 
           <div class="card-actions single-action" *ngIf="userRole === 'DINER'">
-            <button
-              class="btn-accept"
-              (click)="openReviewModal(order)"
+            <button class="btn-accept" (click)="openReviewModal(order)"
               [disabled]="reviewedReservationIds.has(order.id)"
-              [title]="reviewedReservationIds.has(order.id) ? 'Ya valoraste esta reserva' : 'Valorar servicio'"
-            >
+              [title]="reviewedReservationIds.has(order.id) ? 'Ya valoraste esta reserva' : 'Valorar servicio'">
               <i class="fa-solid fa-star"></i>
               {{ reviewedReservationIds.has(order.id) ? 'Valorado' : 'Valorar servicio' }}
             </button>
@@ -171,11 +168,26 @@
     <div class="modal-header">
       <h2><i class="fa-solid fa-warning"></i> Advertencia: Cancelación</h2>
     </div>
-    <div class="modal-body">
+
+    <!-- Diner cancellation message -->
+    <div class="modal-body" *ngIf="userRole === 'DINER'">
+      <p><strong>Antes de cancelar, ten en cuenta:</strong></p>
+      <ul class="policy-list">
+        <li>Toda cancelación conlleva una retención del <strong>10%</strong> del importe por gastos administrativos.
+        </li>
+        <li>Si faltan menos de <strong>72 horas</strong> para el servicio, no habrá reembolso.</li>
+      </ul>
+      <p class="secondary-text">El chef será notificado de la cancelación.</p>
+      <p class="warning-text"><i class="fa-solid fa-triangle-exclamation"></i> Esta acción es irreversible</p>
+    </div>
+
+    <!-- Chef cancellation message -->
+    <div class="modal-body" *ngIf="userRole === 'CHEF'">
       <p><strong>Atención:</strong> Cancelar una reserva confirmada afecta tu reputación en Chef Pro.</p>
       <p class="secondary-text">El comensal será notificado del cambio y recibirá un reembolso.</p>
       <p class="warning-text"><i class="fa-solid fa-triangle-exclamation"></i> Esta acción es irreversible</p>
     </div>
+
     <div class="modal-actions">
       <button class="btn-secondary" (click)="closeConfirmation()">No, mantener reserva</button>
       <button class="btn-danger" (click)="confirmCancel()">Sí, cancelar de todas formas</button>
@@ -184,11 +196,7 @@
 </div>
 
 <!-- Review Form Modal (for diners to rate chefs) -->
-<app-review-form
-  *ngIf="selectedReservationForReview && userRole === 'DINER'"
-  [isOpen]="reviewModalOpen"
-  [chefId]="selectedReservationForReview.chefId"
-  [reservationDate]="selectedReservationForReview.dateRaw"
-  (closed)="handleReviewClosed()"
-  (submitted)="handleReviewSubmitted($event)">
+<app-review-form *ngIf="selectedReservationForReview && userRole === 'DINER'" [isOpen]="reviewModalOpen"
+  [chefId]="selectedReservationForReview.chefId" [reservationDate]="selectedReservationForReview.dateRaw"
+  (closed)="handleReviewClosed()" (submitted)="handleReviewSubmitted($event)">
 </app-review-form>
