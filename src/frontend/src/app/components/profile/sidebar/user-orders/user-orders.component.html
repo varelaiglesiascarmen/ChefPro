@@ -27,10 +27,16 @@
 
     <div class="tab-content" *ngIf="!isLoading && activeTab === 'PENDING'">
 
-      <div class="empty-state" *ngIf="pendingOrders.length === 0">
+      <div class="empty-state" *ngIf="pendingOrders.length === 0 && userRole === 'CHEF'">
         <i class="fa-solid fa-bell-slash"></i>
         <h3>No tienes solicitudes nuevas</h3>
         <p>Cuando un comensal reserve uno de tus menús, aparecerá aquí para tu revisión.</p>
+      </div>
+
+      <div class="empty-state" *ngIf="pendingOrders.length === 0 && userRole === 'DINER'">
+        <i class="fa-solid fa-bell-slash"></i>
+        <h3>No tienes solicitudes pendientes</h3>
+        <p>Cuando reserves un menú, aparecerá aquí hasta que el chef lo confirme.</p>
       </div>
 
       <div class="orders-grid">
@@ -53,12 +59,23 @@
             <div class="price-tag">{{ order.price }}</div>
           </div>
 
-          <div class="card-actions">
+          <!-- Chef: accept/reject actions -->
+          <div class="card-actions" *ngIf="userRole === 'CHEF'">
             <button class="btn-reject" (click)="showRejectConfirmation(order)" title="Rechazar esta solicitud">
               <i class="fa-solid fa-xmark"></i> Rechazar
             </button>
             <button class="btn-accept" (click)="acceptOrder(order)">
               <i class="fa-solid fa-check"></i> Aceptar Reserva
+            </button>
+          </div>
+
+          <!-- Diner: status indicator + cancel option -->
+          <div class="card-actions single-action" *ngIf="userRole === 'DINER'">
+            <div class="diner-status-info">
+              <i class="fa-solid fa-clock"></i> Pendiente de aceptación
+            </div>
+            <button class="btn-cancel" (click)="showCancelConfirmation(order)" title="Cancelar esta solicitud">
+              Cancelar solicitud
             </button>
           </div>
         </div>
@@ -67,10 +84,16 @@
 
     <div class="tab-content" *ngIf="!isLoading && activeTab === 'CONFIRMED'">
 
-      <div class="empty-state" *ngIf="confirmedOrders.length === 0">
+      <div class="empty-state" *ngIf="confirmedOrders.length === 0 && userRole === 'CHEF'">
         <i class="fa-solid fa-calendar-check"></i>
         <h3>Tu agenda está despejada</h3>
         <p>Acepta las solicitudes pendientes para llenar tu calendario de servicios.</p>
+      </div>
+
+      <div class="empty-state" *ngIf="confirmedOrders.length === 0 && userRole === 'DINER'">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h3>No tienes reservas confirmadas</h3>
+        <p>Cuando un chef acepte tu solicitud, la reserva aparecerá aquí.</p>
       </div>
 
       <div class="orders-grid">
@@ -104,10 +127,16 @@
 
     <div class="tab-content" *ngIf="!isLoading && activeTab === 'COMPLETED'">
 
-      <div class="empty-state" *ngIf="completedOrders.length === 0">
+      <div class="empty-state" *ngIf="completedOrders.length === 0 && userRole === 'CHEF'">
         <i class="fa-solid fa-clipboard-check"></i>
-        <h3>Aun no tienes reservas completadas</h3>
-        <p>Cuando finalices un servicio, aparecera aqui para que puedas hacer seguimiento.</p>
+        <h3>Aún no tienes reservas completadas</h3>
+        <p>Cuando finalices un servicio, aparecerá aquí para que puedas hacer seguimiento.</p>
+      </div>
+
+      <div class="empty-state" *ngIf="completedOrders.length === 0 && userRole === 'DINER'">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <h3>Aún no tienes reservas completadas</h3>
+        <p>Cuando disfrutes de un servicio, aparecerá aquí para que puedas valorarlo.</p>
       </div>
 
       <div class="orders-grid">

@@ -15,7 +15,7 @@ export interface Order {
   date: string;
   menuName: string;
   guests: number;
-  price: number;
+  price: string;
   status: 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
   location: string;
 }
@@ -31,6 +31,7 @@ export interface ReservationApi {
   chefName: string;
   dinerName: string;
   menuTitle: string;
+  totalPrice: number;
 }
 
 @Component({
@@ -243,7 +244,7 @@ export class UserOrdersComponent implements OnInit {
       date: reservation.date,
       menuName: reservation.menuTitle || 'Menú',
       guests: reservation.numberOfDiners || 0,
-      price: 0,
+      price: (reservation.totalPrice || 0).toFixed(2),
       status: reservation.status as any,
       location: reservation.address || ''
     };

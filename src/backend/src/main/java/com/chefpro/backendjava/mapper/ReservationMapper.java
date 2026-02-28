@@ -7,6 +7,8 @@ import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.common.object.entity.Reservation;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class ReservationMapper {
 
@@ -25,6 +27,12 @@ public class ReservationMapper {
 
     String menuTitle = r.getMenu() != null ? r.getMenu().getTitle() : null;
 
+    // Total = pricePerPerson * numberOfDiners
+    BigDecimal totalPrice = BigDecimal.ZERO;
+    if (r.getMenu() != null && r.getMenu().getPricePerPerson() != null && r.getNumberOfDiners() != null) {
+      totalPrice = r.getMenu().getPricePerPerson().multiply(BigDecimal.valueOf(r.getNumberOfDiners()));
+    }
+
     return ReservationDTO.builder()
       .chefId(r.getChefId())
       .date(r.getDate())
@@ -33,6 +41,7 @@ public class ReservationMapper {
       .numberOfDiners(r.getNumberOfDiners())
       .address(r.getAddress())
       .status(r.getStatus())
+      .totalPrice(totalPrice)
       .chefName(chefName)
       .dinerName(dinerName)
       .menuTitle(menuTitle)
