@@ -174,13 +174,25 @@ public class ReservationServiceImpl implements ReservationService {
       .findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    Chef chef = chefRepository.findById(authUser.getId())
-      .orElseThrow(() -> new RuntimeException("Only chefs can update reservation status"));
-
     Reservation.ReservationId reservationId = new Reservation.ReservationId(uReq.getChefId(), uReq.getDate());
     Reservation reservation = reservaRepository
       .findById(reservationId)
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
+
+    // Diners can only cancel their own reservations
+    boolean isDiner = reservation.getDiner().getId().equals(authUser.getId());
+    if (isDiner) {
+      if (uReq.getStatus() != Reservation.ReservationStatus.CANCELLED) {
+        throw new IllegalArgumentException("Diners can only cancel reservations");
+      }
+      reservation.setStatus(uReq.getStatus());
+      Reservation saved = reservaRepository.save(reservation);
+      return reservationMapper.toDto(saved);
+    }
+
+    // Chefs can accept, reject, or mark as completed
+    Chef chef = chefRepository.findById(authUser.getId())
+      .orElseThrow(() -> new RuntimeException("Only the chef or diner of this reservation can update its status"));
 
     if (!reservation.getChef().getId().equals(chef.getId())) {
       throw new RuntimeException("You can only update your own reservations");

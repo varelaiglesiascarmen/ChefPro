@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -43,6 +43,7 @@ export class ServiceDetailPageComponent implements OnInit {
   private authService = inject(AuthService);
   private chefService = inject(ChefService);
   private reservationService = inject(ReservationService);
+  private cdr = inject(ChangeDetectorRef);
 
   user: User | null = null;
   currentUser: User | null = null;
@@ -65,6 +66,7 @@ export class ServiceDetailPageComponent implements OnInit {
   ngOnInit() {
     this.authService.user$.subscribe(user => {
       this.currentUser = user;
+      this.cdr.detectChanges();
     });
 
     this.route.paramMap.subscribe(params => {
@@ -169,6 +171,7 @@ export class ServiceDetailPageComponent implements OnInit {
         this.reservationLoading = false;
         this.reservationConfirmed = true;
         this.reservationSuccess = '¡Reserva enviada con éxito! El chef confirmará en las próximas 24 h.';
+        this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
         this.reservationLoading = false;
@@ -184,6 +187,7 @@ export class ServiceDetailPageComponent implements OnInit {
         } else {
           this.reservationError = 'Error al crear la reserva. Inténtalo de nuevo.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
@@ -235,6 +239,7 @@ export class ServiceDetailPageComponent implements OnInit {
           }))
         };
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         if (err.status === 404) {
@@ -245,6 +250,7 @@ export class ServiceDetailPageComponent implements OnInit {
           this.errorMessage = 'Error al cargar los datos del chef.';
         }
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -273,6 +279,7 @@ export class ServiceDetailPageComponent implements OnInit {
         };
         this.reservationGuests = this.data.minDiners || 2;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         if (err.status === 404) {
@@ -283,6 +290,7 @@ export class ServiceDetailPageComponent implements OnInit {
           this.errorMessage = 'Error al cargar los datos del menú.';
         }
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
