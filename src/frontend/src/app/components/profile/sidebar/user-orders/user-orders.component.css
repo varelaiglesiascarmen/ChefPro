@@ -421,6 +421,26 @@
   flex: 1;
 }
 
+.diner-status-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(156, 119, 16, 0.08);
+  border: 1px solid rgba(156, 119, 16, 0.25);
+  border-radius: 8px;
+  color: #9C7710;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: 1;
+  justify-content: center;
+}
+
+.diner-status-info i {
+  font-size: 0.9rem;
+}
+
 .fadeIn {
   animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
