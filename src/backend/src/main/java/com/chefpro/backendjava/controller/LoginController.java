@@ -34,36 +34,22 @@ public class LoginController {
 
   @PostMapping("/login")
   public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
-
-    Authentication authentication = authenticationManager.authenticate(
-      new UsernamePasswordAuthenticationToken(
-        request.getUsername(),
-        request.getPassword()
-      )
+    Authentication auth = authenticationManager.authenticate(
+      new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
     );
-
-    UserDetails user = (UserDetails) authentication.getPrincipal();
-    String token = jwtUtil.generateToken(user);
-
-    String role = user.getAuthorities().stream()
-      .map(GrantedAuthority::getAuthority)
-      .findFirst()
-      .orElse(null);
-
-    UserLoginDto userLoginDto = userService.findByEmail(request.getUsername());
-    // Actualizar el rol con el formato correcto
-    userLoginDto.setRole(role);
-
-    LoginResponseDto response = new LoginResponseDto();
-    response.setToken(token);
-    response.setUser(userLoginDto);
-
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(buildLoginResponse((UserDetails) auth.getPrincipal()));
   }
 
-  @GetMapping("/health")
-  public String health() {
-    return "OK";
+  @PostMapping("/signup")
+  public ResponseEntity<LoginResponseDto> signup(@RequestBody @Valid SignUpReqDto request) {
+    if (!userService.signUp(request)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    Authentication auth = authenticationManager.authenticate(
+      new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+    );
+    return ResponseEntity.status(HttpStatus.CREATED).body(buildLoginResponse((UserDetails) auth.getPrincipal()));
   }
 
   @GetMapping("/me")
@@ -71,65 +57,25 @@ public class LoginController {
     if (user == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-    String role = user.getAuthorities().stream()
-      .map(GrantedAuthority::getAuthority)
-      .findFirst()
-      .orElse(null);
-
-    UserLoginDto userLoginDto = userService.findByEmail(user.getUsername());
-    // Actualizar el rol con el formato correcto
-    userLoginDto.setRole(role);
-
-    return ResponseEntity.ok(userLoginDto);
+    String role = extractRole(user);
+    UserLoginDto dto = userService.findByEmail(user.getUsername());
+    dto.setRole(role);
+    return ResponseEntity.ok(dto);
   }
 
-  @PostMapping("/signup")
-  public ResponseEntity<LoginResponseDto> signup(@RequestBody @Valid SignUpReqDto request) {
-
-    if (userService.signUp(request)) {
-
-      // Auto-login después del registro (usa username/password del signup)
-      Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-          request.getUsername(),
-          request.getPassword()
-        )
-      );
-
-      UserDetails user = (UserDetails) authentication.getPrincipal();
-      String token = jwtUtil.generateToken(user);
-
-      String role = user.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .findFirst()
-        .orElse(null);
-
-      UserLoginDto userLoginDto = userService.findByEmail(request.getUsername());
-      // Actualizar el rol con el formato correcto
-      userLoginDto.setRole(role);
-
-      LoginResponseDto response = new LoginResponseDto();
-      response.setToken(token);
-      response.setUser(userLoginDto);
-
-      return ResponseEntity.status(201).body(response);
-    }
-
-    return ResponseEntity.status(400).build();
+  @GetMapping("/health")
+  public String health() {
+    return "OK";
   }
 
   @GetMapping("/check-username")
   public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
-    boolean exists = userService.existsByUsername(username);
-    // Return true if available (not taken), false if taken
-    return ResponseEntity.ok(!exists);
+    return ResponseEntity.ok(!userService.existsByUsername(username));
   }
 
   @GetMapping("/check-email")
   public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
-    boolean exists = userService.existsByEmail(email);
-    return ResponseEntity.ok(!exists);
+    return ResponseEntity.ok(!userService.existsByEmail(email));
   }
 
   @PostMapping("/logout")
@@ -140,15 +86,12 @@ public class LoginController {
   @PutMapping("/profile")
   public ResponseEntity<UserLoginDto> updateProfile(
       @AuthenticationPrincipal UserDetails user,
-      @Valid @RequestBody UpdateProfileDto updateProfileDto) {
-    
+      @Valid @RequestBody UpdateProfileDto dto) {
     if (user == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
     try {
-      UserLoginDto updatedUser = userService.updateProfile(user.getUsername(), updateProfileDto);
-      return ResponseEntity.ok(updatedUser);
+      return ResponseEntity.ok(userService.updateProfile(user.getUsername(), dto));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
@@ -159,12 +102,28 @@ public class LoginController {
     if (user == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
     try {
       userService.deleteAccount(user.getUsername());
       return ResponseEntity.ok().build();
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+  }
+
+  private LoginResponseDto buildLoginResponse(UserDetails user) {
+    String token = jwtUtil.generateToken(user);
+    UserLoginDto dto = userService.findByEmail(user.getUsername());
+    dto.setRole(extractRole(user));
+    LoginResponseDto response = new LoginResponseDto();
+    response.setToken(token);
+    response.setUser(dto);
+    return response;
+  }
+
+  private String extractRole(UserDetails user) {
+    return user.getAuthorities().stream()
+      .map(GrantedAuthority::getAuthority)
+      .findFirst()
+      .orElse(null);
   }
 }
