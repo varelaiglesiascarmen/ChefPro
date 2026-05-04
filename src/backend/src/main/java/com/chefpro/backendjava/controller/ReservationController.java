@@ -6,14 +6,15 @@ import com.chefpro.backendjava.common.object.dto.ReservationsUReqDto;
 import com.chefpro.backendjava.common.object.dto.ReviewCReqDto;
 import com.chefpro.backendjava.service.ReservationService;
 import com.chefpro.backendjava.service.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -40,22 +41,22 @@ public class ReservationController {
   }
 
   @PostMapping
-  public ResponseEntity<Void> crearReservas(
-    @RequestBody ReservationsCReqDto reservationsDto,
+  public ResponseEntity<Void> createReservation(
+    @RequestBody @Valid ReservationsCReqDto reservationsDto,
     Authentication authentication
   ) {
     reservationService.createReservations(reservationsDto, authentication);
-    return ResponseEntity.status(201).build();
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @DeleteMapping
-  public ResponseEntity<Void> deleteReserva(
+  public ResponseEntity<Void> deleteReservation(
     Authentication authentication,
     @RequestParam Long chefId,
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
   ) {
     reservationService.deleteReservation(authentication, chefId, date);
-    return ResponseEntity.status(204).build();
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @PatchMapping("/status")
@@ -63,20 +64,15 @@ public class ReservationController {
     Authentication authentication,
     @RequestBody ReservationsUReqDto reservaUpdateDto
   ) {
-    ReservationDTO updated = reservationService.updateReservationStatus(authentication, reservaUpdateDto);
-    return ResponseEntity.ok(updated);
+    return ResponseEntity.ok(reservationService.updateReservationStatus(authentication, reservaUpdateDto));
   }
 
   @PostMapping("/review")
-  public ResponseEntity<?> createReview(
+  public ResponseEntity<Void> createReview(
     Authentication authentication,
-    @RequestBody ReviewCReqDto reviewDto
+    @RequestBody @Valid ReviewCReqDto reviewDto
   ) {
-    try {
-      reviewService.createReview(reviewDto, authentication);
-      return ResponseEntity.status(201).build();
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    reviewService.createReview(reviewDto, authentication);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 }

@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +46,7 @@ public class ChefController {
   }
 
   @PostMapping("/menus")
-  public ResponseEntity<MenuDTO> createMenu(@RequestBody MenuCReqDto dto, Authentication authentication) {
+  public ResponseEntity<MenuDTO> createMenu(@RequestBody @Valid MenuCReqDto dto, Authentication authentication) {
     return ResponseEntity.status(HttpStatus.CREATED).body(menuService.createMenu(dto, authentication));
   }
 
@@ -110,20 +110,12 @@ public class ChefController {
 
   @GetMapping("/{chefId}/profile")
   public ResponseEntity<ChefPublicDetailDto> getChefPublicProfile(@PathVariable Long chefId) {
-    try {
-      return ResponseEntity.ok(chefProfileService.getChefPublicProfile(chefId));
-    } catch (NoSuchElementException e) {
-      return ResponseEntity.notFound().build();
-    }
+    return ResponseEntity.ok(chefProfileService.getChefPublicProfile(chefId));
   }
 
   @GetMapping("/menus/{menuId}/public")
   public ResponseEntity<MenuPublicDetailDto> getPublicMenuDetail(@PathVariable Long menuId) {
-    try {
-      return ResponseEntity.ok(chefProfileService.getMenuPublicDetail(menuId));
-    } catch (NoSuchElementException e) {
-      return ResponseEntity.notFound().build();
-    }
+    return ResponseEntity.ok(chefProfileService.getMenuPublicDetail(menuId));
   }
 
   // Authenticated profile

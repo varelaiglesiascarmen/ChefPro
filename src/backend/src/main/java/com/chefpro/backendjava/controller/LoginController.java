@@ -54,9 +54,6 @@ public class LoginController {
 
   @GetMapping("/me")
   public ResponseEntity<UserLoginDto> me(@AuthenticationPrincipal UserDetails user) {
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
     String role = extractRole(user);
     UserLoginDto dto = userService.findByEmail(user.getUsername());
     dto.setRole(role);
@@ -87,27 +84,13 @@ public class LoginController {
   public ResponseEntity<UserLoginDto> updateProfile(
       @AuthenticationPrincipal UserDetails user,
       @Valid @RequestBody UpdateProfileDto dto) {
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-    try {
-      return ResponseEntity.ok(userService.updateProfile(user.getUsername(), dto));
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+    return ResponseEntity.ok(userService.updateProfile(user.getUsername(), dto));
   }
 
   @DeleteMapping("/account")
   public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal UserDetails user) {
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-    try {
-      userService.deleteAccount(user.getUsername());
-      return ResponseEntity.ok().build();
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+    userService.deleteAccount(user.getUsername());
+    return ResponseEntity.ok().build();
   }
 
   private LoginResponseDto buildLoginResponse(UserDetails user) {
