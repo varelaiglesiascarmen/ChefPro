@@ -67,21 +67,7 @@ public class DishServiceImpl implements DishService {
       .build();
 
     dishRepository.save(dish);
-
-    if (cReq.getAllergens() != null && !cReq.getAllergens().isEmpty()) {
-      for (String allergenName : cReq.getAllergens()) {
-        OfficialAllergen official = officialAllergenRepository.findById(allergenName)
-          .orElseThrow(() -> new IllegalArgumentException("Allergen not found: " + allergenName));
-
-        allergenDishRepository.save(AllergenDish.builder()
-          .menuId(dish.getMenuId())
-          .dishId(dish.getDishId())
-          .allergen(allergenName)
-          .dish(dish)
-          .officialAllergen(official)
-          .build());
-      }
-    }
+    saveAllergens(dish, cReq.getAllergens());
   }
 
   @Override
@@ -137,26 +123,26 @@ public class DishServiceImpl implements DishService {
     if (uReq.getAllergens() != null) {
       allergenDishRepository.deleteAll(dish.getAllergenDishes());
       dish.getAllergenDishes().clear();
-
-      for (String allergenName : uReq.getAllergens()) {
-        OfficialAllergen official = officialAllergenRepository.findById(allergenName)
-          .orElseThrow(() -> new IllegalArgumentException("Allergen not found: " + allergenName));
-
-        AllergenDish allergenDish = AllergenDish.builder()
-          .menuId(dish.getMenuId())
-          .dishId(dish.getDishId())
-          .allergen(allergenName)
-          .dish(dish)
-          .officialAllergen(official)
-          .build();
-
-        allergenDishRepository.save(allergenDish);
-        dish.getAllergenDishes().add(allergenDish);
-      }
+      saveAllergens(dish, uReq.getAllergens());
     }
 
     dishRepository.save(dish);
     return toDto(dish, chef);
+  }
+
+  private void saveAllergens(Dish dish, List<String> allergenNames) {
+    if (allergenNames == null || allergenNames.isEmpty()) return;
+    for (String allergenName : allergenNames) {
+      OfficialAllergen official = officialAllergenRepository.findById(allergenName)
+        .orElseThrow(() -> new IllegalArgumentException("Allergen not found: " + allergenName));
+      allergenDishRepository.save(AllergenDish.builder()
+        .menuId(dish.getMenuId())
+        .dishId(dish.getDishId())
+        .allergen(allergenName)
+        .dish(dish)
+        .officialAllergen(official)
+        .build());
+    }
   }
 
   private DishDto toDto(Dish dish, Chef chef) {

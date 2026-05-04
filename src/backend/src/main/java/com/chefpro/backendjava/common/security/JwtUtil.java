@@ -18,10 +18,12 @@ import java.util.function.Function;
 public class JwtUtil {
 
   private final SecretKey SECRET_KEY;
-  private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 horas
+  private final long EXPIRATION_TIME;
 
-  public JwtUtil(@Value("${jwt.secret}") String secret) {
+  public JwtUtil(@Value("${jwt.secret}") String secret,
+                 @Value("${jwt.expiration-ms:36000000}") long expirationMs) {
     this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    this.EXPIRATION_TIME = expirationMs;
   }
 
   public String generateToken(UserDetails userDetails) {

@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class ChefProfileServiceImpl implements ChefProfileService {
 
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
   // Allergen name (DB) → EU regulation numeric ID
   private static final Map<String, Integer> ALLERGEN_NAME_TO_ID = Map.ofEntries(
     Map.entry("Gluten", 1),
@@ -75,11 +77,10 @@ public class ChefProfileServiceImpl implements ChefProfileService {
       .collect(Collectors.toList());
 
     List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(chefId);
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     List<ReviewSummaryDto> reviewSummaries = reviews.stream()
       .map(r -> ReviewSummaryDto.builder()
         .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
-        .date(r.getDate() != null ? r.getDate().format(formatter) : "")
+        .date(r.getDate() != null ? r.getDate().format(DATE_FORMATTER) : "")
         .score(r.getScore())
         .comment(r.getComment())
         .build())
