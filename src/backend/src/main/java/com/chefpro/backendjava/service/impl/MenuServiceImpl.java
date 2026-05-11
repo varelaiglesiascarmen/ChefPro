@@ -55,7 +55,7 @@ public class MenuServiceImpl implements MenuService {
     Menu saved = menuRepository.save(menu);
 
     return MenuDTO.builder()
-      .menuId(saved.getId())
+      .id(saved.getId())
       .title(saved.getTitle())
       .description(saved.getDescription())
       .pricePerPerson(saved.getPricePerPerson())
@@ -145,17 +145,21 @@ public class MenuServiceImpl implements MenuService {
   }
 
   private MenuDTO toDto(Menu menu) {
-    List<DishSummaryDto> dishes = menu.getDishes().stream()
-      .map(dish -> DishSummaryDto.builder()
+    String creatorName = menu.getChef().getUser().getName() != null && menu.getChef().getUser().getLastname() != null
+      ? menu.getChef().getUser().getName() + " " + menu.getChef().getUser().getLastname()
+      : menu.getChef().getUser().getUsername();
+
+    List<DishDto> dishes = menu.getDishes().stream()
+      .map(dish -> DishDto.builder()
         .menuId(dish.getMenuId())
         .dishId(dish.getDishId())
         .title(dish.getTitle())
         .description(dish.getDescription())
         .category(dish.getCategory())
+        .creator(creatorName)
         .allergens(dish.getAllergenDishes().stream()
           .map(AllergenDish::getAllergen)
           .collect(Collectors.toList()))
-        .photo(dish.getPhoto())
         .build())
       .collect(Collectors.toList());
 
@@ -165,7 +169,7 @@ public class MenuServiceImpl implements MenuService {
       .collect(Collectors.toSet());
 
     return MenuDTO.builder()
-      .menuId(menu.getId())
+      .id(menu.getId())
       .title(menu.getTitle())
       .description(menu.getDescription())
       .pricePerPerson(menu.getPricePerPerson())

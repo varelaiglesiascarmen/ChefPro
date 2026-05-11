@@ -27,6 +27,7 @@ public class MenuCReqDto {
 
   @NotNull(message = "pricePerPerson is required")
   @DecimalMin(value = "0.01", message = "pricePerPerson must be greater than 0")
+  @JsonProperty("price_per_person")
   private BigDecimal pricePerPerson;
 
   private Integer minNumberDiners;
