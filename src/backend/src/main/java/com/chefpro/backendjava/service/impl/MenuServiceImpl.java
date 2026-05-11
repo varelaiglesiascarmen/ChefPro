@@ -15,7 +15,7 @@ import com.chefpro.backendjava.common.object.dto.MenuUReqDto;
 import com.chefpro.backendjava.common.object.entity.AllergenDish;
 import com.chefpro.backendjava.common.object.entity.Chef;
 import com.chefpro.backendjava.common.object.entity.Menu;
-import com.chefpro.backendjava.repository.ChefRepository;
+import com.chefpro.backendjava.common.util.ChefResolver;
 import com.chefpro.backendjava.repository.MenuRepository;
 import com.chefpro.backendjava.service.MenuService;
 
@@ -23,27 +23,21 @@ import com.chefpro.backendjava.service.MenuService;
 public class MenuServiceImpl implements MenuService {
 
   private final MenuRepository menuRepository;
-  private final ChefRepository chefRepository;
+  private final ChefResolver chefResolver;
 
-  public MenuServiceImpl(MenuRepository menuRepository,
-                         ChefRepository chefRepository) {
+  public MenuServiceImpl(MenuRepository menuRepository, ChefResolver chefResolver) {
     this.menuRepository = menuRepository;
-    this.chefRepository = chefRepository;
+    this.chefResolver = chefResolver;
   }
 
   @Override
   @Transactional
   public MenuDTO createMenu(MenuCReqDto dto, Authentication authentication) {
-
-    System.out.println("AUTH NAME = " + authentication.getName());
-
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
+    Chef chef = chefResolver.resolve(authentication);
 
     if (dto.getTitle() == null || dto.getTitle().isBlank()) {
       throw new IllegalArgumentException("title is required");
     }
-
     if (dto.getPricePerPerson() == null || dto.getPricePerPerson().signum() <= 0) {
       throw new IllegalArgumentException("pricePerPerson must be > 0");
     }
@@ -58,14 +52,13 @@ public class MenuServiceImpl implements MenuService {
       .kitchenRequirements(dto.getKitchenRequirements())
       .build();
 
-    Menu savedMenu = menuRepository.save(menu);
+    Menu saved = menuRepository.save(menu);
 
-    // Devolver el menú creado con su ID para que el frontend pueda crear los platos
     return MenuDTO.builder()
-      .id(savedMenu.getId())
-      .title(savedMenu.getTitle())
-      .description(savedMenu.getDescription())
-      .pricePerPerson(savedMenu.getPricePerPerson())
+      .id(saved.getId())
+      .title(saved.getTitle())
+      .description(saved.getDescription())
+      .pricePerPerson(saved.getPricePerPerson())
       .chefUsername(chef.getUser().getUsername())
       .build();
   }
@@ -73,45 +66,101 @@ public class MenuServiceImpl implements MenuService {
   @Override
   @Transactional(readOnly = true)
   public List<MenuDTO> listByChef(Authentication authentication) {
-
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Chef not found"));
-
+    Chef chef = chefResolver.resolve(authentication);
     List<Menu> menus = menuRepository.findByChefIdWithDishes(chef.getId());
-
-    // Cargar alérgenos en una segunda query (Hibernate lo hace automáticamente)
-    menus.forEach(menu ->
-      menu.getDishes().forEach(dish ->
-        dish.getAllergenDishes().size() // Forzar carga lazy
-      )
-    );
-
-    return menus.stream()
-      .map(this::convertToDto)
-      .toList();
+    menus.forEach(menu -> menu.getDishes().forEach(dish -> dish.getAllergenDishes().size()));
+    return menus.stream().map(this::toDto).toList();
   }
 
-  private MenuDTO convertToDto(Menu menu) {
+  @Override
+  @Transactional
+  public void deleteMenu(Authentication authentication, Long menuId) {
+    Chef chef = chefResolver.resolve(authentication);
+
+    Menu menu = menuRepository.findById(menuId)
+      .orElseThrow(() -> new RuntimeException("Menu not found: " + menuId));
+
+    if (!chef.getId().equals(menu.getChef().getId())) {
+      throw new RuntimeException("Not allowed to delete this menu");
+    }
+    if (menu.getReservations() != null && !menu.getReservations().isEmpty()) {
+      throw new RuntimeException("Cannot delete a menu with active reservations");
+    }
+
+    menuRepository.delete(menu);
+  }
+
+  @Override
+  @Transactional
+  public MenuDTO updateMenu(Authentication authentication, MenuUReqDto uReq) {
+    Chef chef = chefResolver.resolve(authentication);
+
+    if (uReq.getId() == null) {
+      throw new IllegalArgumentException("id is required");
+    }
+
+    Menu menu = menuRepository.findById(uReq.getId())
+      .orElseThrow(() -> new RuntimeException("Menu not found: " + uReq.getId()));
+
+    if (!chef.getId().equals(menu.getChef().getId())) {
+      throw new RuntimeException("Not allowed to update this menu");
+    }
+
+    if (uReq.getTitle() != null && !uReq.getTitle().isBlank())     menu.setTitle(uReq.getTitle());
+    if (uReq.getDescription() != null)                              menu.setDescription(uReq.getDescription());
+    if (uReq.getPricePerPerson() != null
+        && uReq.getPricePerPerson().signum() > 0)                   menu.setPricePerPerson(uReq.getPricePerPerson());
+    if (uReq.getMinNumberDiners() != null
+        && uReq.getMinNumberDiners() > 0)                           menu.setMinNumberDiners(uReq.getMinNumberDiners());
+    if (uReq.getMaxNumberDiners() != null
+        && uReq.getMaxNumberDiners() > 0)                           menu.setMaxNumberDiners(uReq.getMaxNumberDiners());
+    if (uReq.getKitchenRequirements() != null)                      menu.setKitchenRequirements(uReq.getKitchenRequirements());
+
+    Menu saved = menuRepository.save(menu);
+
+    return MenuDTO.builder()
+      .id(saved.getId())
+      .title(saved.getTitle())
+      .description(saved.getDescription())
+      .pricePerPerson(saved.getPricePerPerson())
+      .minNumberDiners(saved.getMinNumberDiners())
+      .maxNumberDiners(saved.getMaxNumberDiners())
+      .kitchenRequirements(saved.getKitchenRequirements())
+      .dishes(List.of())
+      .allergens(Set.of())
+      .deliveryAvailable(false)
+      .cookAtClientHome(false)
+      .pickupAvailable(false)
+      .chefUsername(authentication.getName())
+      .createdAt(null)
+      .build();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<MenuDTO> listAllMenus() {
+    List<Menu> menus = menuRepository.findAllWithDishes();
+    menus.forEach(menu -> menu.getDishes().forEach(dish -> dish.getAllergenDishes().size()));
+    return menus.stream().map(this::toDto).toList();
+  }
+
+  private MenuDTO toDto(Menu menu) {
+    String creatorName = menu.getChef().getUser().getName() != null && menu.getChef().getUser().getLastname() != null
+      ? menu.getChef().getUser().getName() + " " + menu.getChef().getUser().getLastname()
+      : menu.getChef().getUser().getUsername();
+
     List<DishDto> dishes = menu.getDishes().stream()
-      .map(dish -> {
-        List<String> allergens = dish.getAllergenDishes().stream()
+      .map(dish -> DishDto.builder()
+        .menuId(dish.getMenuId())
+        .dishId(dish.getDishId())
+        .title(dish.getTitle())
+        .description(dish.getDescription())
+        .category(dish.getCategory())
+        .creator(creatorName)
+        .allergens(dish.getAllergenDishes().stream()
           .map(AllergenDish::getAllergen)
-          .collect(Collectors.toList());
-
-        String creatorName = menu.getChef().getUser().getName() != null && menu.getChef().getUser().getLastname() != null
-          ? menu.getChef().getUser().getName() + " " + menu.getChef().getUser().getLastname()
-          : menu.getChef().getUser().getUsername();
-
-        return DishDto.builder()
-          .menuId(dish.getMenuId())
-          .dishId(dish.getDishId())
-          .title(dish.getTitle())
-          .description(dish.getDescription())
-          .category(dish.getCategory())
-          .creator(creatorName)
-          .allergens(allergens)
-          .build();
-      })
+          .collect(Collectors.toList()))
+        .build())
       .collect(Collectors.toList());
 
     Set<String> allergens = menu.getDishes().stream()
@@ -136,112 +185,4 @@ public class MenuServiceImpl implements MenuService {
       .createdAt(null)
       .build();
   }
-
-  @Override
-  @Transactional
-  public void deleteMenu(Authentication authentication, Long idMenu) {
-
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
-
-    Menu menu = menuRepository.findById(idMenu)
-      .orElseThrow(() -> new RuntimeException("Menu not found: " + idMenu));
-
-    if (!chef.getId().equals(menu.getChef().getId())) {
-      throw new RuntimeException("Not allowed to delete this menu");
-    }
-
-    // Verificar si el menú tiene reservas activas
-    if (menu.getReservations() != null && !menu.getReservations().isEmpty()) {
-      throw new RuntimeException("No se puede eliminar este menú porque tiene reservas confirmadas. " +
-        "Por favor, espera a que finalicen las reservas antes de eliminar el menú.");
-    }
-
-    menuRepository.delete(menu);
-  }
-
-  @Override
-  @Transactional
-  public MenuDTO updateMenu(Authentication authentication, MenuUReqDto uReq) {
-
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
-
-    if (uReq.getId() == null) {
-      throw new IllegalArgumentException("id is required");
-    }
-
-    Menu menu = menuRepository.findById(uReq.getId())
-      .orElseThrow(() -> new RuntimeException("Menu not found: " + uReq.getId()));
-
-    if (!chef.getId().equals(menu.getChef().getId())) {
-      throw new RuntimeException("Not allowed to update this menu");
-    }
-
-    if (uReq.getTitle() != null && !uReq.getTitle().isBlank()) {
-      menu.setTitle(uReq.getTitle());
-    }
-
-    if (uReq.getDescription() != null) {
-      menu.setDescription(uReq.getDescription());
-    }
-
-    if (uReq.getPricePerPerson() != null && uReq.getPricePerPerson().signum() > 0) {
-      menu.setPricePerPerson(uReq.getPricePerPerson());
-    }
-
-    if (uReq.getMinNumberDiners() != null && uReq.getMinNumberDiners() > 0) {
-      menu.setMinNumberDiners(uReq.getMinNumberDiners());
-    }
-
-    if (uReq.getMaxNumberDiners() != null && uReq.getMaxNumberDiners() > 0) {
-      menu.setMaxNumberDiners(uReq.getMaxNumberDiners());
-    }
-
-    if (uReq.getKitchenRequirements() != null) {
-      menu.setKitchenRequirements(uReq.getKitchenRequirements());
-    }
-
-
-    Menu saved = menuRepository.save(menu);
-
-    return MenuDTO.builder()
-      .id(saved.getId())
-      .title(saved.getTitle())
-      .description(saved.getDescription())
-      .pricePerPerson(saved.getPricePerPerson())
-      .minNumberDiners(saved.getMinNumberDiners())
-      .maxNumberDiners(saved.getMaxNumberDiners())
-      .kitchenRequirements(saved.getKitchenRequirements())
-
-      .dishes(List.of())
-      .allergens(Set.of())
-      .deliveryAvailable(false)
-      .cookAtClientHome(false)
-      .pickupAvailable(false)
-
-      .chefUsername(authentication.getName())
-      .createdAt(null)
-      .build();
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<MenuDTO> listAllMenus() {
-
-    // Obtener todos los menús con sus platos
-    List<Menu> menus = menuRepository.findAllWithDishes();
-
-    // Cargar alérgenos (forzar carga lazy)
-    menus.forEach(menu ->
-      menu.getDishes().forEach(dish ->
-        dish.getAllergenDishes().size()
-      )
-    );
-
-    return menus.stream()
-      .map(this::convertToDto)
-      .toList();
-  }
-
 }
