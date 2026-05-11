@@ -81,12 +81,12 @@ public class ChefController {
 
   // Dishes
 
-  @Operation(summary = "Listar platos del chef", description = "Devuelve los platos del chef autenticado. Se puede filtrar por nombre con el parámetro 'nombrePlato'.")
+  @Operation(summary = "Listar platos del chef", description = "Devuelve los platos del chef autenticado. Se puede filtrar por nombre con el parámetro 'dishName'.")
   @SecurityRequirement(name = "bearerAuth")
   @GetMapping("/plato")
   public List<DishDto> getDishes(Authentication authentication,
-                                 @RequestParam(required = false) String nombrePlato) {
-    return dishService.getDish(authentication, nombrePlato);
+                                 @RequestParam(required = false) String dishName) {
+    return dishService.getDish(authentication, dishName);
   }
 
   @Operation(summary = "Crear plato", description = "Añade un nuevo plato a un menú del chef autenticado. Se pueden asociar alérgenos oficiales.")
