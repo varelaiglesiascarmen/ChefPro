@@ -47,7 +47,7 @@ public class ChefController {
   @Operation(summary = "Listar menús del chef", description = "Devuelve todos los menús creados por el chef autenticado, incluyendo sus platos y alérgenos.")
   @SecurityRequirement(name = "bearerAuth")
   @GetMapping("/menus")
-  public List<MenuDTO> listMenus(Authentication authentication) {
+  public List<MenuDTO> listarMenusChef(Authentication authentication) {
     return menuService.listByChef(authentication);
   }
 
@@ -61,7 +61,10 @@ public class ChefController {
   @Operation(summary = "Eliminar menú", description = "Elimina un menú del chef autenticado. No se puede eliminar si tiene reservas activas asociadas.")
   @SecurityRequirement(name = "bearerAuth")
   @DeleteMapping("/menus/{id}")
-  public ResponseEntity<Void> deleteMenu(@PathVariable Long id, Authentication authentication) {
+  public ResponseEntity<Void> eliminarMenu(
+    Authentication authentication,
+    @PathVariable Long id
+  ) {
     menuService.deleteMenu(authentication, id);
     return ResponseEntity.noContent().build();
   }
@@ -69,14 +72,18 @@ public class ChefController {
   @Operation(summary = "Actualizar menú", description = "Actualiza los campos del menú indicados en el cuerpo. Solo se modifican los campos que se envíen.")
   @SecurityRequirement(name = "bearerAuth")
   @PatchMapping("/menus")
-  public MenuDTO updateMenu(@RequestBody MenuUReqDto dto, Authentication authentication) {
-    return menuService.updateMenu(authentication, dto);
+  public MenuDTO actualizarMenu(
+    Authentication authentication,
+    @RequestBody MenuUReqDto menuUpdateDto
+  ) {
+    return menuService.updateMenu(authentication, menuUpdateDto);
   }
 
   @Operation(summary = "Listar todos los menús públicos", description = "Devuelve todos los menús de la plataforma. Endpoint público, no requiere autenticación.")
   @GetMapping("/menus/public")
-  public ResponseEntity<List<MenuDTO>> listPublicMenus() {
-    return ResponseEntity.ok(menuService.listAllMenus());
+  public ResponseEntity<List<MenuDTO>> listarMenusPublicos() {
+    List<MenuDTO> menus = menuService.listAllMenus();
+    return ResponseEntity.ok(menus);
   }
 
   // Dishes
@@ -138,8 +145,13 @@ public class ChefController {
 
   @Operation(summary = "Ver detalle público de un menú", description = "Devuelve el detalle de un menú con sus platos, alérgenos (IDs de reglamento UE) y fechas ocupadas del chef. Endpoint público.")
   @GetMapping("/menus/{menuId}/public")
-  public ResponseEntity<MenuPublicDetailDto> getPublicMenuDetail(@PathVariable Long menuId) {
-    return ResponseEntity.ok(chefProfileService.getMenuPublicDetail(menuId));
+  public ResponseEntity<MenuPublicDetailDto> obtenerDetalleMenuPublico(@PathVariable Long menuId) {
+    try {
+      MenuPublicDetailDto dto = chefProfileService.getMenuPublicDetail(menuId);
+      return ResponseEntity.ok(dto);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   // Authenticated profile
@@ -155,9 +167,12 @@ public class ChefController {
   @Operation(summary = "Subir foto de perfil", description = "Sube una imagen de perfil para el chef. Se acepta JPEG, PNG o WebP con un tamaño máximo de 5 MB. Se almacena en base64.")
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping("/profile/photo")
-  public ResponseEntity<Map<String, String>> uploadPhoto(@RequestParam("file") MultipartFile file,
-                                                         Authentication authentication) {
-    return ResponseEntity.ok(Map.of("photo", photoUploadService.uploadChefPhoto(file, authentication)));
+  public ResponseEntity<Map<String, String>> uploadPhoto(
+    @RequestParam("file") MultipartFile file,
+    Authentication authentication
+  ) {
+    String base64 = photoUploadService.uploadChefPhoto(file, authentication);
+    return ResponseEntity.ok(Map.of("photo", base64));
   }
 
   @Operation(summary = "Subir foto de portada", description = "Sube una imagen de portada para el perfil del chef. Mismas restricciones que la foto de perfil: imagen, máximo 5 MB.")
