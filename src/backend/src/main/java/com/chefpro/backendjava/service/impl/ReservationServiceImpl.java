@@ -41,13 +41,10 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional(readOnly = true)
   public List<ReservationDTO> listByChef(Authentication authentication) {
-
     Chef chef = chefRepository.findByUser_Username(authentication.getName())
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
-    List<Reservation> reservations = reservaRepository.findByChefId(chef.getId());
-
-    return reservations.stream()
+    return reservaRepository.findByChefId(chef.getId()).stream()
       .map(reservationMapper::toDto)
       .toList();
   }
@@ -55,17 +52,13 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional(readOnly = true)
   public List<ReservationDTO> listByClient(Authentication authentication) {
-
-    UserLogin user = userRepository
-      .findByUsername(authentication.getName())
+    UserLogin user = userRepository.findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
     Diner diner = dinerRepository.findById(user.getId())
       .orElseThrow(() -> new RuntimeException("Diner not found"));
 
-    List<Reservation> reservations = reservaRepository.findByDinerId(diner.getId());
-
-    return reservations.stream()
+    return reservaRepository.findByDinerId(diner.getId()).stream()
       .map(reservationMapper::toDto)
       .toList();
   }
@@ -73,50 +66,32 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public void createReservations(ReservationsCReqDto dto, Authentication authentication) {
+    if (dto.getChefId() == null)                                        throw new IllegalArgumentException("chefId is required");
+    if (dto.getDate() == null)                                          throw new IllegalArgumentException("date is required");
+    if (dto.getMenuId() == null)                                        throw new IllegalArgumentException("menuId is required");
+    if (dto.getNumberOfDiners() == null || dto.getNumberOfDiners() <= 0) throw new IllegalArgumentException("numberOfDiners must be greater than 0");
 
-    // 1. Obtener el usuario autenticado
-    UserLogin user = userRepository
-      .findByUsername(authentication.getName())
+    UserLogin user = userRepository.findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    // 2. Buscar o crear el Diner
     Diner diner = dinerRepository.findById(user.getId())
       .orElseGet(() -> {
-        // Si no existe, crear uno nuevo
         Diner newDiner = new Diner();
         newDiner.setId(user.getId());
         newDiner.setUser(user);
-        newDiner.setAddress(dto.getAddress()); // Usar la dirección de la reserva como dirección por defecto
+        newDiner.setAddress(dto.getAddress());
         return dinerRepository.save(newDiner);
       });
 
-    // 3. Validaciones
-    if (dto.getChefId() == null) {
-      throw new IllegalArgumentException("chefId is required");
-    }
-    if (dto.getDate() == null) {
-      throw new IllegalArgumentException("date is required");
-    }
-    if (dto.getMenuId() == null) {
-      throw new IllegalArgumentException("menuId is required");
-    }
-    if (dto.getNumberOfDiners() == null || dto.getNumberOfDiners() <= 0) {
-      throw new IllegalArgumentException("numberOfDiners must be greater than 0");
-    }
-
-    // 4. Obtener el Chef
     Chef chef = chefRepository.findById(dto.getChefId())
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
-    // 5. Obtener el Menu y verificar que pertenece al chef
     Menu menu = menuRepository.findById(dto.getMenuId())
       .orElseThrow(() -> new RuntimeException("Menu not found"));
 
     if (!menu.getChef().getId().equals(chef.getId())) {
       throw new IllegalArgumentException("This menu does not belong to the specified chef");
     }
-
-    // 6. Verificar que el número de comensales está dentro del rango del menú
     if (menu.getMinNumberDiners() != null && dto.getNumberOfDiners() < menu.getMinNumberDiners()) {
       throw new IllegalArgumentException("Number of diners is below minimum required: " + menu.getMinNumberDiners());
     }
@@ -124,73 +99,58 @@ public class ReservationServiceImpl implements ReservationService {
       throw new IllegalArgumentException("Number of diners exceeds maximum allowed: " + menu.getMaxNumberDiners());
     }
 
-    // 7. Verificar que no existe ya una reserva para ese chef en esa fecha
     Reservation.ReservationId reservationId = new Reservation.ReservationId(chef.getId(), dto.getDate());
     if (reservaRepository.existsById(reservationId)) {
       throw new IllegalArgumentException("This chef already has a reservation for this date");
     }
 
-    // 8. Crear la reserva
-    Reservation reservation = reservationMapper.toEntity(dto, chef, diner, menu);
-    reservaRepository.save(reservation);
+    reservaRepository.save(reservationMapper.toEntity(dto, chef, diner, menu));
   }
 
   @Override
   @Transactional
   public void deleteReservation(Authentication authentication, Long chefId, LocalDate date) {
-
-    UserLogin authUser = userRepository
-      .findByUsername(authentication.getName())
+    UserLogin authUser = userRepository.findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    Reservation.ReservationId reservationId = new Reservation.ReservationId(chefId, date);
-    Reservation reservation = reservaRepository
-      .findById(reservationId)
+    Reservation reservation = reservaRepository.findById(new Reservation.ReservationId(chefId, date))
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
     boolean isDiner = reservation.getDiner().getId().equals(authUser.getId());
-    boolean isChef = reservation.getChef().getId().equals(authUser.getId());
+    boolean isChef  = reservation.getChef().getId().equals(authUser.getId());
 
     if (!isDiner && !isChef) {
       throw new RuntimeException("Not allowed to delete this reservation");
     }
 
-    reservaRepository.deleteById(reservationId);
+    reservaRepository.deleteById(new Reservation.ReservationId(chefId, date));
   }
 
   @Override
   @Transactional
   public ReservationDTO updateReservationStatus(Authentication authentication, ReservationsUReqDto uReq) {
-
     if (uReq.getChefId() == null || uReq.getDate() == null) {
-      throw new IllegalArgumentException("chefId and date are required to identify the reservation");
+      throw new IllegalArgumentException("chefId and date are required");
     }
-
     if (uReq.getStatus() == null) {
       throw new IllegalArgumentException("status is required");
     }
 
-    UserLogin authUser = userRepository
-      .findByUsername(authentication.getName())
+    UserLogin authUser = userRepository.findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    Reservation.ReservationId reservationId = new Reservation.ReservationId(uReq.getChefId(), uReq.getDate());
-    Reservation reservation = reservaRepository
-      .findById(reservationId)
+    Reservation reservation = reservaRepository.findById(new Reservation.ReservationId(uReq.getChefId(), uReq.getDate()))
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-    // Diners can only cancel their own reservations
     boolean isDiner = reservation.getDiner().getId().equals(authUser.getId());
     if (isDiner) {
       if (uReq.getStatus() != Reservation.ReservationStatus.CANCELLED) {
         throw new IllegalArgumentException("Diners can only cancel reservations");
       }
       reservation.setStatus(uReq.getStatus());
-      Reservation saved = reservaRepository.save(reservation);
-      return reservationMapper.toDto(saved);
+      return reservationMapper.toDto(reservaRepository.save(reservation));
     }
 
-    // Chefs can accept, reject, or mark as completed
     Chef chef = chefRepository.findById(authUser.getId())
       .orElseThrow(() -> new RuntimeException("Only the chef or diner of this reservation can update its status"));
 
@@ -199,8 +159,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     reservation.setStatus(uReq.getStatus());
-
-    Reservation saved = reservaRepository.save(reservation);
-    return reservationMapper.toDto(saved);
+    return reservationMapper.toDto(reservaRepository.save(reservation));
   }
 }

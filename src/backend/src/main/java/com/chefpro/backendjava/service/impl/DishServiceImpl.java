@@ -4,6 +4,7 @@ import com.chefpro.backendjava.common.object.dto.DishDto;
 import com.chefpro.backendjava.common.object.dto.DishCReqDto;
 import com.chefpro.backendjava.common.object.dto.DishUReqDto;
 import com.chefpro.backendjava.common.object.entity.*;
+import com.chefpro.backendjava.common.util.ChefResolver;
 import com.chefpro.backendjava.repository.*;
 import com.chefpro.backendjava.service.DishService;
 import org.springframework.security.core.Authentication;
@@ -17,49 +18,44 @@ import java.util.stream.Collectors;
 @Component("dishService")
 public class DishServiceImpl implements DishService {
 
-  private final ChefRepository chefRepository;
+  private final ChefResolver chefResolver;
   private final MenuRepository menuRepository;
   private final DishRepository dishRepository;
   private final AllergenDishRepository allergenDishRepository;
   private final OfficialAllergenRepository officialAllergenRepository;
 
-  public DishServiceImpl(ChefRepository chefRepository, MenuRepository menuRepository, DishRepository dishRepository, AllergenDishRepository allergenDishRepository, OfficialAllergenRepository officialAllergenRepository) {
-    this.chefRepository = chefRepository;
+  public DishServiceImpl(ChefResolver chefResolver,
+                         MenuRepository menuRepository,
+                         DishRepository dishRepository,
+                         AllergenDishRepository allergenDishRepository,
+                         OfficialAllergenRepository officialAllergenRepository) {
+    this.chefResolver = chefResolver;
     this.menuRepository = menuRepository;
     this.dishRepository = dishRepository;
     this.allergenDishRepository = allergenDishRepository;
     this.officialAllergenRepository = officialAllergenRepository;
   }
 
-
   @Override
   @Transactional
-  public void createDish(Authentication auth, DishCReqDto cReq) {
+  public void createDish(Authentication authentication, DishCReqDto cReq) {
+    Chef chef = chefResolver.resolve(authentication);
 
-    // 1. Obtener el chef autenticado
-    Chef chef = chefRepository.findByUser_Username(auth.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
-
-    // 2. Validar que el menú existe y pertenece al chef
     Menu menu = menuRepository.findById(cReq.getMenuId())
       .orElseThrow(() -> new IllegalArgumentException("Menu not found"));
 
     if (!menu.getChef().getId().equals(chef.getId())) {
       throw new IllegalArgumentException("This menu does not belong to the authenticated chef");
     }
-
-    // 3. Validaciones
     if (cReq.getTitle() == null || cReq.getTitle().isBlank()) {
       throw new IllegalArgumentException("Title is required");
     }
 
-    // 4. Calcular el siguiente dish_ID para este menú
     Long nextDishId = dishRepository.findMaxDishIdByMenuId(cReq.getMenuId())
       .map(maxId -> maxId + 1)
       .orElse(1L);
 
-    // 5. Crear el plato
-    Dish plato = Dish.builder()
+    Dish dish = Dish.builder()
       .menuId(cReq.getMenuId())
       .dishId(nextDishId)
       .title(cReq.getTitle())
@@ -70,60 +66,86 @@ public class DishServiceImpl implements DishService {
       .allergenDishes(new ArrayList<>())
       .build();
 
-    dishRepository.save(plato);
-
-    // 6. Asociar alérgenos si existen
-    if (cReq.getAllergens() != null && !cReq.getAllergens().isEmpty()) {
-      for (String allergenName : cReq.getAllergens()) {
-        // Verificar que el alérgeno existe en la lista oficial
-        OfficialAllergen officialAllergen = officialAllergenRepository
-          .findById(allergenName)
-          .orElseThrow(() -> new IllegalArgumentException("Allergen not found: " + allergenName));
-
-        AllergenDish allergenDish = AllergenDish.builder()
-          .menuId(plato.getMenuId())
-          .dishId(plato.getDishId())
-          .allergen(allergenName)
-          .dish(plato)
-          .officialAllergen(officialAllergen)
-          .build();
-
-        allergenDishRepository.save(allergenDish);
-      }
-    }
+    dishRepository.save(dish);
+    saveAllergens(dish, cReq.getAllergens());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<DishDto> getDish(Authentication authentication, String dishName) {
+    Chef chef = chefResolver.resolve(authentication);
 
-    // 1. Obtener el chef autenticado
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
+    List<Dish> dishes = (dishName != null && !dishName.isEmpty())
+      ? dishRepository.findByChefIdAndTitleContaining(chef.getId(), dishName)
+      : dishRepository.findAllByChefId(chef.getId());
 
-    List<Dish> dishes;
-
-    // 2. Si se proporciona nombre de plato, buscar por título
-    if (dishName != null && !dishName.isEmpty()) {
-      dishes = dishRepository.findByChefIdAndTitleContaining(chef.getId(), dishName);
-    } else {
-      // 3. Si no hay filtro, devolver todos los platos del chef
-      dishes = dishRepository.findAllByChefId(chef.getId());
-    }
-
-    // 4. Convertir a DTO
     return dishes.stream()
-      .map(dish -> convertToDto(dish, chef))
+      .map(dish -> toDto(dish, chef))
       .collect(Collectors.toList());
   }
 
-  // Método auxiliar para convertir entidad a DTO
-  private DishDto convertToDto(Dish dish, Chef chef) {
-    // Obtener los nombres de los alérgenos
-    List<String> allergens = dish.getAllergenDishes().stream()
-      .map(AllergenDish::getAllergen)
-      .collect(Collectors.toList());
+  @Override
+  @Transactional
+  public void deleteDish(Authentication authentication, Long menuId, Long dishId) {
+    Chef chef = chefResolver.resolve(authentication);
 
-    // Obtener el nombre completo del chef
+    Dish dish = dishRepository.findById(new Dish.DishId(menuId, dishId))
+      .orElseThrow(() -> new IllegalArgumentException("Dish not found"));
+
+    if (!dish.getMenu().getChef().getId().equals(chef.getId())) {
+      throw new IllegalArgumentException("This dish does not belong to the authenticated chef");
+    }
+
+    dishRepository.delete(dish);
+  }
+
+  @Override
+  @Transactional
+  public DishDto updateDish(Authentication authentication, DishUReqDto uReq) {
+    Chef chef = chefResolver.resolve(authentication);
+
+    if (uReq.getMenuId() == null || uReq.getDishId() == null) {
+      throw new IllegalArgumentException("menuId and dishId are required");
+    }
+
+    Dish dish = dishRepository.findById(new Dish.DishId(uReq.getMenuId(), uReq.getDishId()))
+      .orElseThrow(() -> new IllegalArgumentException("Dish not found"));
+
+    if (!dish.getMenu().getChef().getId().equals(chef.getId())) {
+      throw new IllegalArgumentException("This dish does not belong to the authenticated chef");
+    }
+
+    if (uReq.getTitle() != null && !uReq.getTitle().isBlank()) dish.setTitle(uReq.getTitle());
+    if (uReq.getDescription() != null)                          dish.setDescription(uReq.getDescription());
+    if (uReq.getCategory() != null)                             dish.setCategory(uReq.getCategory());
+    if (uReq.getPhoto() != null)                                dish.setPhoto(uReq.getPhoto());
+
+    if (uReq.getAllergens() != null) {
+      allergenDishRepository.deleteAll(dish.getAllergenDishes());
+      dish.getAllergenDishes().clear();
+      saveAllergens(dish, uReq.getAllergens());
+    }
+
+    dishRepository.save(dish);
+    return toDto(dish, chef);
+  }
+
+  private void saveAllergens(Dish dish, List<String> allergenNames) {
+    if (allergenNames == null || allergenNames.isEmpty()) return;
+    for (String allergenName : allergenNames) {
+      OfficialAllergen official = officialAllergenRepository.findById(allergenName)
+        .orElseThrow(() -> new IllegalArgumentException("Allergen not found: " + allergenName));
+      allergenDishRepository.save(AllergenDish.builder()
+        .menuId(dish.getMenuId())
+        .dishId(dish.getDishId())
+        .allergen(allergenName)
+        .dish(dish)
+        .officialAllergen(official)
+        .build());
+    }
+  }
+
+  private DishDto toDto(Dish dish, Chef chef) {
     String creatorName = chef.getUser().getName() != null && chef.getUser().getLastname() != null
       ? chef.getUser().getName() + " " + chef.getUser().getLastname()
       : chef.getUser().getUsername();
@@ -136,101 +158,9 @@ public class DishServiceImpl implements DishService {
       .category(dish.getCategory())
       .photo(dish.getPhoto())
       .creator(creatorName)
-      .allergens(allergens)
+      .allergens(dish.getAllergenDishes().stream()
+        .map(AllergenDish::getAllergen)
+        .collect(Collectors.toList()))
       .build();
-  }
-
-  @Override
-  @Transactional
-  public void deleteDish(Authentication authentication, Long menuId, Long idDish) {
-
-    // 1. Obtener el chef autenticado
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
-
-    // 2. Buscar el plato con su clave compuesta
-    Dish.DishId dishIdObj = new Dish.DishId(menuId, idDish);
-    Dish dish = dishRepository.findById(dishIdObj)
-      .orElseThrow(() -> new IllegalArgumentException("Dish not found"));
-
-    // 3. Verificar que el plato pertenece a un menú del chef autenticado
-    if (!dish.getMenu().getChef().getId().equals(chef.getId())) {
-      throw new IllegalArgumentException("This dish does not belong to the authenticated chef");
-    }
-
-    // 4. Eliminar el plato (los alérgenos se borran automáticamente por cascade)
-    dishRepository.delete(dish);
-  }
-
-  @Override
-  @Transactional
-  public DishDto updateDish(Authentication authentication, DishUReqDto uReq) {
-
-    // 1. Obtener el chef autenticado
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new RuntimeException("Authenticated chef not found"));
-
-    // 2. Validaciones
-    if (uReq.getMenuId() == null || uReq.getDishId() == null) {
-      throw new IllegalArgumentException("menuId and dishId are required");
-    }
-
-    // 3. Buscar el plato con su clave compuesta
-    Dish.DishId dishIdObj = new Dish.DishId(uReq.getMenuId(), uReq.getDishId());
-    Dish dish = dishRepository.findById(dishIdObj)
-      .orElseThrow(() -> new IllegalArgumentException("Dish not found"));
-
-    // 4. Verificar que el plato pertenece a un menú del chef autenticado
-    if (!dish.getMenu().getChef().getId().equals(chef.getId())) {
-      throw new IllegalArgumentException("This dish does not belong to the authenticated chef");
-    }
-
-    // 5. Actualizar los campos del plato
-    if (uReq.getTitle() != null && !uReq.getTitle().isBlank()) {
-      dish.setTitle(uReq.getTitle());
-    }
-
-    if (uReq.getDescription() != null) {
-      dish.setDescription(uReq.getDescription());
-    }
-
-    if (uReq.getCategory() != null) {
-      dish.setCategory(uReq.getCategory());
-    }
-
-    if (uReq.getPhoto() != null) {
-      dish.setPhoto(uReq.getPhoto());
-    }
-
-    // 6. Actualizar alérgenos si se proporcionan
-    if (uReq.getAllergens() != null) {
-      // Eliminar alérgenos existentes
-      allergenDishRepository.deleteAll(dish.getAllergenDishes());
-      dish.getAllergenDishes().clear();
-
-      // Añadir nuevos alérgenos
-      for (String allergenName : uReq.getAllergens()) {
-        OfficialAllergen officialAllergen = officialAllergenRepository
-          .findById(allergenName)
-          .orElseThrow(() -> new IllegalArgumentException("Allergen not found: " + allergenName));
-
-        AllergenDish allergenDish = AllergenDish.builder()
-          .menuId(dish.getMenuId())
-          .dishId(dish.getDishId())
-          .allergen(allergenName)
-          .dish(dish)
-          .officialAllergen(officialAllergen)
-          .build();
-
-        allergenDishRepository.save(allergenDish);
-        dish.getAllergenDishes().add(allergenDish);
-      }
-    }
-
-    // 7. Guardar cambios
-    dishRepository.save(dish);
-
-    // 8. Convertir a DTO y devolver
-    return convertToDto(dish, chef);
   }
 }

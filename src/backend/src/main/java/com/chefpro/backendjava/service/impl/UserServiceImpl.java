@@ -1,7 +1,5 @@
 package com.chefpro.backendjava.service.impl;
 
-import java.util.Optional;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,55 +30,20 @@ public class UserServiceImpl implements UserService {
                          PasswordEncoder passwordEncoder) {
     this.customUserRepository = customUserRepository;
     this.dinerRepository = dinerRepository;
-    this.chefRepository= chefRepository;
+    this.chefRepository = chefRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
   @Override
   public UserLoginDto findByEmail(String email) {
-
-    Optional<UserLogin> foundUser = customUserRepository.findByUsername(email);
-
-    if (foundUser.isPresent()) {
-
-      UserLogin userLogin = foundUser.get();
-
-      UserLoginDto userLoginDto = new UserLoginDto();
-      userLoginDto.setId(userLogin.getId());
-      userLoginDto.setName(userLogin.getName());
-      userLoginDto.setSurname(userLogin.getLastname());
-      userLoginDto.setUsername(userLogin.getUsername());
-      userLoginDto.setEmail(userLogin.getEmail());
-      userLoginDto.setPhoneNumber(userLogin.getPhoneNumber());
-      userLoginDto.setPhoto(userLogin.getPhoto());
-      userLoginDto.setRole(userLogin.getRole().name());
-
-      // Incluir datos específicos de Chef o Diner
-      if (userLogin.getRole() == UserRoleEnum.CHEF) {
-        Optional<Chef> chefOpt = chefRepository.findByUser(userLogin);
-        if (chefOpt.isPresent()) {
-          Chef chef = chefOpt.get();
-          userLoginDto.setBio(chef.getBio());
-          userLoginDto.setPrizes(chef.getPrizes());
-          userLoginDto.setAddress(chef.getAddress());
-        }
-      } else if (userLogin.getRole() == UserRoleEnum.DINER) {
-        Optional<Diner> dinerOpt = dinerRepository.findByUser(userLogin);
-        if (dinerOpt.isPresent()) {
-          userLoginDto.setAddress(dinerOpt.get().getAddress());
-        }
-      }
-
-      return userLoginDto;
-    }
-
-    return null;
+    return customUserRepository.findByUsername(email)
+      .map(this::toUserLoginDto)
+      .orElse(null);
   }
 
   @Override
   @Transactional
   public Boolean signUp(SignUpReqDto signUpRequest) {
-
     if (signUpRequest == null
       || signUpRequest.getUsername() == null
       || signUpRequest.getPassword() == null
@@ -92,16 +55,7 @@ public class UserServiceImpl implements UserService {
       return false;
     }
 
-    UserLogin userLogin = new UserLogin();
-    userLogin.setName(signUpRequest.getName());
-    userLogin.setLastname(signUpRequest.getSurname());
-    userLogin.setUsername(signUpRequest.getUsername());
-    userLogin.setEmail(signUpRequest.getEmail());
-    userLogin.setPhoneNumber(signUpRequest.getPhoneNumber());
-    userLogin.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-
-    UserRoleEnum role = UserRoleEnum.DINER; // default
-
+    UserRoleEnum role = UserRoleEnum.DINER;
     if (signUpRequest.getRole() != null && !signUpRequest.getRole().isBlank()) {
       try {
         role = UserRoleEnum.valueOf(signUpRequest.getRole().toUpperCase());
@@ -110,20 +64,24 @@ public class UserServiceImpl implements UserService {
       }
     }
 
-    userLogin.setRole(role);
-
+    UserLogin userLogin = new UserLogin();
     userLogin.setName(signUpRequest.getName() != null ? signUpRequest.getName() : "Usuario");
     userLogin.setLastname(signUpRequest.getSurname() != null ? signUpRequest.getSurname() : "Nuevo");
+    userLogin.setUsername(signUpRequest.getUsername());
+    userLogin.setEmail(signUpRequest.getEmail());
+    userLogin.setPhoneNumber(signUpRequest.getPhoneNumber());
+    userLogin.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+    userLogin.setRole(role);
 
-    UserLogin savedUser = customUserRepository.saveAndFlush(userLogin);
+    UserLogin saved = customUserRepository.saveAndFlush(userLogin);
 
     if (role == UserRoleEnum.CHEF) {
       Chef chef = new Chef();
-      chef.setUser(savedUser);
+      chef.setUser(saved);
       chefRepository.save(chef);
     } else {
       Diner diner = new Diner();
-      diner.setUser(savedUser);
+      diner.setUser(saved);
       dinerRepository.save(diner);
     }
 
@@ -132,103 +90,41 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public UserLoginDto updateProfile(String userEmail, UpdateProfileDto updateProfileDto) {
-    Optional<UserLogin> foundUser = customUserRepository.findByUsername(userEmail);
+  public UserLoginDto updateProfile(String userEmail, UpdateProfileDto dto) {
+    UserLogin userLogin = customUserRepository.findByUsername(userEmail)
+      .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-    if (foundUser.isEmpty()) {
-      throw new RuntimeException("Usuario no encontrado");
+    userLogin.setName(dto.getName());
+    userLogin.setLastname(dto.getSurname());
+    userLogin.setUsername(dto.getUsername());
+
+    if (dto.getPhoto() != null) {
+      userLogin.setPhoto(dto.getPhoto().isBlank() ? null : dto.getPhoto());
     }
 
-    UserLogin userLogin = foundUser.get();
-
-    // Actualizar campos básicos del usuario
-    userLogin.setName(updateProfileDto.getName());
-    userLogin.setLastname(updateProfileDto.getSurname());
-    userLogin.setUsername(updateProfileDto.getUsername());
-
-    // Update photo: null means "don't change", empty/blank means "delete", otherwise set new value
-    if (updateProfileDto.getPhoto() != null) {
-      if (updateProfileDto.getPhoto().isBlank()) {
-        userLogin.setPhoto(null);
-      } else {
-        userLogin.setPhoto(updateProfileDto.getPhoto());
-      }
-    }
-
-    // Si es un chef, actualizar información adicional
     if (userLogin.getRole() == UserRoleEnum.CHEF) {
-      Optional<Chef> chefOpt = chefRepository.findByUser(userLogin);
-      if (chefOpt.isPresent()) {
-        Chef chef = chefOpt.get();
-        if (updateProfileDto.getBio() != null) {
-          chef.setBio(updateProfileDto.getBio());
-        }
-        if (updateProfileDto.getPrizes() != null) {
-          chef.setPrizes(updateProfileDto.getPrizes());
-        }
-        if (updateProfileDto.getAddress() != null) {
-          chef.setAddress(updateProfileDto.getAddress());
-        }
+      chefRepository.findByUser(userLogin).ifPresent(chef -> {
+        if (dto.getBio() != null)     chef.setBio(dto.getBio());
+        if (dto.getPrizes() != null)  chef.setPrizes(dto.getPrizes());
+        if (dto.getAddress() != null) chef.setAddress(dto.getAddress());
         chefRepository.save(chef);
-      }
-    }
-
-    // Si es un diner, actualizar dirección
-    if (userLogin.getRole() == UserRoleEnum.DINER) {
-      Optional<Diner> dinerOpt = dinerRepository.findByUser(userLogin);
-      if (dinerOpt.isPresent()) {
-        Diner diner = dinerOpt.get();
-        if (updateProfileDto.getAddress() != null) {
-          diner.setAddress(updateProfileDto.getAddress());
-        }
+      });
+    } else if (userLogin.getRole() == UserRoleEnum.DINER) {
+      dinerRepository.findByUser(userLogin).ifPresent(diner -> {
+        if (dto.getAddress() != null) diner.setAddress(dto.getAddress());
         dinerRepository.save(diner);
-      }
+      });
     }
 
-    // Guardar usuario actualizado
-    UserLogin savedUser = customUserRepository.save(userLogin);
-
-    // Construir y devolver DTO
-    UserLoginDto userLoginDto = new UserLoginDto();
-    userLoginDto.setId(savedUser.getId());
-    userLoginDto.setName(savedUser.getName());
-    userLoginDto.setSurname(savedUser.getLastname());
-    userLoginDto.setUsername(savedUser.getUsername());
-    userLoginDto.setEmail(savedUser.getEmail());
-    userLoginDto.setPhoneNumber(savedUser.getPhoneNumber());
-    userLoginDto.setPhoto(savedUser.getPhoto());
-    userLoginDto.setRole(savedUser.getRole().name());
-
-    // Incluir datos específicos de Chef o Diner
-    if (savedUser.getRole() == UserRoleEnum.CHEF) {
-      Optional<Chef> chefOpt = chefRepository.findByUser(savedUser);
-      if (chefOpt.isPresent()) {
-        Chef chef = chefOpt.get();
-        userLoginDto.setBio(chef.getBio());
-        userLoginDto.setPrizes(chef.getPrizes());
-        userLoginDto.setAddress(chef.getAddress());
-      }
-    } else if (savedUser.getRole() == UserRoleEnum.DINER) {
-      Optional<Diner> dinerOpt = dinerRepository.findByUser(savedUser);
-      if (dinerOpt.isPresent()) {
-        userLoginDto.setAddress(dinerOpt.get().getAddress());
-      }
-    }
-
-    return userLoginDto;
+    return toUserLoginDto(customUserRepository.save(userLogin));
   }
 
   @Override
   @Transactional
   public void deleteAccount(String userEmail) {
-    Optional<UserLogin> foundUser = customUserRepository.findByUsername(userEmail);
-    if (foundUser.isEmpty()) {
-      throw new RuntimeException("Usuario no encontrado");
-    }
+    UserLogin userLogin = customUserRepository.findByUsername(userEmail)
+      .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-    UserLogin userLogin = foundUser.get();
-
-    // Delete role-specific data first (cascades handle related entities like menus, reservations)
     if (userLogin.getRole() == UserRoleEnum.CHEF) {
       chefRepository.findByUser(userLogin).ifPresent(chefRepository::delete);
     } else if (userLogin.getRole() == UserRoleEnum.DINER) {
@@ -248,4 +144,27 @@ public class UserServiceImpl implements UserService {
     return customUserRepository.existsByEmail(email);
   }
 
+  private UserLoginDto toUserLoginDto(UserLogin user) {
+    UserLoginDto dto = new UserLoginDto();
+    dto.setId(user.getId());
+    dto.setName(user.getName());
+    dto.setSurname(user.getLastname());
+    dto.setUsername(user.getUsername());
+    dto.setEmail(user.getEmail());
+    dto.setPhoneNumber(user.getPhoneNumber());
+    dto.setPhoto(user.getPhoto());
+    dto.setRole(user.getRole().name());
+
+    if (user.getRole() == UserRoleEnum.CHEF) {
+      chefRepository.findByUser(user).ifPresent(chef -> {
+        dto.setBio(chef.getBio());
+        dto.setPrizes(chef.getPrizes());
+        dto.setAddress(chef.getAddress());
+      });
+    } else if (user.getRole() == UserRoleEnum.DINER) {
+      dinerRepository.findByUser(user).ifPresent(diner -> dto.setAddress(diner.getAddress()));
+    }
+
+    return dto;
+  }
 }

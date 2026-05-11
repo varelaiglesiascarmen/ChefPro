@@ -2,6 +2,7 @@ package com.chefpro.backendjava.service.impl;
 
 import com.chefpro.backendjava.common.object.dto.*;
 import com.chefpro.backendjava.common.object.entity.*;
+import com.chefpro.backendjava.common.util.ChefResolver;
 import com.chefpro.backendjava.repository.*;
 import com.chefpro.backendjava.service.ChefProfileService;
 import org.springframework.security.core.Authentication;
@@ -16,7 +17,9 @@ import java.util.stream.Collectors;
 @Service
 public class ChefProfileServiceImpl implements ChefProfileService {
 
-  // Mapeo estático de nombre de alérgeno (BD) → ID numérico (normativa UE)
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+  // Allergen name (DB) → EU regulation numeric ID
   private static final Map<String, Integer> ALLERGEN_NAME_TO_ID = Map.ofEntries(
     Map.entry("Gluten", 1),
     Map.entry("Crustáceos", 2),
@@ -34,15 +37,18 @@ public class ChefProfileServiceImpl implements ChefProfileService {
     Map.entry("Moluscos", 14)
   );
 
+  private final ChefResolver chefResolver;
   private final ChefRepository chefRepository;
   private final MenuRepository menuRepository;
   private final ReviewRepository reviewRepository;
   private final ReservaRepository reservaRepository;
 
-  public ChefProfileServiceImpl(ChefRepository chefRepository,
+  public ChefProfileServiceImpl(ChefResolver chefResolver,
+                                ChefRepository chefRepository,
                                 MenuRepository menuRepository,
                                 ReviewRepository reviewRepository,
                                 ReservaRepository reservaRepository) {
+    this.chefResolver = chefResolver;
     this.chefRepository = chefRepository;
     this.menuRepository = menuRepository;
     this.reviewRepository = reviewRepository;
@@ -53,11 +59,10 @@ public class ChefProfileServiceImpl implements ChefProfileService {
   @Transactional(readOnly = true)
   public ChefPublicDetailDto getChefPublicProfile(Long chefId) {
     Chef chef = chefRepository.findById(chefId)
-      .orElseThrow(() -> new NoSuchElementException("Chef no encontrado con ID: " + chefId));
+      .orElseThrow(() -> new NoSuchElementException("Chef not found: " + chefId));
 
     UserLogin user = chef.getUser();
 
-    // Menús con platos
     List<Menu> menus = menuRepository.findByChefIdWithDishes(chefId);
     List<MenuSummaryDto> menuSummaries = menus.stream()
       .map(m -> MenuSummaryDto.builder()
@@ -71,35 +76,28 @@ public class ChefProfileServiceImpl implements ChefProfileService {
         .build())
       .collect(Collectors.toList());
 
-    // Reseñas
     List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(chefId);
     List<ReviewSummaryDto> reviewSummaries = reviews.stream()
       .map(r -> ReviewSummaryDto.builder()
-        .reviewerName(r.getReviewerUser().getName() + " " +
-          r.getReviewerUser().getLastname().charAt(0) + ".")
-        .date(r.getDate() != null ? r.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "")
+        .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
+        .date(r.getDate() != null ? r.getDate().format(DATE_FORMATTER) : "")
         .score(r.getScore())
         .comment(r.getComment())
         .build())
       .collect(Collectors.toList());
 
-    // Rating y conteo
     Double rating = reviewRepository.findAverageScoreByReviewedUserId(chefId);
     Long reviewsCount = reviewRepository.countByReviewedUserId(chefId);
 
-    // Fechas ocupadas
-    List<LocalDate> busyLocalDates = reservaRepository.findBusyDatesByChefId(chefId);
-    List<String> busyDates = busyLocalDates.stream()
+    List<String> busyDates = reservaRepository.findBusyDatesByChefId(chefId).stream()
       .map(LocalDate::toString)
       .collect(Collectors.toList());
-
-    String fullName = user.getName() + " " + user.getLastname();
 
     return ChefPublicDetailDto.builder()
       .id(chef.getId())
       .name(user.getName())
       .lastname(user.getLastname())
-      .fullName(fullName)
+      .fullName(user.getName() + " " + user.getLastname())
       .email(user.getEmail())
       .phoneNumber(user.getPhoneNumber())
       .photo(chef.getPhoto())
@@ -120,16 +118,13 @@ public class ChefProfileServiceImpl implements ChefProfileService {
   @Transactional(readOnly = true)
   public MenuPublicDetailDto getMenuPublicDetail(Long menuId) {
     Menu menu = menuRepository.findByIdWithDetails(menuId)
-      .orElseThrow(() -> new NoSuchElementException("Menú no encontrado con ID: " + menuId));
+      .orElseThrow(() -> new NoSuchElementException("Menu not found: " + menuId));
 
-    // Forzar carga lazy de alérgenos
     menu.getDishes().forEach(dish -> dish.getAllergenDishes().size());
 
     Chef chef = menu.getChef();
     UserLogin chefUser = chef.getUser();
-    String chefName = chefUser.getName() + " " + chefUser.getLastname();
 
-    // Convertir platos con alérgenos numéricos
     List<DishPublicDto> dishes = menu.getDishes().stream()
       .map(dish -> {
         List<Integer> allergenIds = dish.getAllergenDishes().stream()
@@ -148,9 +143,7 @@ public class ChefProfileServiceImpl implements ChefProfileService {
       })
       .collect(Collectors.toList());
 
-    // Fechas ocupadas del chef dueño del menú
-    List<LocalDate> busyLocalDates = reservaRepository.findBusyDatesByChefId(chef.getId());
-    List<String> busyDates = busyLocalDates.stream()
+    List<String> busyDates = reservaRepository.findBusyDatesByChefId(chef.getId()).stream()
       .map(LocalDate::toString)
       .collect(Collectors.toList());
 
@@ -163,7 +156,7 @@ public class ChefProfileServiceImpl implements ChefProfileService {
       .maxDiners(menu.getMaxNumberDiners())
       .requirements(menu.getKitchenRequirements())
       .chefId(chef.getId())
-      .chefName(chefName)
+      .chefName(chefUser.getName() + " " + chefUser.getLastname())
       .chefPhoto(chef.getPhoto())
       .dishes(dishes)
       .busyDates(busyDates)
@@ -173,20 +166,16 @@ public class ChefProfileServiceImpl implements ChefProfileService {
   @Override
   @Transactional
   public ChefPublicDetailDto updateChefProfile(Authentication authentication, ChefUReqDto dto) {
-    Chef chef = chefRepository.findByUser_Username(authentication.getName())
-      .orElseThrow(() -> new NoSuchElementException("Chef not found for user: " + authentication.getName()));
+    Chef chef = chefResolver.resolve(authentication);
 
-    // Partial update: only non-null DTO fields are applied
-    if (dto.getPhoto() != null)     chef.setPhoto(dto.getPhoto());
-    if (dto.getBio() != null)       chef.setBio(dto.getBio());
-    if (dto.getPrizes() != null)    chef.setPrizes(dto.getPrizes());
-    if (dto.getLocation() != null)  chef.setLocation(dto.getLocation());
-    if (dto.getLanguages() != null) chef.setLanguages(dto.getLanguages());
-    if (dto.getCoverPhoto() != null) chef.setCoverPhoto(dto.getCoverPhoto());
+    if (dto.getPhoto() != null)       chef.setPhoto(dto.getPhoto());
+    if (dto.getBio() != null)         chef.setBio(dto.getBio());
+    if (dto.getPrizes() != null)      chef.setPrizes(dto.getPrizes());
+    if (dto.getLocation() != null)    chef.setLocation(dto.getLocation());
+    if (dto.getLanguages() != null)   chef.setLanguages(dto.getLanguages());
+    if (dto.getCoverPhoto() != null)  chef.setCoverPhoto(dto.getCoverPhoto());
 
     chefRepository.save(chef);
-
-    // Reuse the existing method to return the full updated profile
     return getChefPublicProfile(chef.getId());
   }
 }

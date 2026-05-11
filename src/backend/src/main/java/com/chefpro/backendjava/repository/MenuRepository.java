@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-  List<Menu> findByChef_User_Username(String username);
-
   @Query("SELECT DISTINCT m FROM Menu m " +
     "LEFT JOIN FETCH m.dishes " +
     "WHERE m.chef.id = :chefId")
