@@ -50,7 +50,6 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<User> {
     if (this.isDevMode) {
       const mock = this.getMockUser();
-      localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
       return of(mock);
     }
@@ -73,7 +72,6 @@ export class AuthService {
   signup(data: any): Observable<User> {
     if (this.isDevMode) {
       const mock = this.getMockUser(data.role || 'CHEF');
-      localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
       return of(mock);
     }
