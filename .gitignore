@@ -75,3 +75,21 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 .vercel
+# CLAUDE / ANTHROPIC
+.claude/
+.claude-cache/
+.claude-config.json
+.claude.json
+.claude.local.json
+.claude.env
+.claude.logs/
+
+
+# ENV / CREDENCIALES
+.env
+.env.*
+!.env.example
+
+
+# LOGS
+*.log
