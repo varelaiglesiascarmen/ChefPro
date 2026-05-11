@@ -63,7 +63,7 @@ public class ChefController {
   // MENÚS
 
   @GetMapping("/menus")
-  public List<MenuDTO> getMenusDelChef(Authentication authentication) {
+  public List<MenuDTO> listarMenusChef(Authentication authentication) {
     return menuService.listByChef(authentication);
   }
 
@@ -77,7 +77,7 @@ public class ChefController {
   }
 
   @DeleteMapping("/menus/{id}")
-  public ResponseEntity<Void> deleteMenu(
+  public ResponseEntity<Void> eliminarMenu(
     Authentication authentication,
     @PathVariable Long id
   ) {
@@ -86,7 +86,7 @@ public class ChefController {
   }
 
   @PatchMapping("/menus")
-  public MenuDTO patchMenu(
+  public MenuDTO actualizarMenu(
     Authentication authentication,
     @RequestBody MenuUReqDto menuUpdateDto
   ) {
@@ -94,7 +94,7 @@ public class ChefController {
   }
 
   @GetMapping("/menus/public")
-  public ResponseEntity<List<MenuDTO>> getAllMenusPublic() {
+  public ResponseEntity<List<MenuDTO>> listarMenusPublicos() {
     List<MenuDTO> menus = menuService.listAllMenus();
     return ResponseEntity.ok(menus);
   }
@@ -166,7 +166,7 @@ public class ChefController {
   }
 
   @GetMapping("/menus/{menuId}/public")
-  public ResponseEntity<MenuPublicDetailDto> getMenuPublicDetail(@PathVariable Long menuId) {
+  public ResponseEntity<MenuPublicDetailDto> obtenerDetalleMenuPublico(@PathVariable Long menuId) {
     try {
       MenuPublicDetailDto dto = chefProfileService.getMenuPublicDetail(menuId);
       return ResponseEntity.ok(dto);

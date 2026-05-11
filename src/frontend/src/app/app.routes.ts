@@ -19,6 +19,8 @@ import { UserOrdersComponent } from './components/profile/sidebar/user-orders/us
 import { CancellationPoliciesComponent } from './components/cancellation-policies/cancellation-policies.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 import { authRedirectGuard } from './guards/auth-redirect.guard';
+import { authGuard } from './guards/auth.guard';
+import { chefGuard } from './guards/chef.guard';
 
 export const routes: Routes = [
 
@@ -53,12 +55,13 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'info', pathMatch: 'full' },
       { path: 'info', component: UserInfoComponent },
-      { path: 'menus', component: ChefMenusComponent },
-      { path: 'new-menu', component: NewMenuComponent },
-      { path: 'edit-menu/:id', component: EditMenuComponent },
+      { path: 'menus', component: ChefMenusComponent, canActivate: [chefGuard] },
+      { path: 'new-menu', component: NewMenuComponent, canActivate: [chefGuard] },
+      { path: 'edit-menu/:id', component: EditMenuComponent, canActivate: [chefGuard] },
       { path: 'calendar', component: UserCalendarComponent },
       { path: 'orders', component: UserOrdersComponent }
     ]
