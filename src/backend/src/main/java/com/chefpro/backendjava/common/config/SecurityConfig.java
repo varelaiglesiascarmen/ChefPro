@@ -37,6 +37,12 @@ public class SecurityConfig {
     http
       .cors(Customizer.withDefaults())
       .csrf(csrf -> csrf.disable())
+      .headers(headers -> headers
+        .httpStrictTransportSecurity(hsts -> hsts
+          .includeSubDomains(true)
+          .maxAgeInSeconds(31536000)
+        )
+      )
       .userDetailsService(usuarioDetailsService)
       .sessionManagement(session ->
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

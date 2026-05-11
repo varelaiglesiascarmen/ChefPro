@@ -14,6 +14,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig {
 
+  @Value("${cors.allowed-origins}")
+  private String allowedOriginsRaw;
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    List<String> allowedOrigins = Arrays.asList(allowedOriginsRaw.split(","));
+
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(allowedOrigins);
+    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowCredentials(true);
+    config.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+  }
+
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();

@@ -194,11 +194,6 @@ public class ChefController {
     @RequestParam("file") MultipartFile file,
     Authentication authentication
   ) {
-    System.out.println("=== UPLOAD PHOTO ===");
-    System.out.println("Auth: " + authentication);
-    System.out.println("Name: " + (authentication != null ? authentication.getName() : "NULL"));
-    System.out.println("File: " + (file != null ? file.getOriginalFilename() + " size=" + file.getSize() : "NULL"));
-
     String base64 = photoUploadService.uploadChefPhoto(file, authentication);
     return ResponseEntity.ok(Map.of("photo", base64));
   }
