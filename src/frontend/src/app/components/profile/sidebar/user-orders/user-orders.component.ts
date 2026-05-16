@@ -182,10 +182,6 @@ export class UserOrdersComponent implements OnInit {
   }
 
   openReviewModal(order: Order) {
-    if (this.userRole !== 'DINER') {
-      this.toastService.error('Solo los comensales pueden dejar valoraciones');
-      return;
-    }
     if (order.status !== 'COMPLETED') {
       this.toastService.warning('Solo puedes valorar reservas completadas');
       return;
