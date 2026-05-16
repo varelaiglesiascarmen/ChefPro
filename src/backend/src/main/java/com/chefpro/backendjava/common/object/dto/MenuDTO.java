@@ -5,8 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,15 +14,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class MenuDTO {
 
-    @JsonProperty("menu_ID")
-    private Long id;
+    private Long menuId;
     private String title;
     private String description;
 
-    private List<DishDto> dishes;
+    private List<DishSummaryDto> dishes;
     private Set<String> allergens;
 
     private BigDecimal pricePerPerson;
