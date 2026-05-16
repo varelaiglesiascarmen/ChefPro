@@ -13,12 +13,16 @@
       <a routerLink="/aboutUs" (click)="toggleMenu()">Sobre nosotros</a>
       <a routerLink="/contact" (click)="toggleMenu()">Contacto</a>
       <a routerLink="/login" (click)="toggleMenu()">Iniciar sesión</a>
-      <a routerLink="/signIn" (click)="toggleMenu()">Únete</a>
+      <!-- Conditional link: "Únete" for guests, "Mis reservas" for logged-in chefs users -->
+      <a *ngIf="!currentUser" routerLink="/signIn" (click)="isMenuOpen = false">Únete</a>
+      <!-- Conditional link: "Perfil" for logged-in users -->
+      <a *ngIf="currentUser" routerLink="/profile/orders" (click)="isMenuOpen = false">Mis reservas</a>
+      <a *ngIf="currentUser" routerLink="/profile" (click)="isMenuOpen = false">Perfil</a>
     </nav>
   </div>
 
   @if (isMenuOpen) {
-    <div class="menu-overlay" (click)="toggleMenu()"></div>
+  <div class="menu-overlay" (click)="toggleMenu()"></div>
   }
 
   <main class="content">
@@ -27,8 +31,8 @@
       <img src="logos/largeWebsiteLogo.svg" alt="Chef Pro Logo" class="logo-img">
     </div>
 
-    <button class="cta-button" routerLink="/index"
-        data-tooltip="Descubre un nuevo mundo culinario">¿Qué vas a comer hoy?</button>
+    <button class="cta-button" routerLink="/index" data-tooltip="Descubre un nuevo mundo culinario">¿Qué vas a comer
+      hoy?</button>
   </main>
 
   <footer class="simple-footer">
