@@ -31,6 +31,7 @@ export class SearchResultsComponent implements OnInit {
   currentUser: User | null = null;
   showLoginModal = false;
   searchTerm: string = '';
+  isDiscoverMode = false;
 
   ngOnInit() {
     this.authService.user$.subscribe(user => {
@@ -39,6 +40,7 @@ export class SearchResultsComponent implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       this.searchTerm = params['q'] || '';
+      this.isDiscoverMode = params['discover'] === 'true' || !this.searchTerm;
 
       const filters: ChefFilter = {
         q: params['q'] || '',
