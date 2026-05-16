@@ -159,12 +159,15 @@
             <div class="price-tag">{{ order.price }}</div>
           </div>
 
-          <div class="card-actions single-action" *ngIf="userRole === 'DINER'">
+          <div class="card-actions single-action">
             <button class="btn-accept" (click)="openReviewModal(order)"
               [disabled]="reviewedReservationIds.has(order.id)"
-              [title]="reviewedReservationIds.has(order.id) ? 'Ya valoraste esta reserva' : 'Valorar servicio'">
+              [title]="reviewedReservationIds.has(order.id) ? 'Ya hiciste tu reseña' : (userRole === 'DINER' ? 'Valorar servicio del chef' : 'Valorar al comensal')">
               <i class="fa-solid fa-star"></i>
-              {{ reviewedReservationIds.has(order.id) ? 'Valorado' : 'Valorar servicio' }}
+              <span *ngIf="!reviewedReservationIds.has(order.id)">
+                {{ userRole === 'DINER' ? 'Valorar servicio' : 'Valorar comensal' }}
+              </span>
+              <span *ngIf="reviewedReservationIds.has(order.id)">Reseña enviada</span>
             </button>
           </div>
         </div>
@@ -224,8 +227,8 @@
   </div>
 </div>
 
-<!-- Review Form Modal (for diners to rate chefs) -->
-<app-review-form *ngIf="selectedReservationForReview && userRole === 'DINER'" [isOpen]="reviewModalOpen"
+<!-- Review Form Modal (public reviews) -->
+<app-review-form *ngIf="selectedReservationForReview" [isOpen]="reviewModalOpen"
   [chefId]="selectedReservationForReview.chefId" [reservationDate]="selectedReservationForReview.dateRaw"
   (closed)="handleReviewClosed()" (submitted)="handleReviewSubmitted($event)">
 </app-review-form>
