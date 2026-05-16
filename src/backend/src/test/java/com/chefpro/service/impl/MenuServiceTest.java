@@ -6,6 +6,7 @@ import com.chefpro.backendjava.common.object.dto.MenuUReqDto;
 import com.chefpro.backendjava.common.object.entity.Chef;
 import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.common.object.entity.UserLogin;
+import com.chefpro.backendjava.common.util.ChefResolver;
 import com.chefpro.backendjava.repository.ChefRepository;
 import com.chefpro.backendjava.repository.MenuRepository;
 import com.chefpro.backendjava.service.MenuService;
@@ -28,7 +29,7 @@ class MenuServiceTest {
     private MenuService menuService;
 
     private MenuRepository menuRepository;
-    private ChefRepository chefRepository;
+    private ChefResolver chefResolver;
     private Authentication authentication;
 
     // Entidades reutilizables
@@ -38,10 +39,10 @@ class MenuServiceTest {
     @BeforeEach
     void setUp() {
         menuRepository = mock(MenuRepository.class);
-        chefRepository = mock(ChefRepository.class);
+        chefResolver = mock(ChefResolver.class);
         authentication = mock(Authentication.class);
 
-        menuService = new MenuServiceImpl(menuRepository, chefRepository);
+        menuService = new MenuServiceImpl(menuRepository, chefResolver);
 
         // Construir entidades base
         userLogin = mock(UserLogin.class);
@@ -54,7 +55,7 @@ class MenuServiceTest {
         when(chef.getUser()).thenReturn(userLogin);
 
         when(authentication.getName()).thenReturn("chef@example.com");
-        when(chefRepository.findByUser_Username("chef@example.com")).thenReturn(Optional.of(chef));
+        when(chefResolver.resolve(authentication)).thenReturn(chef);
     }
 
     // ─── createMenu ──────────────────────────────────────────────────────────
@@ -79,9 +80,9 @@ class MenuServiceTest {
         MenuDTO result = menuService.createMenu(dto, authentication);
 
         assertNotNull(result);
-        assertEquals(10L, result.getId());
+        assertEquals(10L, result.getMenuId());
         assertEquals("Menú Mediterráneo", result.getTitle());
-        verify(chefRepository).findByUser_Username("chef@example.com");
+        verify(chefResolver).resolve(authentication);
         verify(menuRepository).save(any(Menu.class));
     }
 
@@ -109,13 +110,13 @@ class MenuServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(chefRepository).findByUser_Username("chef@example.com");
+        verify(chefResolver).resolve(authentication);
         verify(menuRepository).findByChefIdWithDishes(1L);
     }
 
     @Test
     void listByChef_chefNotFound_throwsRuntimeException() {
-        when(chefRepository.findByUser_Username("chef@example.com")).thenReturn(Optional.empty());
+        when(chefResolver.resolve(authentication)).thenThrow(new RuntimeException("Chef not found"));
 
         assertThrows(RuntimeException.class, () -> menuService.listByChef(authentication));
         verify(menuRepository, never()).findByChefIdWithDishes(any());
@@ -169,7 +170,7 @@ class MenuServiceTest {
         MenuDTO result = menuService.updateMenu(authentication, uReq);
 
         assertNotNull(result);
-        assertEquals(5L, result.getId());
+        assertEquals(5L, result.getMenuId());
         verify(menuRepository).save(menu);
     }
 
