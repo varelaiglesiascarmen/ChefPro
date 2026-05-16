@@ -12,6 +12,7 @@
     <a routerLink="/index" (click)="isMenuOpen = false">Inicio</a>
     <a [routerLink]="[]" fragment="footer" (click)="isMenuOpen = false">Sobre nosotros</a>
     <a routerLink="/contact" (click)="isMenuOpen = false">Contacto</a>
+    <a routerLink="/search-results" (click)="isMenuOpen = false">Explora qué vas a comer hoy</a>
     <!-- Conditional link: "Únete" for guests, "Mis reservas" for logged-in chefs users -->
     <a *ngIf="!currentUser" routerLink="/signIn" (click)="isMenuOpen = false">Únete</a>
     <!-- Conditional link: "Perfil" for logged-in users -->
