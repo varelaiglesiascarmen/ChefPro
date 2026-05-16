@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { AuthService } from '../../services/auth.service';
-import { FocusOnInitDirective } from '../../directives/focus-on-init.directive';
 import { SearchFilterComponent } from '../search-filter/search-filter.component';
 import { User } from '../../models/auth.model';
 import { UserMenuComponent } from '../user-menu/user-menu.component';
@@ -16,7 +15,6 @@ import { UserMenuComponent } from '../user-menu/user-menu.component';
     RouterLink,
     FormsModule,
     CommonModule,
-    FocusOnInitDirective,
     SearchFilterComponent,
     UserMenuComponent
   ],
@@ -94,6 +92,7 @@ export class NavbarComponent implements OnInit {
       if (!this.isSearchOpen) {
         this.isSearchOpen = true;
         this.isMenuOpen = false;
+        this.showFilterMenu = true;
       } else {
         const cleanText = this.searchText.trim();
         const hasContent = cleanText.length > 0 || this.hasFilterActive;
