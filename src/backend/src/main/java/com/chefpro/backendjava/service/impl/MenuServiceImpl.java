@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.chefpro.backendjava.common.object.dto.DishDto;
+import com.chefpro.backendjava.common.object.dto.DishSummaryDto;
 import com.chefpro.backendjava.common.object.dto.MenuCReqDto;
 import com.chefpro.backendjava.common.object.dto.MenuDTO;
 import com.chefpro.backendjava.common.object.dto.MenuUReqDto;
@@ -119,7 +119,7 @@ public class MenuServiceImpl implements MenuService {
     Menu saved = menuRepository.save(menu);
 
     return MenuDTO.builder()
-      .id(saved.getId())
+      .menuId(saved.getId())
       .title(saved.getTitle())
       .description(saved.getDescription())
       .pricePerPerson(saved.getPricePerPerson())
