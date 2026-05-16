@@ -87,7 +87,7 @@ class ReservationControllerTest {
         ReservationsCReqDto req = mock(ReservationsCReqDto.class);
         doNothing().when(reservationService).createReservations(req, authentication);
 
-        ResponseEntity<Void> response = controller.crearReservas(req, authentication);
+        ResponseEntity<Void> response = controller.createReservation(req, authentication);
 
         assertEquals(201, response.getStatusCode().value());
         verify(reservationService).createReservations(req, authentication);
@@ -99,7 +99,7 @@ class ReservationControllerTest {
         doThrow(new IllegalArgumentException("Invalid reservation"))
             .when(reservationService).createReservations(req, authentication);
 
-        assertThrows(IllegalArgumentException.class, () -> controller.crearReservas(req, authentication));
+        assertThrows(IllegalArgumentException.class, () -> controller.createReservation(req, authentication));
         verify(reservationService).createReservations(req, authentication);
     }
 
@@ -110,7 +110,7 @@ class ReservationControllerTest {
         LocalDate date = LocalDate.of(2025, 8, 20);
         doNothing().when(reservationService).deleteReservation(authentication, 1L, date);
 
-        ResponseEntity<Void> response = controller.deleteReserva(authentication, 1L, date);
+        ResponseEntity<Void> response = controller.deleteReservation(authentication, 1L, date);
 
         assertEquals(204, response.getStatusCode().value());
         verify(reservationService).deleteReservation(authentication, 1L, date);
@@ -122,7 +122,7 @@ class ReservationControllerTest {
         doThrow(new NoSuchElementException("Reservation not found"))
             .when(reservationService).deleteReservation(authentication, 99L, date);
 
-        assertThrows(NoSuchElementException.class, () -> controller.deleteReserva(authentication, 99L, date));
+        assertThrows(NoSuchElementException.class, () -> controller.deleteReservation(authentication, 99L, date));
         verify(reservationService).deleteReservation(authentication, 99L, date);
     }
 

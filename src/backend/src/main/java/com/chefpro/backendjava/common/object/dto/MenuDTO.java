@@ -20,7 +20,7 @@ public class MenuDTO {
     private String title;
     private String description;
 
-    private List<DishSummaryDto> dishes;
+    private List<DishDto> dishes;
     private Set<String> allergens;
 
     private BigDecimal pricePerPerson;
