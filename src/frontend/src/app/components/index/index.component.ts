@@ -23,9 +23,20 @@ export class IndexComponent {
     const user = this.authService.currentUserValue;
 
     if (!user) {
-      this.router.navigate(['/signup'], { queryParams: { role: path } });
-    } else {
-      this.router.navigate(['/profile']);
+      this.router.navigate(['/login']);
+      return;
     }
+
+    if (user.role === 'CHEF') {
+      this.router.navigate(['/profile/new-menu']);
+      return;
+    }
+
+    if (user.role === 'DINER') {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.router.navigate(['/login']);
   }
 }
