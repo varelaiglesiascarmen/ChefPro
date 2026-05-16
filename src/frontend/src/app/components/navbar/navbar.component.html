@@ -20,8 +20,7 @@
   <div class="nav-actions">
     <div class="search-box" [class.expanded]="isSearchOpen">
       <input type="text" placeholder="Buscar..." [(ngModel)]="searchText" (keyup.enter)="performSearch()"
-        (focus)="showFilterMenu = true" (click)="$event.stopPropagation(); showFilterMenu = true" class="search-input"
-        appFocusOnInit>
+        (click)="$event.stopPropagation(); showFilterMenu = true" class="search-input">
 
       <button class="search-submit-btn" (click)="toggleSearch()">
         <img src="/logos/magnifier.svg" alt="Buscar" class="search-icon-svg">
