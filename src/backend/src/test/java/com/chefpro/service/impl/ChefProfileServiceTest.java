@@ -5,6 +5,7 @@ import com.chefpro.backendjava.common.object.dto.ChefUReqDto;
 import com.chefpro.backendjava.common.object.dto.MenuPublicDetailDto;
 import com.chefpro.backendjava.common.object.entity.*;
 import com.chefpro.backendjava.repository.*;
+import com.chefpro.backendjava.common.util.ChefResolver;
 import com.chefpro.backendjava.service.ChefProfileService;
 import com.chefpro.backendjava.service.impl.ChefProfileServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ class ChefProfileServiceTest {
   private MenuRepository menuRepository;
   private ReviewRepository reviewRepository;
   private ReservaRepository reservaRepository;
+  private ChefResolver chefResolver;
   private Authentication authentication;
 
   private Chef chef;
@@ -38,10 +40,11 @@ class ChefProfileServiceTest {
     menuRepository  = mock(MenuRepository.class);
     reviewRepository = mock(ReviewRepository.class);
     reservaRepository = mock(ReservaRepository.class);
+    chefResolver = mock(ChefResolver.class);
     authentication  = mock(Authentication.class);
 
     chefProfileService = new ChefProfileServiceImpl(
-      chefRepository, menuRepository, reviewRepository, reservaRepository
+      chefResolver, chefRepository, menuRepository, reviewRepository, reservaRepository
     );
 
     userLogin = mock(UserLogin.class);
@@ -142,8 +145,7 @@ class ChefProfileServiceTest {
     when(dto.getLanguages()).thenReturn(null);
     when(dto.getCoverPhoto()).thenReturn(null);
 
-    when(authentication.getName()).thenReturn("mario@example.com");
-    when(chefRepository.findByUser_Username("mario@example.com")).thenReturn(Optional.of(chef));
+    when(chefResolver.resolve(authentication)).thenReturn(chef);
     // findById es necesario porque updateChefProfile llama internamente a getChefPublicProfile(chef.getId())
     when(chefRepository.findById(1L)).thenReturn(Optional.of(chef));
 
@@ -165,8 +167,7 @@ class ChefProfileServiceTest {
   @Test
   void updateChefProfile_chefNotFound_throwsNoSuchElementException() {
     ChefUReqDto dto = mock(ChefUReqDto.class);
-    when(authentication.getName()).thenReturn("unknown@example.com");
-    when(chefRepository.findByUser_Username("unknown@example.com")).thenReturn(Optional.empty());
+    when(chefResolver.resolve(authentication)).thenThrow(new NoSuchElementException("Chef not found"));
 
     assertThrows(NoSuchElementException.class,
       () -> chefProfileService.updateChefProfile(authentication, dto));
