@@ -149,6 +149,13 @@ export class ServiceDetailPageComponent implements OnInit {
       return;
     }
 
+    const token = localStorage.getItem('chefpro_token');
+    if (!token) {
+      this.showLoginModal = true;
+      this.reservationError = 'Necesitas iniciar sesión para reservar.';
+      return;
+    }
+
     if (this.currentUser.role !== 'DINER') {
       this.reservationError = 'Solo los comensales pueden hacer reservas.';
       return;
