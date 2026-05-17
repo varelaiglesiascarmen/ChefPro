@@ -1,3 +1,4 @@
+// ...existing code...
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -12,6 +13,9 @@ import { PublicProfile } from '../../interfaces/profile.interface';
   styleUrl: './public-profile.css',
 })
 export class PublicProfileComponent implements OnInit {
+  // ...existing code...
+  // ...existing code...
+  // goToPublicProfile is now correctly placed inside the class
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private chefService = inject(ChefService);
@@ -68,8 +72,13 @@ export class PublicProfileComponent implements OnInit {
     return this.chef?.menus ?? [];
   }
 
+
   goToMenu(menuId: number): void {
     this.router.navigate(['/service-detail', 'menu', menuId]);
+  }
+
+  goToPublicProfile(id: number): void {
+    this.router.navigate(['/public-profile', id]);
   }
 
   scrollMenus(direction: 1 | -1): void {
