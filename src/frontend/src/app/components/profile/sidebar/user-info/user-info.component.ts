@@ -147,7 +147,7 @@ export class UserInfoComponent implements OnInit {
   }
 
   private loadChefCoverPhoto(chefId: number): void {
-    this.chefService.getChefPublicProfile(chefId).subscribe({
+    this.chefService.getPublicProfile(chefId).subscribe({
       next: (chef) => {
         this.chefCoverPhotoUrl = chef.coverPhoto || '';
       },
