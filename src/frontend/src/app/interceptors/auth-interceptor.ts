@@ -15,7 +15,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/api/auth/check-username',
     '/api/auth/check-email',
     '/api/chef/menus/public',
-    '/api/chef/search'
+    '/api/chef/search',
+    '/api/public-profile'
   ];
 
   // Dynamic public URL patterns (e.g. /api/chef/42/profile, /api/chef/menus/7/public)

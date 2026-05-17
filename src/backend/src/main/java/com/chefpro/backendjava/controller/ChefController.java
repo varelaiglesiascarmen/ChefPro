@@ -159,6 +159,13 @@ public class ChefController {
     }
   }
 
+  @Operation(summary = "Ver perfil público de un chef", description = "Devuelve el perfil completo de un chef: datos personales, menús, reseñas y fechas ocupadas. Endpoint público.")
+  @GetMapping("/public-profile/{id}")
+  public ResponseEntity<ChefPublicDetailDto> getPublicProfile(@PathVariable Long id) {
+    ChefPublicDetailDto chefProfile = chefProfileService.getChefPublicProfile(id);
+    return ResponseEntity.ok(chefProfile);
+  }
+
   // Authenticated profile
 
   @Operation(summary = "Actualizar perfil del chef", description = "Actualiza los campos del perfil profesional del chef: bio, localización, idiomas, premios y fotos.")

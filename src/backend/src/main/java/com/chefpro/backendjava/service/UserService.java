@@ -4,6 +4,7 @@ import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.LoginRequestDto;
 import com.chefpro.backendjava.common.object.dto.login.UpdateProfileDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
+import com.chefpro.backendjava.common.object.dto.PublicProfileDto;
 
 public interface UserService {
 
@@ -18,4 +19,8 @@ public interface UserService {
   boolean existsByEmail(String email);
 
   void deleteAccount(String userEmail);
+
+  PublicProfileDto getUserPublicProfile(Long userId);
+
+  PublicProfileDto getPublicProfile(Long userId);
 }
