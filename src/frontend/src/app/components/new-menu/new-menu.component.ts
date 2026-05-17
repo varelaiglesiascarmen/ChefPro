@@ -161,7 +161,12 @@ export class NewMenuComponent implements OnInit {
 
     this.chefService.createMenu(menuPayload).subscribe({
       next: (resMenu: any) => {
-        const newMenuId = resMenu.menu_ID;
+        const newMenuId = resMenu?.menuId ?? resMenu?.menu_ID;
+        if (!newMenuId) {
+          this.isSaving = false;
+          this.toastService.error('No se recibió el identificador del menú creado. Intenta nuevamente.');
+          return;
+        }
 
         from(Promise.all(this.dishes.map(async (dish, index) => {
           const allergenNames = dish.allergenIds.map((id: number) => {
@@ -172,8 +177,8 @@ export class NewMenuComponent implements OnInit {
           const photoBase64 = dish.photo ? await this.fileToBase64(dish.photo) : null;
 
           return {
-            menu_ID: newMenuId,
-            dish_ID: index + 1,
+            menuId: newMenuId,
+            dishId: index + 1,
             title: dish.title,
             description: dish.description,
             category: dish.category,
@@ -188,7 +193,7 @@ export class NewMenuComponent implements OnInit {
         ).subscribe({
           next: () => {
             this.toastService.success('¡Menú creado con éxito!');
-            this.router.navigate(['/profile']);
+            this.router.navigate(['/profile/menus']);
           },
           error: () => {
             this.toastService.error('No pudimos crear todos los platos del menú. Intenta nuevamente.');
