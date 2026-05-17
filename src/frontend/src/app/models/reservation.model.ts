@@ -18,7 +18,9 @@ export interface ReservationCreateDto {
 export interface ReservationStatusUpdate {
   chefId: number;
   date: string;
-  status: 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  status?: 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  paymentStatus?: 'PENDING' | 'PAID';
+  cancellationReason?: string;
   numberOfDiners?: number;
   address?: string;
   menuId?: number;
