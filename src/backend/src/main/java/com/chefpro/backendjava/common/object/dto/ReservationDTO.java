@@ -22,6 +22,8 @@ public class ReservationDTO {
   private Integer numberOfDiners;
   private String address;
   private Reservation.ReservationStatus status;
+  private Reservation.ReservationPaymentStatus paymentStatus;
+  private String cancellationReason;
 
 
   private BigDecimal totalPrice;
