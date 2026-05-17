@@ -65,6 +65,7 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.GET, "/api/chef/search").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/chef/{chefId}/profile").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/chef/menus/{menuId}/public").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/public-profile/**").permitAll()
 
         // Chef-only
         .requestMatchers("/api/chef/**").hasAuthority("ROLE_CHEF")

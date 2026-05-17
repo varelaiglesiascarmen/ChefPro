@@ -10,6 +10,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { UserMenuComponent } from './components/user-menu/user-menu.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
+import { PublicProfileComponent } from './components/public-profile/public-profile';
 import { NewMenuComponent } from './components/new-menu/new-menu.component';
 import { EditMenuComponent } from './components/profile/sidebar/edit-menu/edit-menu.component';
 import { UserInfoComponent } from './components/profile/sidebar/user-info/user-info.component';
@@ -45,6 +46,8 @@ export const routes: Routes = [
   { path: 'search-results', component: SearchResultsComponent },
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
+  // public-profile root
+  { path: 'public-profile/:id', component: PublicProfileComponent },
 
   // login root (redirect to profile if already authenticated)
   { path: 'login', component: LoginComponent, canActivate: [authRedirectGuard] },

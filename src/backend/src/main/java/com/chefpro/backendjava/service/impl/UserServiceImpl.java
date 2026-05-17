@@ -4,16 +4,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import com.chefpro.backendjava.common.object.dto.PublicProfileDto;
+import com.chefpro.backendjava.common.object.dto.ReviewSummaryDto;
 import com.chefpro.backendjava.common.object.dto.SignUpReqDto;
 import com.chefpro.backendjava.common.object.dto.login.UpdateProfileDto;
 import com.chefpro.backendjava.common.object.dto.login.UserLoginDto;
 import com.chefpro.backendjava.common.object.entity.Chef;
 import com.chefpro.backendjava.common.object.entity.Diner;
+import com.chefpro.backendjava.common.object.entity.Review;
 import com.chefpro.backendjava.common.object.entity.UserLogin;
 import com.chefpro.backendjava.common.object.entity.UserRoleEnum;
 import com.chefpro.backendjava.repository.ChefRepository;
 import com.chefpro.backendjava.repository.CustomUserRepository;
 import com.chefpro.backendjava.repository.DinerRepository;
+import com.chefpro.backendjava.repository.ReviewRepository;
 import com.chefpro.backendjava.service.UserService;
 
 @Component("userService")
@@ -23,15 +31,18 @@ public class UserServiceImpl implements UserService {
   private final DinerRepository dinerRepository;
   private final ChefRepository chefRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ReviewRepository reviewRepository;
 
   public UserServiceImpl(CustomUserRepository customUserRepository,
                          DinerRepository dinerRepository,
                          ChefRepository chefRepository,
-                         PasswordEncoder passwordEncoder) {
+                         PasswordEncoder passwordEncoder,
+                         ReviewRepository reviewRepository) {
     this.customUserRepository = customUserRepository;
     this.dinerRepository = dinerRepository;
     this.chefRepository = chefRepository;
     this.passwordEncoder = passwordEncoder;
+    this.reviewRepository = reviewRepository;
   }
 
   @Override
@@ -166,5 +177,93 @@ public class UserServiceImpl implements UserService {
     }
 
     return dto;
+  }
+
+  @Override
+  public PublicProfileDto getUserPublicProfile(Long userId) {
+    UserLogin user = customUserRepository.findById(userId)
+      .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+
+    List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(userId);
+    List<ReviewSummaryDto> reviewSummaries = reviews.stream()
+      .map(r -> ReviewSummaryDto.builder()
+        .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
+        .date(r.getDate() != null ? r.getDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "")
+        .score(r.getScore())
+        .comment(r.getComment())
+        .build())
+      .collect(Collectors.toList());
+
+    Double rating = reviewRepository.findAverageScoreByReviewedUserId(userId);
+    Long reviewsCount = reviewRepository.countByReviewedUserId(userId);
+
+    return PublicProfileDto.builder()
+      .id(user.getId())
+      .name(user.getName())
+      .lastname(user.getLastname())
+      .fullName(user.getName() + " " + user.getLastname())
+      .email(user.getEmail())
+      .phoneNumber(user.getPhoneNumber())
+      .photo(user.getPhoto())
+      .bio("") // Si hay bio para comensal, añadir aquí
+      .location("") // Si hay location para comensal, añadir aquí
+      .languages("") // Si hay languages para comensal, añadir aquí
+      .rating(rating != null ? Math.round(rating * 10.0) / 10.0 : 0.0)
+      .reviewsCount(reviewsCount != null ? reviewsCount : 0L)
+      .reviews(reviewSummaries)
+      .build();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public PublicProfileDto getPublicProfile(Long userId) {
+    UserLogin user = customUserRepository.findById(userId)
+      .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+
+    List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(userId);
+    List<ReviewSummaryDto> reviewSummaries = reviews.stream()
+      .map(r -> ReviewSummaryDto.builder()
+        .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
+        .date(r.getDate() != null ? r.getDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "")
+        .score(r.getScore())
+        .comment(r.getComment())
+        .build())
+      .collect(Collectors.toList());
+
+    Double rating = reviewRepository.findAverageScoreByReviewedUserId(userId);
+    Long reviewsCount = reviewRepository.countByReviewedUserId(userId);
+
+    // Detectar si es chef y enriquecer datos
+    String bio = "";
+    String location = "";
+    String languages = "";
+    String photo = user.getPhoto();
+
+    if (user.getRole() == UserRoleEnum.CHEF) {
+      Chef chef = chefRepository.findByUser_Username(user.getUsername())
+        .orElse(null);
+      if (chef != null) {
+        bio = chef.getBio() != null ? chef.getBio() : "";
+        location = chef.getLocation() != null ? chef.getLocation() : "";
+        languages = chef.getLanguages() != null ? chef.getLanguages() : "";
+        if (chef.getPhoto() != null) photo = chef.getPhoto();
+      }
+    }
+
+    return PublicProfileDto.builder()
+      .id(user.getId())
+      .name(user.getName())
+      .lastname(user.getLastname())
+      .fullName(user.getName() + " " + user.getLastname())
+      .email(user.getEmail())
+      .phoneNumber(user.getPhoneNumber())
+      .photo(photo)
+      .bio(bio)
+      .location(location)
+      .languages(languages)
+      .rating(rating != null ? Math.round(rating * 10.0) / 10.0 : 0.0)
+      .reviewsCount(reviewsCount != null ? reviewsCount : 0L)
+      .reviews(reviewSummaries)
+      .build();
   }
 }

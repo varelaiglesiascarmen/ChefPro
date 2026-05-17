@@ -76,6 +76,7 @@ public class ChefProfileServiceImpl implements ChefProfileService {
         .build())
       .collect(Collectors.toList());
 
+    // Obtener reviews donde el usuario es el chef o el comensal puntuado
     List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(chefId);
     List<ReviewSummaryDto> reviewSummaries = reviews.stream()
       .map(r -> ReviewSummaryDto.builder()
