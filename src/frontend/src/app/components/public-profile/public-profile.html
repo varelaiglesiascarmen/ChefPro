@@ -31,10 +31,10 @@
 			</div>
 		</header>
 
-		<div class="body-grid">
+		<div class="body-grid" [class.single-column]="!isChefProfile">
 			<section class="info-card">
-				<h2>Sobre este chef</h2>
-				<p class="bio-text">{{ chef.bio || 'Este chef todavía no ha añadido una biografía pública.' }}</p>
+				<h2>{{ isChefProfile ? 'Sobre este chef' : 'Sobre este usuario' }}</h2>
+				<p class="bio-text">{{ chef.bio || 'Este usuario todavía no ha añadido una biografía pública.' }}</p>
 
 				<div *ngIf="languageTags.length > 0" class="language-block">
 					<h3>Idiomas</h3>
@@ -44,20 +44,29 @@
 				</div>
 			</section>
 
-			<aside class="quick-card">
+			<aside class="quick-card" *ngIf="isChefProfile">
 				<h3>¿Te interesa este chef?</h3>
 				<p>Explora sus menús y revisa su disponibilidad para reservar tu próxima experiencia.</p>
 				<a [routerLink]="['/search-results']" class="action-btn">Buscar experiencias</a>
 			</aside>
 		</div>
 
-		<section class="list-section" *ngIf="chef.menus && chef.menus.length > 0">
+		<section class="list-section" *ngIf="isChefProfile && chefMenus.length > 0">
 			<div class="section-header">
-				<h2>Menús publicados</h2>
+				<h2>Propuestas gastronómicas</h2>
+
+				<div class="carousel-actions" *ngIf="chefMenus.length > 1">
+					<button type="button" class="carousel-btn" (click)="scrollMenus(-1)" aria-label="Ver menús anteriores">
+						‹
+					</button>
+					<button type="button" class="carousel-btn" (click)="scrollMenus(1)" aria-label="Ver más menús">
+						›
+					</button>
+				</div>
 			</div>
 
-			<div class="menus-grid">
-				<article *ngFor="let menu of chef.menus" class="menu-card" (click)="goToMenu(menu.id)">
+			<div class="menus-carousel" #menusTrack>
+				<article *ngFor="let menu of chefMenus" class="menu-card" (click)="goToMenu(menu.id)">
 					<div class="menu-top">
 						<h3>{{ menu.title }}</h3>
 						<span class="price">{{ menu.price | number:'1.0-2' }}€ / persona</span>
@@ -73,25 +82,27 @@
 			</div>
 		</section>
 
-		<section class="list-section" *ngIf="chef.reviews && chef.reviews.length > 0">
+		<section class="list-section">
 			<div class="section-header">
 				<h2>Reseñas recientes</h2>
 			</div>
-
-			<div class="reviews-grid">
+			<div *ngIf="chef.reviews && chef.reviews.length > 0; else noReviewsBlock" class="reviews-grid">
 				<article *ngFor="let review of chef.reviews" class="review-card">
 					<header>
-						<strong>{{ review.reviewerName }}</strong>
+						<span class="review-user clickable-profile-link" (click)="goToPublicProfile(review.reviewerId)">{{ review.reviewerName }}</span>
 						<span>{{ review.date }}</span>
 					</header>
-
 					<div class="stars-row">
 						<span *ngFor="let star of reviewsStars" [class.filled]="star <= review.score">★</span>
 					</div>
-
 					<p>{{ review.comment }}</p>
 				</article>
 			</div>
+			<ng-template #noReviewsBlock>
+				<div class="empty-card" style="padding:2rem;text-align:center;color:#9c8b7a;">
+					<p>Este usuario todavía no ha recibido ninguna reseña.</p>
+				</div>
+			</ng-template>
 		</section>
 	</article>
 </section>

@@ -63,6 +63,14 @@ public class Reservation {
   @Builder.Default
   private ReservationStatus status = ReservationStatus.PENDING;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "payment_status", nullable = false)
+  @Builder.Default
+  private ReservationPaymentStatus paymentStatus = ReservationPaymentStatus.PENDING;
+
+  @Column(name = "cancellation_reason", length = 100)
+  private String cancellationReason;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
@@ -74,6 +82,9 @@ public class Reservation {
     if (status == null) {
       status = ReservationStatus.PENDING;
     }
+    if (paymentStatus == null) {
+      paymentStatus = ReservationPaymentStatus.PENDING;
+    }
   }
 
   // Enum para el status
@@ -83,6 +94,11 @@ public class Reservation {
     REJECTED,
     CANCELLED,
     COMPLETED
+  }
+
+  public enum ReservationPaymentStatus {
+    PENDING,
+    PAID
   }
 
   // Clase interna para la clave compuesta

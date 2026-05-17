@@ -20,4 +20,6 @@ public class ReservationsUReqDto {
   private String address;
   private Long menuId;
   private Reservation.ReservationStatus status;
+  private Reservation.ReservationPaymentStatus paymentStatus;
+  private String cancellationReason;
 }

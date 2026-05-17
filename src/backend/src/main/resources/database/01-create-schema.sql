@@ -140,6 +140,8 @@ CREATE TABLE `reservations` (
   `n_diners` int(11) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
   `status` enum('PENDING','CONFIRMED','REJECTED','CANCELLED','COMPLETED') NOT NULL DEFAULT 'PENDING',
+  `payment_status` enum('PENDING','PAID') NOT NULL DEFAULT 'PENDING',
+  `cancellation_reason` varchar(100) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`chef_ID`,`date`),
   KEY `diner_ID` (`diner_ID`),

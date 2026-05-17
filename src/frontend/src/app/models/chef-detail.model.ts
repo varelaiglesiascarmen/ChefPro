@@ -4,6 +4,7 @@
  */
 
 export interface ReviewSummary {
+  reviewerId: number;
   reviewerName: string;
   date: string;
   score: number;

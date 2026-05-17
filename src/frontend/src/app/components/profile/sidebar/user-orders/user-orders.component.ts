@@ -17,6 +17,8 @@ export interface Order {
   guests: number;
   price: string;
   status: 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  paymentStatus: 'PENDING' | 'PAID';
+  cancellationReason: string | null;
   location: string;
 }
 
@@ -28,6 +30,8 @@ export interface ReservationApi {
   numberOfDiners: number;
   address: string;
   status: 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  paymentStatus: 'PENDING' | 'PAID';
+  cancellationReason: string | null;
   chefName: string;
   dinerName: string;
   menuTitle: string;
@@ -47,7 +51,7 @@ export class UserOrdersComponent implements OnInit {
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
-  activeTab: 'PENDING' | 'CONFIRMED' | 'COMPLETED' = 'PENDING';
+  activeTab: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' = 'PENDING';
   isLoading = true;
   orders: Order[] = [];
   userRole: string | null = null;
@@ -58,7 +62,7 @@ export class UserOrdersComponent implements OnInit {
   reviewedReservationIds = new Set<string>();
 
   // Para confirmaciones
-  confirmActionType: 'reject' | 'cancel' | null = null;
+  confirmActionType: 'reject' | 'cancel' | 'pay' | null = null;
   selectedOrderForConfirmation: Order | null = null;
 
   ngOnInit() {
@@ -106,7 +110,11 @@ export class UserOrdersComponent implements OnInit {
     return this.orders.filter(o => o.status === 'COMPLETED');
   }
 
-  setTab(tab: 'PENDING' | 'CONFIRMED' | 'COMPLETED') {
+  get cancelledOrders() {
+    return this.orders.filter(o => o.status === 'CANCELLED');
+  }
+
+  setTab(tab: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED') {
     this.activeTab = tab;
   }
 
@@ -169,6 +177,40 @@ export class UserOrdersComponent implements OnInit {
     this.confirmActionType = 'cancel';
   }
 
+  showPayConfirmation(order: Order) {
+    this.selectedOrderForConfirmation = order;
+    this.confirmActionType = 'pay';
+  }
+
+  confirmPay() {
+    if (!this.selectedOrderForConfirmation) return;
+
+    const order = this.selectedOrderForConfirmation;
+    const payload = {
+      chefId: order.chefId,
+      date: order.dateRaw,
+      paymentStatus: 'PAID' as const
+    };
+
+    this.http.patch<ReservationApi>(`${environment.apiUrl}/reservations/status`, payload).subscribe({
+      next: (updated) => {
+        order.paymentStatus = updated.paymentStatus;
+        order.status = updated.status;
+        order.cancellationReason = updated.cancellationReason || null;
+        if (updated.status === 'CANCELLED' && updated.cancellationReason === 'PAYMENT_OUT_OF_DEADLINE') {
+          this.toastService.warning('No se pudo registrar el pago: reserva cancelada por pago fuera de plazo.');
+        } else {
+          this.toastService.success('Pago registrado correctamente. Demo sin cobro real.');
+        }
+        this.closeConfirmation();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toastService.error('No se pudo registrar el pago. Inténtalo de nuevo.');
+      }
+    });
+  }
+
   confirmCancel() {
     if (this.selectedOrderForConfirmation) {
       this.cancelOrder(this.selectedOrderForConfirmation);
@@ -220,6 +262,42 @@ export class UserOrdersComponent implements OnInit {
     return labels[status] || status;
   }
 
+  getCancelledStatusLabel(order: Order): string {
+    if (order.cancellationReason === 'PAYMENT_OUT_OF_DEADLINE') {
+      return 'Cancelada: pagada fuera de plazo';
+    }
+    return 'Cancelada';
+  }
+
+  getConfirmedStatusLabel(order: Order): string {
+    if (this.userRole !== 'DINER') {
+      return 'Confirmada';
+    }
+
+    return this.isReservationPaid(order) ? 'Pagada' : 'Pendiente de pago';
+  }
+
+  getConfirmedStatusClass(order: Order): 'success' | 'warning' {
+    if (this.userRole !== 'DINER') {
+      return 'success';
+    }
+
+    return this.isReservationPaid(order) ? 'success' : 'warning';
+  }
+
+  isReservationPaid(order: Order): boolean {
+    return order.paymentStatus === 'PAID';
+  }
+
+  showPaymentDeadlineWarning(order: Order): boolean {
+    if (this.userRole !== 'DINER' || order.status !== 'CONFIRMED' || this.isReservationPaid(order)) {
+      return false;
+    }
+
+    const daysUntilService = this.getDaysUntilService(order.dateRaw);
+    return daysUntilService <= 2;
+  }
+
   getStatusColor(status: string): string {
     const colors: Record<string, string> = {
       'PENDING': '#f59e0b',
@@ -242,8 +320,22 @@ export class UserOrdersComponent implements OnInit {
       guests: reservation.numberOfDiners || 0,
       price: (reservation.totalPrice || 0).toFixed(2),
       status: reservation.status as any,
+      paymentStatus: reservation.paymentStatus || 'PENDING',
+      cancellationReason: reservation.cancellationReason || null,
       location: reservation.address || ''
     };
+  }
+
+  private getDaysUntilService(dateRaw: string): number {
+    const [year, month, day] = dateRaw.split('-').map(Number);
+    const serviceDate = new Date(year, month - 1, day);
+    serviceDate.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const msPerDay = 24 * 60 * 60 * 1000;
+    return Math.floor((serviceDate.getTime() - today.getTime()) / msPerDay);
   }
 }
 
