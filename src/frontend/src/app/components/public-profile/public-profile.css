@@ -1,3 +1,55 @@
+/* Reuse clickable-profile-link style from service-detail for consistency */
+.review-user {
+	font-weight: 600;
+	color: var(--dark-brown, #4E240A);
+}
+
+.clickable-profile-link {
+	cursor: pointer;
+	transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+	color: var(--dark-brown, #4E240A);
+	position: relative;
+	display: inline-block;
+}
+
+.clickable-profile-link::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background: var(--gold-primary, #A67C00);
+	transition: width 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.clickable-profile-link:hover {
+	color: var(--gold-primary, #A67C00);
+}
+
+.clickable-profile-link:hover::after {
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.clickable-profile-link {
+		text-decoration: underline;
+		text-decoration-color: rgba(166, 124, 0, 0.3);
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+
+	.clickable-profile-link:active {
+		color: var(--gold-primary, #A67C00);
+		text-decoration-color: var(--gold-primary, #A67C00);
+	}
+
+	.review-user::before {
+		content: '👤 ';
+		margin-right: 4px;
+		opacity: 0.7;
+	}
+}
 :host {
 	display: block;
 	width: 100%;

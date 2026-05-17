@@ -82,25 +82,27 @@
 			</div>
 		</section>
 
-		<section class="list-section" *ngIf="chef.reviews && chef.reviews.length > 0">
+		<section class="list-section">
 			<div class="section-header">
 				<h2>Reseñas recientes</h2>
 			</div>
-
-			<div class="reviews-grid">
+			<div *ngIf="chef.reviews && chef.reviews.length > 0; else noReviewsBlock" class="reviews-grid">
 				<article *ngFor="let review of chef.reviews" class="review-card">
 					<header>
-						<strong>{{ review.reviewerName }}</strong>
+						<span class="review-user clickable-profile-link" (click)="goToPublicProfile(review.reviewerId)">{{ review.reviewerName }}</span>
 						<span>{{ review.date }}</span>
 					</header>
-
 					<div class="stars-row">
 						<span *ngFor="let star of reviewsStars" [class.filled]="star <= review.score">★</span>
 					</div>
-
 					<p>{{ review.comment }}</p>
 				</article>
 			</div>
+			<ng-template #noReviewsBlock>
+				<div class="empty-card" style="padding:2rem;text-align:center;color:#9c8b7a;">
+					<p>Este usuario todavía no ha recibido ninguna reseña.</p>
+				</div>
+			</ng-template>
 		</section>
 	</article>
 </section>
