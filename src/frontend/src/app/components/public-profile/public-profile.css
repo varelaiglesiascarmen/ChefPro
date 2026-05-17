@@ -123,6 +123,10 @@
 	gap: 1.4rem;
 }
 
+.body-grid.single-column {
+	grid-template-columns: 1fr;
+}
+
 .info-card,
 .quick-card,
 .menu-card,
@@ -208,13 +212,62 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 1rem;
 }
 
-.menus-grid,
+.menus-carousel,
 .reviews-grid {
 	display: grid;
 	gap: 1rem;
+
+}
+
+.menus-carousel {
+	grid-auto-flow: column;
+	grid-auto-columns: minmax(280px, 360px);
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	padding-bottom: 0.35rem;
+	scrollbar-width: thin;
+}
+
+.menus-carousel::-webkit-scrollbar {
+	height: 8px;
+}
+
+.menus-carousel::-webkit-scrollbar-thumb {
+	background: #d7c1a0;
+	border-radius: 999px;
+}
+
+.reviews-grid {
 	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.carousel-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.carousel-btn {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	border: 1px solid #e5d4be;
+	background: #fff;
+	color: #7f610d;
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	box-shadow: 0 8px 20px rgba(81, 33, 9, 0.08);
+	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.carousel-btn:hover {
+	transform: translateY(-2px);
+	border-color: #d8bb84;
+	box-shadow: 0 12px 24px rgba(81, 33, 9, 0.12);
 }
 
 .menu-card,
@@ -223,6 +276,7 @@
 }
 
 .menu-card {
+	scroll-snap-align: start;
 	cursor: pointer;
 	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
@@ -315,6 +369,10 @@
 	.public-profile-shell {
 		width: min(1180px, 96vw);
 		margin-top: 1rem;
+	}
+
+	.carousel-actions {
+		display: none;
 	}
 
 	.hero {

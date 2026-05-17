@@ -232,6 +232,7 @@ export class ServiceDetailPageComponent implements OnInit {
             maxDiners: m.maxDiners
           })),
           reviewsList: (chef.reviews || []).map((r: any) => ({
+            reviewerId: r.reviewerId,
             user: r.reviewerName,
             date: r.date,
             rating: r.score,
@@ -301,5 +302,5 @@ export class ServiceDetailPageComponent implements OnInit {
   }
 
   goToMenu(id: number) { this.router.navigate(['/service-detail', 'menu', id]); }
-  goToChefProfile(id: number) { this.router.navigate(['/service-detail', 'chef', id]); }
+  goToPublicProfile(id: number) { this.router.navigate(['/public-profile', id]); }
 }
