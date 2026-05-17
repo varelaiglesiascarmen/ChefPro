@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ChefService } from '../../services/chef.service';
@@ -15,6 +15,7 @@ export class PublicProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private chefService = inject(ChefService);
+  private cdr = inject(ChangeDetectorRef);
 
   isLoading = true;
   errorMessage: string | null = null;
@@ -27,6 +28,7 @@ export class PublicProfileComponent implements OnInit {
       if (!id || Number.isNaN(id)) {
         this.errorMessage = 'No se ha encontrado el usuario.';
         this.isLoading = false;
+        this.cdr.detectChanges();
         return;
       }
 
@@ -74,10 +76,12 @@ export class PublicProfileComponent implements OnInit {
           fullName: `${profile.name} ${profile.lastname}`,
         };
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'No se ha encontrado el perfil.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
     });
   }
