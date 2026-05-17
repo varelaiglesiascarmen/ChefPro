@@ -138,6 +138,8 @@ CREATE TABLE `reservations` (
   `n_diners` int NOT NULL,
   `address` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `status` enum('PENDING','CONFIRMED','REJECTED','CANCELLED') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING',
+  `payment_status` enum('PENDING','PAID') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING',
+  `cancellation_reason` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`chef_ID`,`date`),
   KEY `diner_ID` (`diner_ID`),

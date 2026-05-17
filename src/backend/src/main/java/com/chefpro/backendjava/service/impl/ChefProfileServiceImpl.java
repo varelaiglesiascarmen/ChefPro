@@ -80,6 +80,7 @@ public class ChefProfileServiceImpl implements ChefProfileService {
     List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(chefId);
     List<ReviewSummaryDto> reviewSummaries = reviews.stream()
       .map(r -> ReviewSummaryDto.builder()
+        .reviewerId(r.getReviewerUser().getId())
         .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
         .date(r.getDate() != null ? r.getDate().format(DATE_FORMATTER) : "")
         .score(r.getScore())

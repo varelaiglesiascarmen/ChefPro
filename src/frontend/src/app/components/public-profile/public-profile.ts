@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+// ...existing code...
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ChefService } from '../../services/chef.service';
@@ -12,10 +13,15 @@ import { PublicProfile } from '../../interfaces/profile.interface';
   styleUrl: './public-profile.css',
 })
 export class PublicProfileComponent implements OnInit {
+  // ...existing code...
+  // ...existing code...
+  // goToPublicProfile is now correctly placed inside the class
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private chefService = inject(ChefService);
   private cdr = inject(ChangeDetectorRef);
+
+  @ViewChild('menusTrack') menusTrack?: ElementRef<HTMLElement>;
 
   isLoading = true;
   errorMessage: string | null = null;
@@ -56,8 +62,31 @@ export class PublicProfileComponent implements OnInit {
     return [1, 2, 3, 4, 5];
   }
 
+  get isChefProfile(): boolean {
+    return this.chefMenus.length > 0 || Boolean(
+      this.chef?.prizes || this.chef?.coverPhoto || this.chef?.languages || this.chef?.location
+    );
+  }
+
+  get chefMenus(): any[] {
+    return this.chef?.menus ?? [];
+  }
+
+
   goToMenu(menuId: number): void {
     this.router.navigate(['/service-detail', 'menu', menuId]);
+  }
+
+  goToPublicProfile(id: number): void {
+    this.router.navigate(['/public-profile', id]);
+  }
+
+  scrollMenus(direction: 1 | -1): void {
+    const track = this.menusTrack?.nativeElement;
+    if (!track) return;
+
+    const amount = Math.max(track.clientWidth * 0.82, 280) * direction;
+    track.scrollBy({ left: amount, behavior: 'smooth' });
   }
 
   goBack(): void {

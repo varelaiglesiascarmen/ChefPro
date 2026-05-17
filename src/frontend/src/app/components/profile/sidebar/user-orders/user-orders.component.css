@@ -265,6 +265,12 @@
   border: 1px solid rgba(46, 125, 50, 0.3);
 }
 
+.status-badge.danger {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+  border: 1px solid rgba(220, 38, 38, 0.28);
+}
+
 .card-body {
   padding: 28px 25px;
   flex-grow: 1;
@@ -439,6 +445,30 @@
 
 .diner-status-info i {
   font-size: 0.9rem;
+}
+
+.diner-status-info.paid {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #047857;
+}
+
+.payment-deadline-warning {
+  margin: 8px 0 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff4d6;
+  border-left: 4px solid #d97706;
+  color: #92400e;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.payment-deadline-warning i {
+  margin-top: 2px;
 }
 
 .fadeIn {
@@ -704,6 +734,16 @@
   background: #520a0a;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(101, 15, 15, 0.3);
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, var(--gold) 0%, #b8923e 100%);
+  color: #fff;
+}
+
+.btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(197, 160, 89, 0.35);
 }
 
 @keyframes fadeIn {
