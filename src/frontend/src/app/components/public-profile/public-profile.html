@@ -1,0 +1,97 @@
+<section class="public-profile-shell">
+	<div *ngIf="isLoading" class="state-box">
+		<div class="spinner"></div>
+		<p>Cargando perfil público...</p>
+	</div>
+
+	<div *ngIf="!isLoading && errorMessage" class="state-box state-error">
+		<h2>No se pudo mostrar el perfil</h2>
+		<p>{{ errorMessage }}</p>
+		<button type="button" class="action-btn" (click)="goBack()">Volver a explorar</button>
+	</div>
+
+	<article *ngIf="!isLoading && chef && !errorMessage" class="profile-content">
+		<header class="hero" [style.backgroundImage]="'url(' + heroCover + ')'">
+			<div class="hero-overlay"></div>
+
+			<div class="hero-main">
+				<img [src]="avatar" alt="Foto del chef" class="avatar">
+
+				<div class="identity">
+					<p class="eyebrow">Perfil público</p>
+					<h1>{{ chef.fullName }}</h1>
+
+					<div class="meta-row">
+						<span *ngIf="chef.location">📍 {{ chef.location }}</span>
+						<span>⭐ {{ chef.rating | number:'1.1-1' }} ({{ chef.reviewsCount }} reseñas)</span>
+					</div>
+
+					<span *ngIf="chef.prizes" class="award-pill">{{ chef.prizes }}</span>
+				</div>
+			</div>
+		</header>
+
+		<div class="body-grid">
+			<section class="info-card">
+				<h2>Sobre este chef</h2>
+				<p class="bio-text">{{ chef.bio || 'Este chef todavía no ha añadido una biografía pública.' }}</p>
+
+				<div *ngIf="languageTags.length > 0" class="language-block">
+					<h3>Idiomas</h3>
+					<div class="tags">
+						<span *ngFor="let lang of languageTags" class="tag">{{ lang }}</span>
+					</div>
+				</div>
+			</section>
+
+			<aside class="quick-card">
+				<h3>¿Te interesa este chef?</h3>
+				<p>Explora sus menús y revisa su disponibilidad para reservar tu próxima experiencia.</p>
+				<a [routerLink]="['/search-results']" class="action-btn">Buscar experiencias</a>
+			</aside>
+		</div>
+
+		<section class="list-section" *ngIf="chef.menus && chef.menus.length > 0">
+			<div class="section-header">
+				<h2>Menús publicados</h2>
+			</div>
+
+			<div class="menus-grid">
+				<article *ngFor="let menu of chef.menus" class="menu-card" (click)="goToMenu(menu.id)">
+					<div class="menu-top">
+						<h3>{{ menu.title }}</h3>
+						<span class="price">{{ menu.price | number:'1.0-2' }}€ / persona</span>
+					</div>
+
+					<p>{{ menu.description }}</p>
+
+					<div class="menu-footer">
+						<span>{{ menu.dishesCount }} platos</span>
+						<span>{{ menu.minDiners }}-{{ menu.maxDiners }} personas</span>
+					</div>
+				</article>
+			</div>
+		</section>
+
+		<section class="list-section" *ngIf="chef.reviews && chef.reviews.length > 0">
+			<div class="section-header">
+				<h2>Reseñas recientes</h2>
+			</div>
+
+			<div class="reviews-grid">
+				<article *ngFor="let review of chef.reviews" class="review-card">
+					<header>
+						<strong>{{ review.reviewerName }}</strong>
+						<span>{{ review.date }}</span>
+					</header>
+
+					<div class="stars-row">
+						<span *ngFor="let star of reviewsStars" [class.filled]="star <= review.score">★</span>
+					</div>
+
+					<p>{{ review.comment }}</p>
+				</article>
+			</div>
+		</section>
+	</article>
+</section>

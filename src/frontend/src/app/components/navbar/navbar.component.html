@@ -17,7 +17,7 @@
     <a *ngIf="!currentUser" routerLink="/signIn" (click)="isMenuOpen = false">Únete</a>
     <!-- Conditional link: "Perfil" for logged-in users -->
     <a *ngIf="currentUser" routerLink="/profile/orders" (click)="isMenuOpen = false">Mis reservas</a>
-    <a *ngIf="currentUser" routerLink="/profile" (click)="isMenuOpen = false">Perfil</a>
+    <a *ngIf="currentUser" [routerLink]="['/public-profile', currentUser.user_ID]" (click)="isMenuOpen = false">Perfil</a>
   </div>
 
   <div class="nav-actions">
