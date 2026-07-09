@@ -50,7 +50,7 @@ class ChefControllerTest {
     MenuDTO menu = mock(MenuDTO.class);
     when(menuService.listByChef(authentication)).thenReturn(List.of(menu));
 
-    List<MenuDTO> result = controller.getMenusDelChef(authentication);
+    List<MenuDTO> result = controller.listarMenusChef(authentication);
 
     assertNotNull(result);
     assertEquals(1, result.size());
@@ -61,7 +61,7 @@ class ChefControllerTest {
   void getMenusDelChef_serviceThrows_propagatesException() {
     when(menuService.listByChef(authentication)).thenThrow(new RuntimeException("DB error"));
 
-    assertThrows(RuntimeException.class, () -> controller.getMenusDelChef(authentication));
+    assertThrows(RuntimeException.class, () -> controller.listarMenusChef(authentication));
     verify(menuService).listByChef(authentication);
   }
 
@@ -73,7 +73,7 @@ class ChefControllerTest {
     MenuDTO created = mock(MenuDTO.class);
     when(menuService.createMenu(req, authentication)).thenReturn(created);
 
-    ResponseEntity<MenuDTO> response = controller.crearMenu(req, authentication);
+    ResponseEntity<MenuDTO> response = controller.createMenu(req, authentication);
 
     assertEquals(201, response.getStatusCode().value());
     assertEquals(created, response.getBody());
@@ -85,7 +85,7 @@ class ChefControllerTest {
     MenuCReqDto req = mock(MenuCReqDto.class);
     when(menuService.createMenu(req, authentication)).thenThrow(new IllegalArgumentException("Invalid data"));
 
-    assertThrows(IllegalArgumentException.class, () -> controller.crearMenu(req, authentication));
+    assertThrows(IllegalArgumentException.class, () -> controller.createMenu(req, authentication));
     verify(menuService).createMenu(req, authentication);
   }
 
@@ -95,7 +95,7 @@ class ChefControllerTest {
   void deleteMenu_success_returns204() {
     doNothing().when(menuService).deleteMenu(authentication, 1L);
 
-    ResponseEntity<Void> response = controller.deleteMenu(authentication, 1L);
+    ResponseEntity<Void> response = controller.eliminarMenu(authentication, 1L);
 
     assertEquals(204, response.getStatusCode().value());
     verify(menuService).deleteMenu(authentication, 1L);
@@ -105,7 +105,7 @@ class ChefControllerTest {
   void deleteMenu_serviceThrows_propagatesException() {
     doThrow(new NoSuchElementException("Menu not found")).when(menuService).deleteMenu(authentication, 99L);
 
-    assertThrows(NoSuchElementException.class, () -> controller.deleteMenu(authentication, 99L));
+    assertThrows(NoSuchElementException.class, () -> controller.eliminarMenu(authentication, 99L));
     verify(menuService).deleteMenu(authentication, 99L);
   }
 
@@ -117,7 +117,7 @@ class ChefControllerTest {
     MenuDTO updated = mock(MenuDTO.class);
     when(menuService.updateMenu(authentication, req)).thenReturn(updated);
 
-    MenuDTO result = controller.patchMenu(authentication, req);
+    MenuDTO result = controller.actualizarMenu(authentication, req);
 
     assertEquals(updated, result);
     verify(menuService).updateMenu(authentication, req);
@@ -128,7 +128,7 @@ class ChefControllerTest {
     MenuUReqDto req = mock(MenuUReqDto.class);
     when(menuService.updateMenu(authentication, req)).thenThrow(new RuntimeException("Update failed"));
 
-    assertThrows(RuntimeException.class, () -> controller.patchMenu(authentication, req));
+    assertThrows(RuntimeException.class, () -> controller.actualizarMenu(authentication, req));
     verify(menuService).updateMenu(authentication, req);
   }
 
@@ -139,7 +139,7 @@ class ChefControllerTest {
     MenuDTO menu = mock(MenuDTO.class);
     when(menuService.listAllMenus()).thenReturn(List.of(menu));
 
-    ResponseEntity<List<MenuDTO>> response = controller.getAllMenusPublic();
+    ResponseEntity<List<MenuDTO>> response = controller.listarMenusPublicos();
 
     assertEquals(200, response.getStatusCode().value());
     assertEquals(1, response.getBody().size());
@@ -150,7 +150,7 @@ class ChefControllerTest {
   void getAllMenusPublic_serviceThrows_propagatesException() {
     when(menuService.listAllMenus()).thenThrow(new RuntimeException("Service failure"));
 
-    assertThrows(RuntimeException.class, () -> controller.getAllMenusPublic());
+    assertThrows(RuntimeException.class, () -> controller.listarMenusPublicos());
     verify(menuService).listAllMenus();
   }
 
@@ -161,7 +161,7 @@ class ChefControllerTest {
     DishDto dish = mock(DishDto.class);
     when(dishService.getDish(authentication, "pasta")).thenReturn(List.of(dish));
 
-    List<DishDto> result = controller.getPlato(authentication, "pasta");
+    List<DishDto> result = controller.getDishes(authentication, "pasta");
 
     assertEquals(1, result.size());
     verify(dishService).getDish(authentication, "pasta");
@@ -171,7 +171,7 @@ class ChefControllerTest {
   void getPlato_serviceThrows_propagatesException() {
     when(dishService.getDish(authentication, null)).thenThrow(new RuntimeException("Error"));
 
-    assertThrows(RuntimeException.class, () -> controller.getPlato(authentication, null));
+    assertThrows(RuntimeException.class, () -> controller.getDishes(authentication, null));
     verify(dishService).getDish(authentication, null);
   }
 
@@ -182,7 +182,7 @@ class ChefControllerTest {
     DishCReqDto req = mock(DishCReqDto.class);
     doNothing().when(dishService).createDish(authentication, req);
 
-    ResponseEntity<DishDto> response = controller.createPlato(authentication, req);
+    ResponseEntity<Void> response = controller.createDish(authentication, req);
 
     assertEquals(201, response.getStatusCode().value());
     verify(dishService).createDish(authentication, req);
@@ -193,7 +193,7 @@ class ChefControllerTest {
     DishCReqDto req = mock(DishCReqDto.class);
     doThrow(new IllegalArgumentException("Invalid dish")).when(dishService).createDish(authentication, req);
 
-    assertThrows(IllegalArgumentException.class, () -> controller.createPlato(authentication, req));
+    assertThrows(IllegalArgumentException.class, () -> controller.createDish(authentication, req));
     verify(dishService).createDish(authentication, req);
   }
 
@@ -203,7 +203,7 @@ class ChefControllerTest {
   void deletePlato_success_returns204() {
     doNothing().when(dishService).deleteDish(authentication, 1L, 2L);
 
-    ResponseEntity<Void> response = controller.deletePlato(authentication, 1L, 2L);
+    ResponseEntity<Void> response = controller.deleteDish(authentication, 1L, 2L);
 
     assertEquals(204, response.getStatusCode().value());
     verify(dishService).deleteDish(authentication, 1L, 2L);
@@ -213,7 +213,7 @@ class ChefControllerTest {
   void deletePlato_serviceThrows_propagatesException() {
     doThrow(new NoSuchElementException("Dish not found")).when(dishService).deleteDish(authentication, 1L, 99L);
 
-    assertThrows(NoSuchElementException.class, () -> controller.deletePlato(authentication, 1L, 99L));
+    assertThrows(NoSuchElementException.class, () -> controller.deleteDish(authentication, 1L, 99L));
     verify(dishService).deleteDish(authentication, 1L, 99L);
   }
 
@@ -225,7 +225,7 @@ class ChefControllerTest {
     DishDto updated = mock(DishDto.class);
     when(dishService.updateDish(authentication, req)).thenReturn(updated);
 
-    ResponseEntity<DishDto> response = controller.patchPlato(authentication, req);
+    ResponseEntity<DishDto> response = controller.updateDish(authentication, req);
 
     assertEquals(200, response.getStatusCode().value());
     assertEquals(updated, response.getBody());
@@ -237,7 +237,7 @@ class ChefControllerTest {
     DishUReqDto req = mock(DishUReqDto.class);
     when(dishService.updateDish(authentication, req)).thenThrow(new RuntimeException("Update failed"));
 
-    assertThrows(RuntimeException.class, () -> controller.patchPlato(authentication, req));
+    assertThrows(RuntimeException.class, () -> controller.updateDish(authentication, req));
     verify(dishService).updateDish(authentication, req);
   }
 
@@ -302,7 +302,7 @@ class ChefControllerTest {
     MenuPublicDetailDto dto = mock(MenuPublicDetailDto.class);
     when(chefProfileService.getMenuPublicDetail(5L)).thenReturn(dto);
 
-    ResponseEntity<MenuPublicDetailDto> response = controller.getMenuPublicDetail(5L);
+    ResponseEntity<MenuPublicDetailDto> response = controller.obtenerDetalleMenuPublico(5L);
 
     assertEquals(200, response.getStatusCode().value());
     assertEquals(dto, response.getBody());
@@ -313,7 +313,7 @@ class ChefControllerTest {
   void getMenuPublicDetail_notFound_returns404() {
     when(chefProfileService.getMenuPublicDetail(999L)).thenThrow(new NoSuchElementException());
 
-    ResponseEntity<MenuPublicDetailDto> response = controller.getMenuPublicDetail(999L);
+    ResponseEntity<MenuPublicDetailDto> response = controller.obtenerDetalleMenuPublico(999L);
 
     assertEquals(404, response.getStatusCode().value());
     verify(chefProfileService).getMenuPublicDetail(999L);

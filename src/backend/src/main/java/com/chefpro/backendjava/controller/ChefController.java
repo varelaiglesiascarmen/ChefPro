@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -140,7 +141,11 @@ public class ChefController {
   @Operation(summary = "Ver perfil público de un chef", description = "Devuelve el perfil completo de un chef: datos personales, menús, reseñas y fechas ocupadas. Endpoint público.")
   @GetMapping("/{chefId}/profile")
   public ResponseEntity<ChefPublicDetailDto> getChefPublicProfile(@PathVariable Long chefId) {
-    return ResponseEntity.ok(chefProfileService.getChefPublicProfile(chefId));
+    try {
+      return ResponseEntity.ok(chefProfileService.getChefPublicProfile(chefId));
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @Operation(summary = "Ver detalle público de un menú", description = "Devuelve el detalle de un menú con sus platos, alérgenos (IDs de reglamento UE) y fechas ocupadas del chef. Endpoint público.")
@@ -152,6 +157,13 @@ public class ChefController {
     } catch (NoSuchElementException e) {
       return ResponseEntity.notFound().build();
     }
+  }
+
+  @Operation(summary = "Ver perfil público de un chef", description = "Devuelve el perfil completo de un chef: datos personales, menús, reseñas y fechas ocupadas. Endpoint público.")
+  @GetMapping("/public-profile/{id}")
+  public ResponseEntity<ChefPublicDetailDto> getPublicProfile(@PathVariable Long id) {
+    ChefPublicDetailDto chefProfile = chefProfileService.getChefPublicProfile(id);
+    return ResponseEntity.ok(chefProfile);
   }
 
   // Authenticated profile

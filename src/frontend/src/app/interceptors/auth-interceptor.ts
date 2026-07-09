@@ -15,7 +15,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/api/auth/check-username',
     '/api/auth/check-email',
     '/api/chef/menus/public',
-    '/api/chef/search'
+    '/api/chef/search',
+    '/api/public-profile'
   ];
 
   // Dynamic public URL patterns (e.g. /api/chef/42/profile, /api/chef/menus/7/public)
@@ -33,9 +34,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const token = localStorage.getItem('chefpro_token');
+  const rawToken = localStorage.getItem('chefpro_token');
+  const token = rawToken
+    ? rawToken.replace(/^Bearer\s+/i, '').replace(/^"|"$/g, '').trim()
+    : null;
 
-  if (token) {
+  if (token && token !== 'null' && token !== 'undefined') {
     const cloned = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`

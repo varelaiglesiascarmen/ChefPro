@@ -4,6 +4,7 @@ import com.chefpro.backendjava.common.object.dto.DishCReqDto;
 import com.chefpro.backendjava.common.object.dto.DishDto;
 import com.chefpro.backendjava.common.object.dto.DishUReqDto;
 import com.chefpro.backendjava.common.object.entity.*;
+import com.chefpro.backendjava.common.util.ChefResolver;
 import com.chefpro.backendjava.repository.*;
 import com.chefpro.backendjava.service.DishService;
 import com.chefpro.backendjava.service.impl.DishServiceImpl;
@@ -22,7 +23,7 @@ class DishServiceTest {
 
   private DishService dishService;
 
-  private ChefRepository chefRepository;
+  private ChefResolver chefResolver;
   private MenuRepository menuRepository;
   private DishRepository dishRepository;
   private AllergenDishRepository allergenDishRepository;
@@ -35,7 +36,7 @@ class DishServiceTest {
 
   @BeforeEach
   void setUp() {
-    chefRepository            = mock(ChefRepository.class);
+    chefResolver            = mock(ChefResolver.class);
     menuRepository            = mock(MenuRepository.class);
     dishRepository            = mock(DishRepository.class);
     allergenDishRepository    = mock(AllergenDishRepository.class);
@@ -43,7 +44,7 @@ class DishServiceTest {
     authentication            = mock(Authentication.class);
 
     dishService = new DishServiceImpl(
-      chefRepository, menuRepository, dishRepository,
+      chefResolver, menuRepository, dishRepository,
       allergenDishRepository, officialAllergenRepository
     );
 
@@ -61,7 +62,7 @@ class DishServiceTest {
     when(menu.getChef()).thenReturn(chef);
 
     when(authentication.getName()).thenReturn("mario@example.com");
-    when(chefRepository.findByUser_Username("mario@example.com")).thenReturn(Optional.of(chef));
+    when(chefResolver.resolve(authentication)).thenReturn(chef);
   }
 
   // ─── createDish ──────────────────────────────────────────────────────────
@@ -168,7 +169,7 @@ class DishServiceTest {
 
   @Test
   void getDish_chefNotFound_throwsRuntimeException() {
-    when(chefRepository.findByUser_Username("mario@example.com")).thenReturn(Optional.empty());
+    when(chefResolver.resolve(authentication)).thenThrow(new RuntimeException("Chef not found"));
 
     assertThrows(RuntimeException.class, () -> dishService.getDish(authentication, null));
     verifyNoInteractions(dishRepository);
