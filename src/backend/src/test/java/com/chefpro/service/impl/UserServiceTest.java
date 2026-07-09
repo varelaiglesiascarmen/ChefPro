@@ -26,6 +26,7 @@ class UserServiceTest {
   private DinerRepository dinerRepository;
   private ChefRepository chefRepository;
   private PasswordEncoder passwordEncoder;
+  private com.chefpro.backendjava.repository.ReviewRepository reviewRepository;
 
   private UserLogin dinerUserLogin;
   private UserLogin chefUserLogin;
@@ -36,9 +37,10 @@ class UserServiceTest {
     dinerRepository      = mock(DinerRepository.class);
     chefRepository       = mock(ChefRepository.class);
     passwordEncoder      = mock(PasswordEncoder.class);
+    reviewRepository     = mock(com.chefpro.backendjava.repository.ReviewRepository.class);
 
     userService = new UserServiceImpl(
-      customUserRepository, dinerRepository, chefRepository, passwordEncoder
+      customUserRepository, dinerRepository, chefRepository, passwordEncoder, reviewRepository
     );
 
     dinerUserLogin = mock(UserLogin.class);

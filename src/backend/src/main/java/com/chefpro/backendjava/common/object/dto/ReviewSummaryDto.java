@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReviewSummaryDto {
 
+  private Long reviewerId;
   private String reviewerName;
   private String date;
   private Integer score;
