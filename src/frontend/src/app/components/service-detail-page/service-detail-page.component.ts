@@ -149,6 +149,13 @@ export class ServiceDetailPageComponent implements OnInit {
       return;
     }
 
+    const token = localStorage.getItem('chefpro_token');
+    if (!token) {
+      this.showLoginModal = true;
+      this.reservationError = 'Necesitas iniciar sesión para reservar.';
+      return;
+    }
+
     if (this.currentUser.role !== 'DINER') {
       this.reservationError = 'Solo los comensales pueden hacer reservas.';
       return;
@@ -200,11 +207,11 @@ export class ServiceDetailPageComponent implements OnInit {
   }
 
   loadChefFromDB(id: number) {
-    this.chefService.getChefPublicProfile(id).subscribe({
-      next: (chef: ChefPublicDetail) => {
+    this.chefService.getPublicProfile(id).subscribe({
+      next: (chef: any) => {
         // Mapear la respuesta del backend al formato esperado por el template
         const languagesArray = chef.languages
-          ? chef.languages.split(',').map(l => l.trim())
+          ? chef.languages.split(',').map((l: string) => l.trim())
           : [];
 
         this.data = {
@@ -222,7 +229,7 @@ export class ServiceDetailPageComponent implements OnInit {
           languages: languagesArray,
           coverUrl: chef.coverPhoto || chef.photo,
           busyDates: chef.busyDates || [],
-          menus: (chef.menus || []).map(m => ({
+          menus: (chef.menus || []).map((m: any) => ({
             id: m.id,
             title: m.title,
             price: m.price,
@@ -231,7 +238,8 @@ export class ServiceDetailPageComponent implements OnInit {
             minDiners: m.minDiners,
             maxDiners: m.maxDiners
           })),
-          reviewsList: (chef.reviews || []).map(r => ({
+          reviewsList: (chef.reviews || []).map((r: any) => ({
+            reviewerId: r.reviewerId,
             user: r.reviewerName,
             date: r.date,
             rating: r.score,
@@ -301,5 +309,5 @@ export class ServiceDetailPageComponent implements OnInit {
   }
 
   goToMenu(id: number) { this.router.navigate(['/service-detail', 'menu', id]); }
-  goToChefProfile(id: number) { this.router.navigate(['/service-detail', 'chef', id]); }
+  goToPublicProfile(id: number) { this.router.navigate(['/public-profile', id]); }
 }

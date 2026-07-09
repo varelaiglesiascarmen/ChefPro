@@ -22,21 +22,26 @@ export class IndexComponent {
   navigateTo(path: 'CHEF' | 'DINER') {
     const user = this.authService.currentUserValue;
 
-    if (!user) {
-      this.router.navigate(['/login']);
+    if (path === 'CHEF') {
+      if (!user) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      if (user.role === 'CHEF') {
+        this.router.navigate(['/profile/new-menu']);
+        return;
+      }
+
+      this.router.navigate(['/profile']);
       return;
     }
 
-    if (user.role === 'CHEF') {
-      this.router.navigate(['/profile/new-menu']);
+    if (path === 'DINER') {
+      this.router.navigate(['/search-results'], { queryParams: { discover: 'true' } });
       return;
     }
 
-    if (user.role === 'DINER') {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.router.navigate(['/login']);
+    this.router.navigate(['/profile']);
   }
 }

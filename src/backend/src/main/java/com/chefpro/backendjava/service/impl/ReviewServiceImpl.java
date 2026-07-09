@@ -42,9 +42,6 @@ public class ReviewServiceImpl implements ReviewService {
     UserLogin authUser = userRepository.findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
 
-    Diner diner = dinerRepository.findById(authUser.getId())
-      .orElseThrow(() -> new RuntimeException("Only diners can submit reviews"));
-
     Chef chef = chefRepository.findById(dto.getChefId())
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
@@ -52,30 +49,49 @@ public class ReviewServiceImpl implements ReviewService {
       .findById(new Reservation.ReservationId(dto.getChefId(), dto.getReservationDate()))
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-    if (!reservation.getDiner().getId().equals(diner.getId())) {
-      throw new RuntimeException("This reservation does not belong to you");
-    }
-    if (!reservation.getDate().isBefore(LocalDate.now())) {
-      throw new IllegalArgumentException("You can only review a reservation that has already taken place");
-    }
+    // Solo se puede dejar review si la reserva está confirmada o completada y ya ha pasado
     if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED
       && reservation.getStatus() != Reservation.ReservationStatus.COMPLETED) {
       throw new IllegalArgumentException("You can only review a confirmed or completed reservation");
     }
+    if (!reservation.getDate().isBefore(LocalDate.now())) {
+      throw new IllegalArgumentException("You can only review a reservation that has already taken place");
+    }
 
-    boolean alreadyReviewed = reviewRepository.existsByReviewedUser_IdAndReviewerUser_Id(
-      chef.getUser().getId(),
-      diner.getUser().getId()
+    // Determinar a quién se está puntuando
+    UserLogin reviewedUser;
+    UserLogin reviewerUser = authUser;
+    Long dinerId = reservation.getDiner().getUser().getId();
+    Long chefUserId = chef.getUser().getId();
+
+    if (authUser.getId().equals(dinerId)) {
+      // El comensal puntúa al chef
+      reviewedUser = chef.getUser();
+    } else if (authUser.getId().equals(chefUserId)) {
+      // El chef puntúa al comensal
+      reviewedUser = reservation.getDiner().getUser();
+    } else {
+      throw new RuntimeException("You are not part of this reservation");
+    }
+
+    // Validar que no exista ya una review de este reviewer a este reviewed para esta reserva
+    boolean alreadyReviewed = reviewRepository.existsByReviewedUserAndReviewerUserAndReservation(
+      reviewedUser.getId(),
+      reviewerUser.getId(),
+      reservation.getDate(),
+      chefUserId,
+      dinerId
     );
     if (alreadyReviewed) {
-      throw new IllegalArgumentException("You have already submitted a review for this chef");
+      throw new IllegalArgumentException("You have already submitted a review for this user in this reservation");
     }
 
     reviewRepository.save(Review.builder()
-      .reviewedUser(chef.getUser())
-      .reviewerUser(diner.getUser())
+      .reviewedUser(reviewedUser)
+      .reviewerUser(reviewerUser)
       .score(dto.getScore())
       .comment(dto.getComment())
+      .date(reservation.getDate())
       .build());
   }
 }
