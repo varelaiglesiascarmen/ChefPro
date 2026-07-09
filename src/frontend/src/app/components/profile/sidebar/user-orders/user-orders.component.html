@@ -18,6 +18,10 @@
         Completadas
         <span class="badge" *ngIf="completedOrders.length > 0">{{ completedOrders.length }}</span>
       </button>
+      <button class="tab-btn" [class.active]="activeTab === 'CANCELLED'" (click)="setTab('CANCELLED')">
+        Canceladas
+        <span class="badge" *ngIf="cancelledOrders.length > 0">{{ cancelledOrders.length }}</span>
+      </button>
     </div>
 
     <div class="loading-state" *ngIf="isLoading">
@@ -100,7 +104,7 @@
         <div class="order-card confirmed-card" *ngFor="let order of confirmedOrders">
           <div class="card-top">
             <span class="order-id">{{ order.id }}</span>
-            <span class="status-badge success">Confirmada</span>
+            <span class="status-badge" [ngClass]="getConfirmedStatusClass(order)">{{ getConfirmedStatusLabel(order) }}</span>
           </div>
 
           <div class="card-body">
@@ -113,10 +117,29 @@
               <div class="detail"><i class="fa-solid fa-location-dot"></i> {{ order.location }}</div>
             </div>
 
+            <div class="payment-deadline-warning" *ngIf="showPaymentDeadlineWarning(order)">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              Debes pagar esta reserva como máximo 2 días antes del servicio para evitar su cancelación automática.
+            </div>
+
             <div class="price-tag">{{ order.price }}</div>
           </div>
 
-          <div class="card-actions single-action">
+          <div class="card-actions" *ngIf="userRole === 'DINER'">
+            <button class="btn-accept" *ngIf="!isReservationPaid(order)" (click)="showPayConfirmation(order)">
+              <i class="fa-solid fa-credit-card"></i> Pagar
+            </button>
+
+            <div class="diner-status-info paid" *ngIf="isReservationPaid(order)">
+              <i class="fa-solid fa-circle-check"></i> Pago registrado (modo demo)
+            </div>
+
+            <button class="btn-cancel" (click)="showCancelConfirmation(order)" title="Cancelar esta reserva confirmada">
+              Cancelar Reserva
+            </button>
+          </div>
+
+          <div class="card-actions single-action" *ngIf="userRole === 'CHEF'">
             <button class="btn-cancel" (click)="showCancelConfirmation(order)" title="Cancelar esta reserva confirmada">
               Cancelar Reserva
             </button>
@@ -174,6 +197,42 @@
       </div>
     </div>
 
+    <div class="tab-content" *ngIf="!isLoading && activeTab === 'CANCELLED'">
+
+      <div class="empty-state" *ngIf="cancelledOrders.length === 0">
+        <i class="fa-solid fa-ban"></i>
+        <h3>No tienes reservas canceladas</h3>
+        <p>Las reservas canceladas aparecerán aquí para que puedas consultar el motivo.</p>
+      </div>
+
+      <div class="orders-grid">
+        <div class="order-card" *ngFor="let order of cancelledOrders">
+          <div class="card-top">
+            <span class="order-id">{{ order.id }}</span>
+            <span class="status-badge danger">{{ getCancelledStatusLabel(order) }}</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="diner-name">{{ order.dinerName }}</h3>
+            <p class="menu-name">{{ order.menuName }}</p>
+
+            <div class="order-details">
+              <div class="detail"><i class="fa-regular fa-calendar"></i> {{ order.date }}</div>
+              <div class="detail"><i class="fa-solid fa-user-group"></i> {{ order.guests }} pax</div>
+              <div class="detail"><i class="fa-solid fa-location-dot"></i> {{ order.location }}</div>
+            </div>
+
+            <div class="payment-deadline-warning" *ngIf="order.cancellationReason === 'PAYMENT_OUT_OF_DEADLINE'">
+              <i class="fa-solid fa-circle-info"></i>
+              Esta reserva fue cancelada automáticamente porque no se pagó dentro del plazo establecido.
+            </div>
+
+            <div class="price-tag">{{ order.price }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -223,6 +282,26 @@
     <div class="modal-actions">
       <button class="btn-secondary" (click)="closeConfirmation()">No, mantener reserva</button>
       <button class="btn-danger" (click)="confirmCancel()">Sí, cancelar de todas formas</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal for Demo Payment -->
+<div class="modal-overlay" *ngIf="confirmActionType === 'pay'" (click)="closeConfirmation()">
+  <div class="modal-content small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fa-solid fa-credit-card"></i> Confirmar pago</h2>
+    </div>
+
+    <div class="modal-body">
+      <p><strong>¿Quieres pagar ya?</strong></p>
+      <p class="secondary-text">Esta funcionalidad está en modo demo: no se realizará ningún cobro real.</p>
+      <p class="warning-text"><i class="fa-solid fa-circle-info"></i> Solo registraremos la reserva como pagada para continuar con la simulación.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="closeConfirmation()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirmPay()">Sí, pagar ahora</button>
     </div>
   </div>
 </div>

@@ -187,6 +187,7 @@ public class UserServiceImpl implements UserService {
     List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(userId);
     List<ReviewSummaryDto> reviewSummaries = reviews.stream()
       .map(r -> ReviewSummaryDto.builder()
+        .reviewerId(r.getReviewerUser().getId())
         .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
         .date(r.getDate() != null ? r.getDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "")
         .score(r.getScore())
@@ -223,6 +224,7 @@ public class UserServiceImpl implements UserService {
     List<Review> reviews = reviewRepository.findByReviewedUserIdWithReviewer(userId);
     List<ReviewSummaryDto> reviewSummaries = reviews.stream()
       .map(r -> ReviewSummaryDto.builder()
+        .reviewerId(r.getReviewerUser().getId())
         .reviewerName(r.getReviewerUser().getName() + " " + r.getReviewerUser().getLastname().charAt(0) + ".")
         .date(r.getDate() != null ? r.getDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "")
         .score(r.getScore())

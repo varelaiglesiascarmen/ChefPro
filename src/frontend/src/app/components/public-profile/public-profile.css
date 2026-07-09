@@ -1,3 +1,55 @@
+/* Reuse clickable-profile-link style from service-detail for consistency */
+.review-user {
+	font-weight: 600;
+	color: var(--dark-brown, #4E240A);
+}
+
+.clickable-profile-link {
+	cursor: pointer;
+	transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+	color: var(--dark-brown, #4E240A);
+	position: relative;
+	display: inline-block;
+}
+
+.clickable-profile-link::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background: var(--gold-primary, #A67C00);
+	transition: width 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.clickable-profile-link:hover {
+	color: var(--gold-primary, #A67C00);
+}
+
+.clickable-profile-link:hover::after {
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.clickable-profile-link {
+		text-decoration: underline;
+		text-decoration-color: rgba(166, 124, 0, 0.3);
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+
+	.clickable-profile-link:active {
+		color: var(--gold-primary, #A67C00);
+		text-decoration-color: var(--gold-primary, #A67C00);
+	}
+
+	.review-user::before {
+		content: '👤 ';
+		margin-right: 4px;
+		opacity: 0.7;
+	}
+}
 :host {
 	display: block;
 	width: 100%;
@@ -123,6 +175,10 @@
 	gap: 1.4rem;
 }
 
+.body-grid.single-column {
+	grid-template-columns: 1fr;
+}
+
 .info-card,
 .quick-card,
 .menu-card,
@@ -131,6 +187,11 @@
 	background: #fff;
 	border: 1px solid #f0e8dc;
 	border-radius: 16px;
+	padding: 1.25rem 1.35rem;
+	color: #9c8b7a;
+	margin-bottom: 0;
+	min-height: unset;
+	box-shadow: none;
 }
 
 .info-card,
@@ -200,21 +261,74 @@
 }
 
 .list-section {
-	display: grid;
-	gap: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .section-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 1rem;
 }
 
-.menus-grid,
+.menus-carousel,
 .reviews-grid {
 	display: grid;
 	gap: 1rem;
+
+}
+
+.menus-carousel {
+	grid-auto-flow: column;
+	grid-auto-columns: minmax(280px, 360px);
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	padding-bottom: 0.35rem;
+	scrollbar-width: thin;
+}
+
+.menus-carousel::-webkit-scrollbar {
+	height: 8px;
+}
+
+.menus-carousel::-webkit-scrollbar-thumb {
+	background: #d7c1a0;
+	border-radius: 999px;
+}
+
+.reviews-grid {
 	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	margin-bottom: 0;
+	padding-bottom: 0;
+	min-height: 0;
+}
+
+.carousel-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.carousel-btn {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	border: 1px solid #e5d4be;
+	background: #fff;
+	color: #7f610d;
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	box-shadow: 0 8px 20px rgba(81, 33, 9, 0.08);
+	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.carousel-btn:hover {
+	transform: translateY(-2px);
+	border-color: #d8bb84;
+	box-shadow: 0 12px 24px rgba(81, 33, 9, 0.12);
 }
 
 .menu-card,
@@ -223,6 +337,7 @@
 }
 
 .menu-card {
+	scroll-snap-align: start;
 	cursor: pointer;
 	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
@@ -315,6 +430,10 @@
 	.public-profile-shell {
 		width: min(1180px, 96vw);
 		margin-top: 1rem;
+	}
+
+	.carousel-actions {
+		display: none;
 	}
 
 	.hero {

@@ -41,6 +41,8 @@ public class ReservationMapper {
       .numberOfDiners(r.getNumberOfDiners())
       .address(r.getAddress())
       .status(r.getStatus())
+      .paymentStatus(r.getPaymentStatus())
+      .cancellationReason(r.getCancellationReason())
       .totalPrice(totalPrice)
       .chefName(chefName)
       .dinerName(dinerName)
@@ -61,6 +63,7 @@ public class ReservationMapper {
       .numberOfDiners(dto.getNumberOfDiners())
       .address(dto.getAddress())
       .status(Reservation.ReservationStatus.PENDING)
+        .paymentStatus(Reservation.ReservationPaymentStatus.PENDING)
       .build();
   }
 
@@ -81,6 +84,14 @@ public class ReservationMapper {
     // Actualizar estado
     if (uReq.getStatus() != null) {
       reservation.setStatus(uReq.getStatus());
+    }
+
+    if (uReq.getPaymentStatus() != null) {
+      reservation.setPaymentStatus(uReq.getPaymentStatus());
+    }
+
+    if (uReq.getCancellationReason() != null) {
+      reservation.setCancellationReason(uReq.getCancellationReason());
     }
 
     // Actualizar menú si se proporciona uno nuevo

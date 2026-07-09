@@ -17,6 +17,8 @@ import java.util.List;
 @Component("reservationService")
 public class ReservationServiceImpl implements ReservationService {
 
+  private static final String PAYMENT_OUT_OF_DEADLINE_REASON = "PAYMENT_OUT_OF_DEADLINE";
+
   private final ReservaRepository reservaRepository;
   private final MenuRepository menuRepository;
   private final ReservationMapper reservationMapper;
@@ -39,18 +41,21 @@ public class ReservationServiceImpl implements ReservationService {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional
   public List<ReservationDTO> listByChef(Authentication authentication) {
     Chef chef = chefRepository.findByUser_Username(authentication.getName())
       .orElseThrow(() -> new RuntimeException("Chef not found"));
 
-    return reservaRepository.findByChefId(chef.getId()).stream()
+    List<Reservation> reservations = reservaRepository.findByChefId(chef.getId());
+    applyAutoCancellationForUnpaidReservations(reservations);
+
+    return reservations.stream()
       .map(reservationMapper::toDto)
       .toList();
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional
   public List<ReservationDTO> listByClient(Authentication authentication) {
     UserLogin user = userRepository.findByUsername(authentication.getName())
       .orElseThrow(() -> new RuntimeException("User not found"));
@@ -58,7 +63,10 @@ public class ReservationServiceImpl implements ReservationService {
     Diner diner = dinerRepository.findById(user.getId())
       .orElseThrow(() -> new RuntimeException("Diner not found"));
 
-    return reservaRepository.findByDinerId(diner.getId()).stream()
+    List<Reservation> reservations = reservaRepository.findByDinerId(diner.getId());
+    applyAutoCancellationForUnpaidReservations(reservations);
+
+    return reservations.stream()
       .map(reservationMapper::toDto)
       .toList();
   }
@@ -104,7 +112,11 @@ public class ReservationServiceImpl implements ReservationService {
       throw new IllegalArgumentException("This chef already has a reservation for this date");
     }
 
-    reservaRepository.save(reservationMapper.toEntity(dto, chef, diner, menu));
+    Reservation reservation = reservationMapper.toEntity(dto, chef, diner, menu);
+    reservation.setPaymentStatus(Reservation.ReservationPaymentStatus.PENDING);
+    reservation.setCancellationReason(null);
+
+    reservaRepository.save(reservation);
   }
 
   @Override
@@ -132,8 +144,8 @@ public class ReservationServiceImpl implements ReservationService {
     if (uReq.getChefId() == null || uReq.getDate() == null) {
       throw new IllegalArgumentException("chefId and date are required");
     }
-    if (uReq.getStatus() == null) {
-      throw new IllegalArgumentException("status is required");
+    if (uReq.getStatus() == null && uReq.getPaymentStatus() == null) {
+      throw new IllegalArgumentException("status or paymentStatus is required");
     }
 
     UserLogin authUser = userRepository.findByUsername(authentication.getName())
@@ -142,12 +154,38 @@ public class ReservationServiceImpl implements ReservationService {
     Reservation reservation = reservaRepository.findById(new Reservation.ReservationId(uReq.getChefId(), uReq.getDate()))
       .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
+    applyAutoCancellationForUnpaidReservations(List.of(reservation));
+
     boolean isDiner = reservation.getDiner().getId().equals(authUser.getId());
     if (isDiner) {
-      if (uReq.getStatus() != Reservation.ReservationStatus.CANCELLED) {
-        throw new IllegalArgumentException("Diners can only cancel reservations");
+      if (uReq.getPaymentStatus() != null) {
+        if (uReq.getPaymentStatus() != Reservation.ReservationPaymentStatus.PAID) {
+          throw new IllegalArgumentException("Diners can only mark reservations as paid");
+        }
+        if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
+          throw new IllegalArgumentException("Only confirmed reservations can be paid");
+        }
+
+        LocalDate paymentDeadline = LocalDate.now().plusDays(2);
+        if (!reservation.getDate().isAfter(paymentDeadline)) {
+          reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
+          reservation.setCancellationReason(PAYMENT_OUT_OF_DEADLINE_REASON);
+          return reservationMapper.toDto(reservaRepository.save(reservation));
+        }
+
+        reservation.setPaymentStatus(Reservation.ReservationPaymentStatus.PAID);
+        reservation.setCancellationReason(null);
+        return reservationMapper.toDto(reservaRepository.save(reservation));
       }
-      reservation.setStatus(uReq.getStatus());
+
+      if (uReq.getStatus() != Reservation.ReservationStatus.CANCELLED) {
+        throw new IllegalArgumentException("Diners can only cancel reservations or pay them");
+      }
+
+      reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
+      reservation.setCancellationReason(
+        uReq.getCancellationReason() != null ? uReq.getCancellationReason() : "MANUAL_CANCELLED"
+      );
       return reservationMapper.toDto(reservaRepository.save(reservation));
     }
 
@@ -158,7 +196,40 @@ public class ReservationServiceImpl implements ReservationService {
       throw new RuntimeException("You can only update your own reservations");
     }
 
+    if (uReq.getStatus() == null) {
+      throw new IllegalArgumentException("status is required for chef updates");
+    }
+
     reservation.setStatus(uReq.getStatus());
+
+    if (uReq.getStatus() == Reservation.ReservationStatus.CONFIRMED) {
+      reservation.setPaymentStatus(Reservation.ReservationPaymentStatus.PENDING);
+      reservation.setCancellationReason(null);
+    }
+
+    if (uReq.getStatus() == Reservation.ReservationStatus.CANCELLED) {
+      reservation.setCancellationReason(
+        uReq.getCancellationReason() != null ? uReq.getCancellationReason() : "MANUAL_CANCELLED"
+      );
+    }
+
     return reservationMapper.toDto(reservaRepository.save(reservation));
+  }
+
+  private void applyAutoCancellationForUnpaidReservations(List<Reservation> reservations) {
+    LocalDate paymentDeadline = LocalDate.now().plusDays(2);
+
+    for (Reservation reservation : reservations) {
+      boolean shouldCancelForUnpaidDeadline =
+        reservation.getStatus() == Reservation.ReservationStatus.CONFIRMED
+          && reservation.getPaymentStatus() != Reservation.ReservationPaymentStatus.PAID
+          && !reservation.getDate().isAfter(paymentDeadline);
+
+      if (shouldCancelForUnpaidDeadline) {
+        reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
+        reservation.setCancellationReason(PAYMENT_OUT_OF_DEADLINE_REASON);
+        reservaRepository.save(reservation);
+      }
+    }
   }
 }
