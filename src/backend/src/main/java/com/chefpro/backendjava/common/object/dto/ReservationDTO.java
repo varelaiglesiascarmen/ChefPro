@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -21,7 +22,11 @@ public class ReservationDTO {
   private Integer numberOfDiners;
   private String address;
   private Reservation.ReservationStatus status;
+  private Reservation.ReservationPaymentStatus paymentStatus;
+  private String cancellationReason;
 
+
+  private BigDecimal totalPrice;
 
   private String chefName;
   private String dinerName;

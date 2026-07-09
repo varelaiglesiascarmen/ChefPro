@@ -19,7 +19,7 @@
       <div class="chef-identity">
         <img [src]="data.photoUrl || '/logos/users.svg'" class="chef-avatar" alt="Foto de perfil">
         <div class="chef-text">
-          <h1>{{ data.fullName }}</h1>
+          <h1 class="clickable-profile-link" (click)="goToPublicProfile(data.id)">{{ data.fullName }}</h1>
 
           <div *ngIf="data.prizes" class="prizes-container">
             <span class="prizes-badge">{{ data.prizes }}</span>
@@ -171,7 +171,7 @@
         <div class="carousel-container">
           <div *ngFor="let review of data.reviewsList" class="review-card">
             <div class="review-header">
-              <span class="review-user">{{ review.user }}</span>
+              <span class="review-user clickable-profile-link" (click)="goToPublicProfile(review.reviewerId)">{{ review.user }}</span>
               <span class="review-date">{{ review.date }}</span>
             </div>
 
@@ -204,7 +204,7 @@
               <span class="amount">{{ data.price }}€</span> <span class="unit">/ persona</span>
             </div>
             <br />
-            <div class="chef-link" (click)="goToChefProfile(data.chefId)">
+            <div class="chef-link" (click)="goToPublicProfile(data.chefId)">
               <span>Diseñado por <strong>Chef {{ data.chefName }}</strong></span>
             </div>
           </div>

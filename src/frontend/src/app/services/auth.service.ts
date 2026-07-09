@@ -49,9 +49,7 @@ export class AuthService {
   // LOGIN WITH BYPASS
   login(credentials: LoginRequest): Observable<User> {
     if (this.isDevMode) {
-      console.warn('⚠️ DEV MODE: Skipping real login');
       const mock = this.getMockUser();
-      localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
       return of(mock);
     }
@@ -73,9 +71,7 @@ export class AuthService {
   // SIGNUP WITH BYPASS
   signup(data: any): Observable<User> {
     if (this.isDevMode) {
-      console.warn('DEV MODE: Skipping real registration');
       const mock = this.getMockUser(data.role || 'CHEF');
-      localStorage.setItem('chefpro_token', 'dev-token-secret');
       this.setSession(mock);
       return of(mock);
     }
@@ -145,7 +141,6 @@ export class AuthService {
           const user = JSON.parse(userJson);
           this.currentUserSubject.next(user);
         } catch (e) {
-          console.error('Error parsing stored user data:', e);
         }
       }
 
@@ -153,7 +148,6 @@ export class AuthService {
       if (!this.isDevMode) {
         this.getUserData().subscribe({
           error: () => {
-            console.warn('Token validation failed, logging out');
             this.logout();
           }
         });
@@ -162,7 +156,6 @@ export class AuthService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('Error en el proceso de autenticación:', error);
     return throwError(() => error);
   }
 

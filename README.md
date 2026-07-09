@@ -1,4 +1,5 @@
 # Chef Pro - Proyecto Intermodular TFG
+## https://chef-pro.vercel.app/homepage
 ![largeWebsiteLogo](https://github.com/user-attachments/assets/62fdbad3-0d5d-488b-91bb-a7af427f7923)<svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="1200" height="600" fill="white"/>
 <path d="M796.849 321.47V318.32C802.249 318.32 805.399 317.32 806.299 315.32V239.87C805.399 237.87 802.249 236.87 796.849 236.87V233.72H857.299V248.27H854.149C854.149 242.87 853.149 239.72 851.149 238.82H820.099V273.32H841.099C843.099 272.42 844.099 269.27 844.099 263.87H847.249V287.87H844.099C844.099 282.47 843.099 279.32 841.099 278.42H820.099V315.32C820.999 317.32 824.149 318.32 829.549 318.32V321.47H796.849Z" fill="black"/>
@@ -95,7 +96,7 @@ Si prefieres instalar cada servicio manualmente:
 #### Base de Datos (MySQL Workbench)
 La persistencia se gestiona en MySQL.
 - El diseño se basa en un Esquema Entidad-Relación detallado que garantiza la integridad de los datos entre usuarios, servicios y reservas.
-<img width="1047" height="855" alt="image" src="https://github.com/user-attachments/assets/193c87ed-1b86-4d8d-9d4f-f4157747db8d" />
+  ![Esquema Entidad-Relacion](https://github.com/user-attachments/assets/82857852-c530-4036-91b6-f5568e2f994d)
 - Se han incluido Seeders (datos de prueba) para permitir una revisión inmediata de la plataforma sin necesidad de carga manual de datos.
 
 #### Backend (Spring Boot)
@@ -105,9 +106,9 @@ La persistencia se gestiona en MySQL.
 *Nota:* La seguridad está implementada mediante Tokens JWT.
 
 #### Frontend (Angular)
-- Abrir la carpeta del frontend en Visual Studio Code.
-- Instalar dependencias: npm install.
-- Lanzar el servidor de desarrollo: ng serve.
+- Abrir la carpeta `src/frontend` en Visual Studio Code (o ejecutar los comandos desde esa ruta).
+- Instalar dependencias: `npm install` (dentro de `src/frontend`).
+- Lanzar el servidor de desarrollo: `ng serve` (dentro de `src/frontend`).
 - Acceder a través de http://localhost:4200. La interfaz es completamente responsive
 
 ## Funciones Principales

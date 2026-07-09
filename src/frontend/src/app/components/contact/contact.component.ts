@@ -78,7 +78,6 @@ export class ContactComponent {
       this.contactForm.reset();
 
     } catch (error) {
-      console.error('Fallo en el servicio de correo:', error);
       this.isError = true;
       this.feedbackMessage = 'Hubo un problema de conexión. Por favor, inténtalo más tarde.';
     } finally {

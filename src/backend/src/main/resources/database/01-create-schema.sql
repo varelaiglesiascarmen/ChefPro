@@ -84,6 +84,7 @@ CREATE TABLE `dishes` (
   `title` varchar(150) NOT NULL,
   `description` text DEFAULT NULL,
   `category` varchar(50) DEFAULT NULL,
+  `photo` text DEFAULT NULL,
   PRIMARY KEY (`menu_ID`,`dish_ID`),
   CONSTRAINT `dishes_ibfk_1` FOREIGN KEY (`menu_ID`) REFERENCES `menu` (`menu_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -139,6 +140,8 @@ CREATE TABLE `reservations` (
   `n_diners` int(11) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
   `status` enum('PENDING','CONFIRMED','REJECTED','CANCELLED','COMPLETED') NOT NULL DEFAULT 'PENDING',
+  `payment_status` enum('PENDING','PAID') NOT NULL DEFAULT 'PENDING',
+  `cancellation_reason` varchar(100) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`chef_ID`,`date`),
   KEY `diner_ID` (`diner_ID`),

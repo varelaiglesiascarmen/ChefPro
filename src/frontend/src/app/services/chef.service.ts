@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { ChefProfileUpdate, ChefPublicDetail, MenuPublicDetail } from '../models/chef-detail.model';
+import { PublicProfile } from '../interfaces/profile.interface';
 import { ReservationStatusUpdate } from '../models/reservation.model';
 
 @Injectable({
@@ -16,8 +17,8 @@ export class ChefService {
 
   // PUBLIC ENDPOINTS (no authentication)
 
-  getChefPublicProfile(chefId: number): Observable<ChefPublicDetail> {
-    return this.http.get<ChefPublicDetail>(`${this.apiUrl}/chef/${chefId}/profile`);
+  getPublicProfile(userId: number): Observable<PublicProfile> {
+    return this.http.get<PublicProfile>(`${this.apiUrl}/public-profile/${userId}`);
   }
 
   getMenuPublicDetail(menuId: number): Observable<MenuPublicDetail> {

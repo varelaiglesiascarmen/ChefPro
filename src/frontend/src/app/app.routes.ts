@@ -10,6 +10,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { UserMenuComponent } from './components/user-menu/user-menu.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { ServiceDetailPageComponent } from './components/service-detail-page/service-detail-page.component';
+import { PublicProfileComponent } from './components/public-profile/public-profile';
 import { NewMenuComponent } from './components/new-menu/new-menu.component';
 import { EditMenuComponent } from './components/profile/sidebar/edit-menu/edit-menu.component';
 import { UserInfoComponent } from './components/profile/sidebar/user-info/user-info.component';
@@ -19,6 +20,8 @@ import { UserOrdersComponent } from './components/profile/sidebar/user-orders/us
 import { CancellationPoliciesComponent } from './components/cancellation-policies/cancellation-policies.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 import { authRedirectGuard } from './guards/auth-redirect.guard';
+import { authGuard } from './guards/auth.guard';
+import { chefGuard } from './guards/chef.guard';
 
 export const routes: Routes = [
 
@@ -43,6 +46,8 @@ export const routes: Routes = [
   { path: 'search-results', component: SearchResultsComponent },
   // service-detail root
   { path: 'service-detail/:type/:id', component: ServiceDetailPageComponent },
+  // public-profile root
+  { path: 'public-profile/:id', component: PublicProfileComponent },
 
   // login root (redirect to profile if already authenticated)
   { path: 'login', component: LoginComponent, canActivate: [authRedirectGuard] },
@@ -53,12 +58,13 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'info', pathMatch: 'full' },
       { path: 'info', component: UserInfoComponent },
-      { path: 'menus', component: ChefMenusComponent },
-      { path: 'new-menu', component: NewMenuComponent },
-      { path: 'edit-menu/:id', component: EditMenuComponent },
+      { path: 'menus', component: ChefMenusComponent, canActivate: [chefGuard] },
+      { path: 'new-menu', component: NewMenuComponent, canActivate: [chefGuard] },
+      { path: 'edit-menu/:id', component: EditMenuComponent, canActivate: [chefGuard] },
       { path: 'calendar', component: UserCalendarComponent },
       { path: 'orders', component: UserOrdersComponent }
     ]

@@ -7,6 +7,8 @@ import com.chefpro.backendjava.common.object.entity.Menu;
 import com.chefpro.backendjava.common.object.entity.Reservation;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class ReservationMapper {
 
@@ -25,6 +27,12 @@ public class ReservationMapper {
 
     String menuTitle = r.getMenu() != null ? r.getMenu().getTitle() : null;
 
+    // Total = pricePerPerson * numberOfDiners
+    BigDecimal totalPrice = BigDecimal.ZERO;
+    if (r.getMenu() != null && r.getMenu().getPricePerPerson() != null && r.getNumberOfDiners() != null) {
+      totalPrice = r.getMenu().getPricePerPerson().multiply(BigDecimal.valueOf(r.getNumberOfDiners()));
+    }
+
     return ReservationDTO.builder()
       .chefId(r.getChefId())
       .date(r.getDate())
@@ -33,6 +41,9 @@ public class ReservationMapper {
       .numberOfDiners(r.getNumberOfDiners())
       .address(r.getAddress())
       .status(r.getStatus())
+      .paymentStatus(r.getPaymentStatus())
+      .cancellationReason(r.getCancellationReason())
+      .totalPrice(totalPrice)
       .chefName(chefName)
       .dinerName(dinerName)
       .menuTitle(menuTitle)
@@ -52,6 +63,7 @@ public class ReservationMapper {
       .numberOfDiners(dto.getNumberOfDiners())
       .address(dto.getAddress())
       .status(Reservation.ReservationStatus.PENDING)
+        .paymentStatus(Reservation.ReservationPaymentStatus.PENDING)
       .build();
   }
 
@@ -72,6 +84,14 @@ public class ReservationMapper {
     // Actualizar estado
     if (uReq.getStatus() != null) {
       reservation.setStatus(uReq.getStatus());
+    }
+
+    if (uReq.getPaymentStatus() != null) {
+      reservation.setPaymentStatus(uReq.getPaymentStatus());
+    }
+
+    if (uReq.getCancellationReason() != null) {
+      reservation.setCancellationReason(uReq.getCancellationReason());
     }
 
     // Actualizar menú si se proporciona uno nuevo

@@ -12,6 +12,25 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   // Auth endpoints (login, signup) handle their own errors in the component
   const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/auth/signup');
 
+  // Public endpoints should not trigger global session-expired redirects
+  const publicEndpoints = [
+    '/api/auth/health',
+    '/api/auth/check-username',
+    '/api/auth/check-email',
+    '/api/chef/menus/public',
+    '/api/chef/search',
+    '/api/public-profile'
+  ];
+
+  const publicPatterns: RegExp[] = [
+    /\/api\/chef\/\d+\/profile$/,
+    /\/api\/chef\/menus\/\d+\/public$/
+  ];
+
+  const isPublicRequest =
+    publicEndpoints.some(endpoint => req.url.includes(endpoint)) ||
+    publicPatterns.some(pattern => pattern.test(req.url));
+
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (isAuthRequest) {
@@ -21,10 +40,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       let errorMessage = 'Algo salió mal. Intenta de nuevo.';
 
       if (error.status === 401) {
+        if (isPublicRequest) {
+          return throwError(() => error);
+        }
         errorMessage = 'Tu sesión ha expirado. Inicia sesión nuevamente.';
         router.navigate(['/login']);
       } else if (error.status === 403) {
-        errorMessage = 'No tienes permiso para realizar esta acción.';
+        // 403 errors are handled individually by each component
+        return throwError(() => error);
       } else if (error.status === 404) {
         errorMessage = 'El recurso que buscas no existe.';
       } else if (error.status === 409) {
@@ -38,7 +61,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       toastService.error(errorMessage);
-      console.error('HTTP Error:', { status: error.status, message: errorMessage });
 
       return throwError(() => error);
     })

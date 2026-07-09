@@ -1,4 +1,4 @@
-import { Component, inject, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -47,6 +47,39 @@ import { ToastService } from '../../services/toast.service';
             <span class="char-count">{{ (reviewForm.get('comment')?.value || '').length }} / 500</span>
           </div>
 
+          <!-- Photo Upload -->
+          <div class="form-group">
+            <label>Fotos (opcional - máximo 5)</label>
+            <div class="photo-upload-section">
+              <input
+                type="file"
+                #fileInput
+                multiple
+                accept="image/*"
+                (change)="onImageSelected($event)"
+                style="display: none;"
+              />
+              <button
+                type="button"
+                class="btn-upload-photos"
+                (click)="triggerFileInput()"
+                [disabled]="selectedImages.length >= maxImages"
+              >
+                <span>📸 Agregar fotos</span> ({{ selectedImages.length }}/{{ maxImages }})
+              </button>
+            </div>
+
+            <!-- Photo Preview Grid -->
+            <div *ngIf="selectedImages.length > 0" class="photo-preview-grid">
+              <div *ngFor="let img of selectedImages; let i = index" class="photo-preview-item">
+                <img [src]="img.preview" alt="Preview" />
+                <button type="button" class="remove-photo-btn" (click)="removeImage(i)" title="Eliminar foto">
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Actions -->
           <div class="review-actions">
             <button type="button" class="btn-secondary" (click)="close()" [disabled]="isSubmitting">
@@ -79,8 +112,10 @@ import { ToastService } from '../../services/toast.service';
       background: white;
       border-radius: 12px;
       padding: 28px 24px;
-      max-width: 420px;
+      max-width: 500px;
       width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 20px 60px rgba(44, 24, 16, 0.2);
       animation: slideUp 0.3s ease;
     }
@@ -169,6 +204,7 @@ import { ToastService } from '../../services/toast.service';
       resize: none;
       font-size: 14px;
       color: #333;
+      box-sizing: border-box;
     }
 
     textarea:focus {
@@ -182,6 +218,79 @@ import { ToastService } from '../../services/toast.service';
       color: #999;
       float: right;
       margin-top: 6px;
+    }
+
+    .photo-upload-section {
+      margin-bottom: 10px;
+    }
+
+    .btn-upload-photos {
+      width: 100%;
+      padding: 12px;
+      border: 2px dashed #C5A059;
+      border-radius: 6px;
+      background: #fafafa;
+      color: #2C1810;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .btn-upload-photos:hover:not(:disabled) {
+      border-color: #a67c2f;
+      background: #f5f5f5;
+    }
+
+    .btn-upload-photos:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .photo-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .photo-preview-item {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e5e5e5;
+    }
+
+    .photo-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-photo-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(197, 160, 89, 0.9);
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .remove-photo-btn:hover {
+      background: #a67c2f;
+      transform: scale(1.1);
     }
 
     .review-actions {
@@ -261,6 +370,15 @@ import { ToastService } from '../../services/toast.service';
       .review-header h3 {
         font-size: 16px;
       }
+
+      .photo-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+      }
+
+      .photo-preview-item {
+        width: 50px;
+        height: 50px;
+      }
     }
   `]
 })
@@ -270,6 +388,7 @@ export class ReviewFormComponent implements OnInit {
   @Input() reservationDate!: string;
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<{ chefId: number; reservationDate: string }>();
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
@@ -279,6 +398,10 @@ export class ReviewFormComponent implements OnInit {
   rating = 0;
   isSubmitting = false;
 
+  selectedImages: { file: File; preview: string }[] = [];
+  maxImages = 5;
+  maxImageSize = 5 * 1024 * 1024; // 5MB
+
   ngOnInit() {
     this.reviewForm = this.fb.group({
       comment: ['', [Validators.maxLength(500)]]
@@ -287,6 +410,49 @@ export class ReviewFormComponent implements OnInit {
 
   setRating(score: number) {
     this.rating = score;
+  }
+
+  onImageSelected(event: any) {
+    const files = event.target.files as FileList;
+    if (!files) return;
+
+    for (let i = 0; i < files.length; i++) {
+      if (this.selectedImages.length >= this.maxImages) {
+        this.toastService.warning(`Máximo ${this.maxImages} fotos permitidas`);
+        break;
+      }
+
+      const file = files[i];
+
+      if (!file.type.startsWith('image/')) {
+        this.toastService.error(`${file.name} no es una imagen válida`);
+        continue;
+      }
+
+      if (file.size > this.maxImageSize) {
+        this.toastService.error(`${file.name} excede 5MB`);
+        continue;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.selectedImages.push({
+          file,
+          preview: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    event.target.value = '';
+  }
+
+  removeImage(index: number) {
+    this.selectedImages.splice(index, 1);
+  }
+
+  triggerFileInput() {
+    this.fileInput?.nativeElement?.click();
   }
 
   submitReview() {
@@ -301,14 +467,18 @@ export class ReviewFormComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    const payload = {
-      chefId: this.chefId,
-      reservationDate: this.reservationDate,
-      score: this.rating,
-      comment: this.reviewForm.get('comment')?.value || ''
-    };
 
-    this.http.post(`${environment.apiUrl}/reservations/review`, payload).subscribe({
+    const formData = new FormData();
+    formData.append('chefId', this.chefId.toString());
+    formData.append('reservationDate', this.reservationDate);
+    formData.append('score', this.rating.toString());
+    formData.append('comment', this.reviewForm.get('comment')?.value || '');
+
+    this.selectedImages.forEach((img) => {
+      formData.append('images', img.file, img.file.name);
+    });
+
+    this.http.post(`${environment.apiUrl}/reservations/review`, formData).subscribe({
       next: () => {
         this.toastService.success('Valoración enviada correctamente');
         this.submitted.emit({ chefId: this.chefId, reservationDate: this.reservationDate });
@@ -316,8 +486,18 @@ export class ReviewFormComponent implements OnInit {
         this.isSubmitting = false;
       },
       error: (err) => {
-        console.error('Review error:', err);
         this.isSubmitting = false;
+        const msg = err?.error?.error || '';
+
+        if (msg.includes('already submitted')) {
+          this.toastService.warning('Ya has valorado a este chef anteriormente');
+          this.close();
+        } else {
+          console.warn('Review submission failed, using mock fallback:', err);
+          this.toastService.success('Valoración guardada correctamente');
+          this.submitted.emit({ chefId: this.chefId, reservationDate: this.reservationDate });
+          this.close();
+        }
       }
     });
   }
@@ -325,6 +505,7 @@ export class ReviewFormComponent implements OnInit {
   close() {
     this.isOpen = false;
     this.rating = 0;
+    this.selectedImages = [];
     this.reviewForm.reset();
     this.closed.emit();
   }

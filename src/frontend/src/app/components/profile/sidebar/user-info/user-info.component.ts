@@ -139,7 +139,6 @@ export class UserInfoComponent implements OnInit {
         this.showSuccessNotification('Foto de portada actualizada con éxito.');
       },
       error: (error) => {
-        console.error('Error uploading cover photo:', error);
         this.isUploadingCover = false;
         event.target.value = '';
         this.showErrorNotification('No se pudo actualizar la portada. Inténtalo de nuevo.');
@@ -148,12 +147,11 @@ export class UserInfoComponent implements OnInit {
   }
 
   private loadChefCoverPhoto(chefId: number): void {
-    this.chefService.getChefPublicProfile(chefId).subscribe({
+    this.chefService.getPublicProfile(chefId).subscribe({
       next: (chef) => {
         this.chefCoverPhotoUrl = chef.coverPhoto || '';
       },
       error: (error) => {
-        console.error('Error loading chef cover photo:', error);
         this.chefCoverPhotoUrl = '';
       }
     });
@@ -352,7 +350,6 @@ export class UserInfoComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error updating profile:', error);
         this.isSaving = false;
         this.showErrorNotification('Error al actualizar el perfil. Por favor, intenta de nuevo.');
       }
@@ -400,7 +397,6 @@ export class UserInfoComponent implements OnInit {
         this.router.navigate(['/index']);
       },
       error: (error) => {
-        console.error('Error deleting account:', error);
         this.isDeleting = false;
         this.showDeleteModal = false;
         this.showErrorNotification('No se pudo eliminar la cuenta. Inténtalo de nuevo.');
